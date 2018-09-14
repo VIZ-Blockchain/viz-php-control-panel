@@ -44,7 +44,6 @@ if('@'==mb_substr($path_array[1],0,1)){
 					$buf.='<img src="'.$content_image.'" itemprop="image" class="schema">';
 				}
 
-				$buf.='test cache: '.time();
 				$buf.='<div class="page content">
 				<h1>'.htmlspecialchars($content['title']).'</h1>
 				<div class="info">
@@ -76,10 +75,28 @@ if('@'==mb_substr($path_array[1],0,1)){
 					<!--<div class="flag right"></div>-->
 				</div>
 				</div>';
+
+
+				$buf.='<div class="page comments" id="comments">
+<div class="actions"><div class="reply reply-action post-reply">Оставить комментарий</div></div>
+<div class="subtitle">Комментарии</div>
+<hr>';
+
+				$comment_tree=new comments_tree();
+				$replies=$api->execute_method('get_all_content_replies',array($author,$permlink,-1));
+				$comment_arr=array();
+				$i=1;
+				foreach($replies as $reply){
+					$comment_arr[$i]=new comments_tree($reply);
+					$comment_tree->add($comment_arr[$i],true);
+					$i++;
+				}
+				$buf.=$comment_tree->tree();
+				$buf.='</div>';
+				$buf.='test cache: '.time();
 				$cache->set($cache_name,$buf,5);
 				print $buf;
 			}
-
 		}
 	}
 }

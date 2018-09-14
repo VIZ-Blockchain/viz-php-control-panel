@@ -765,6 +765,7 @@ a.icon{
 	font-style: normal;
 	font-size:15px;
 	color: rgba(0,0,0,0.6);
+	margin: 12px;
 	margin-bottom:8px;
 }
 .page.comments .comment .info div{

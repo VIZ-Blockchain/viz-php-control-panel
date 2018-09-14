@@ -6,6 +6,7 @@ include($site_root.'/class/cache.php');
 include($site_root.'/class/viz_jsonrpc.php');
 include($site_root.'/class/parsedown/parsedown.php');
 include($site_root.'/class/parsedown/parsedownextra.php');
+include($site_root.'/class/comments_tree.php');
 
 $parsedown = new Parsedown();
 $parsedownextra = new ParsedownExtra();
