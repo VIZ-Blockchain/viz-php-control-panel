@@ -9,6 +9,7 @@
 ```
 git clone https://github.com/VIZ-World/viz-world-control-panel.git
 cd viz-world-control-panel
+git config core.fileMode false
 cp config-example.php config.php
 nano config.php
 ```

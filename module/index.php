@@ -1,8 +1,37 @@
 <?php
 ob_start();
+$api=new viz_jsonrpc_web('https://testnet.viz.world/');
+if('@'==mb_substr($path_array[1],0,1)){
+	if($path_array[2]){
+		$author=mb_substr($path_array[1],1);
+		$permlink=urldecode($path_array[2]);
+		$cache_name=md5($author.$permlink);
+		if($buf=$cache->get($cache_name)){
+			print $buf;
+		}
+		else{
+			$content=$api->execute_method('get_content',array($author,$permlink,-1));
+			if($content['body']){
+				$buf='';
+				$buf.='test cache: '.time();
+				$buf.='<div class="page content">
+				<h1>API get_content</h1>
+				<div class="article">';
+				$buf.='<pre>';
+				$buf.=print_r($content,true);
+				$buf.='</pre>';
+				$buf.='
+				</div>
+				</div>';
+				$cache->set($cache_name,$buf,5);
+				print $buf;
+			}
+
+		}
+	}
+}
 if(''==$path_array[1]){
 	//API examples
-	$api=new viz_jsonrpc_web('https://testnet.viz.world/');
 	print '<div class="page content">
 	<h1>API get_dynamic_global_properties</h1>
 	<div class="article">';
