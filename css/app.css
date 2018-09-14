@@ -413,20 +413,18 @@ a.icon{
 	color:#000;
 	display:inline-block;
 	padding:4px 8px 6px 8px;
-	margin-left:12px;
 	background:rgba(0,0,0,0.1);
 	border-radius:4px;
 	text-decoration:none;
+	margin-right:12px;
+	margin-top:4px;
 }
 .page.preview .tags a{
 	padding:2px 6px 4px 6px;
-	margin-left:4px;
+	margin-right:4px;
 }
 .page .tags a:hover{
 	background:rgba(0,0,0,0.15);
-}
-.page .tags a:first-child{
-	margin-left:0;
 }
 
 .page.content .addon{
