@@ -91,6 +91,9 @@ input[type=button] {width: auto; overflow: visible;}
 	1% {display: block;opacity: 0;}
 	100% {display: block;opacity: 1;}
 }
+.schema{
+	display:none !important;
+}
 hr{
 	display: block; height: 1px; border: 0; border-top: 1px solid rgba(175,175,175,0.5); margin: 1em 0; padding: 0;clear: both;
 }
@@ -288,7 +291,7 @@ a.icon{
 	vertical-align:middle;
 	margin-right:4px;
 	box-sizing: unset;
-	background-image:url('/default-avatar.png')
+	background-image:url('/default-avatar.png');
 	background-color: #fff;
 	background-position: 50% 50%;
 	background-size: cover;
@@ -361,6 +364,7 @@ a.icon{
 }
 .page .article p{
 	margin: 0 21px 12px;
+	line-height: 1.4;
 }
 .page blockquote{
 	border-left:2px solid rgba(0,0,0,0.4);
@@ -627,7 +631,7 @@ a.icon{
 	float:left;
 	box-sizing: unset;
 	box-shadow: 0 1px 3px 0 rgba(0,0,0,0.3);
-	background-image:url('/default-avatar.png')
+	background-image:url('/default-avatar.png');
 	background-color: #fff;
 	background-position: 50% 50%;
 	background-size: cover;
@@ -779,7 +783,7 @@ a.icon{
 	vertical-align:middle;
 	margin-right:4px;
 	box-sizing: unset;
-	background-image:url('/default-avatar.png')
+	background-image:url('/default-avatar.png');
 	background-color: #fff;
 	background-position: 50% 50%;
 	background-size: cover;

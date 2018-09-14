@@ -13,14 +13,67 @@ if('@'==mb_substr($path_array[1],0,1)){
 			$content=$api->execute_method('get_content',array($author,$permlink,-1));
 			if($content['body']){
 				$buf='';
+
+				$date=date_parse_from_format('Y-m-d\TH:i:s',$content['created']);
+				$content_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+				$json=json_decode($content['json_metadata'],true);
+				$content_image=false;
+				if(isset($json['image'][0])){
+					$content_image=$json['image'][0];
+				}
+				$replace['title']=htmlspecialchars($content['title']).' - '.$replace['title'];
+
+				$text=text_to_view($content['body'],($json['format']=='markdown'?true:false));
+				$replace['description']=mb_substr(strip_tags($text),0,250).'...';
+				$replace['description']=str_replace("\n",' ',$replace['description']);
+				$replace['description']=str_replace('  ',' ',$replace['description']);
+
+				$replace['head_addon'].='
+				<meta property="og:url" content="https://viz.world/@'.$content['author'].'/'.$content['permlink'].'/" />
+				<meta name="og:title" content="'.htmlspecialchars($content['title']).'" />
+				<meta name="twitter:title" content="'.htmlspecialchars($content['title']).'" />
+				<meta name="twitter:card" content="summary_large_image" />';
+				if($content_image){
+					if(!preg_match('~^https://~iUs',$content_image)){
+						$content_image='https://i.goldvoice.club/0x0/'.$content_image;
+					}
+					$replace['head_addon'].='
+<link rel="image_src" href="'.$content_image.'" />
+<meta property="og:image" content="'.$content_image.'" />
+<meta name="twitter:image" content="'.$content_image.'" />';
+					$buf.='<img src="'.$content_image.'" itemprop="image" class="schema">';
+				}
+
 				$buf.='test cache: '.time();
 				$buf.='<div class="page content">
-				<h1>API get_content</h1>
+				<h1>'.htmlspecialchars($content['title']).'</h1>
+				<div class="info">
+					<div class="author"><a href="/@'.$content['author'].'/" class="avatar" style=""></a><a href="/@'.$content['author'].'/">@'.$content['author'].'</a></div>
+					<div class="timestamp" data-timestamp="'.$content_time.'">'.date('d.m.Y H:i:s',$content_time).'</div>
+				</div>
 				<div class="article">';
-				$buf.='<pre>';
+				$buf.=$text;
+				$buf.='</b></strong></em></i>';//fix styles
+
+				/*$buf.='<pre>';
 				$buf.=print_r($content,true);
-				$buf.='</pre>';
+				$buf.='</pre>';*/
 				$buf.='
+				</div>';
+				$tags=$json['tags'];
+				if($tags){
+					$tags_list=array();
+					foreach($tags as $tag){
+						$tags_list[]='<a href="/tags/'.htmlspecialchars($tag).'/">'.htmlspecialchars($tag).'</a>';
+					}
+					$buf.='<div class="tags">'.implode($tags_list).'</div>';
+				}
+				$buf.='<hr>
+				<div class="addon">
+					<div class="right"><div class="comments">'.$content['children'].'<a href="#comments" class="icon"><i class="far fa-comment"></i></a></div></div>
+					<a class="award"></a>
+					<div class="votes_count">Получено '.$content['active_votes_count'].' голосов</div>
+					<!--<div class="flag right"></div>-->
 				</div>
 				</div>';
 				$cache->set($cache_name,$buf,5);

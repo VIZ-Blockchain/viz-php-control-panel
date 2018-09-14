@@ -4,6 +4,11 @@ date_default_timezone_set($config['server_timezone']);
 include($site_root.'/class/template.php');
 include($site_root.'/class/cache.php');
 include($site_root.'/class/viz_jsonrpc.php');
+include($site_root.'/class/parsedown/parsedown.php');
+include($site_root.'/class/parsedown/parsedownextra.php');
+
+$parsedown = new Parsedown();
+$parsedownextra = new ParsedownExtra();
 
 $t=new DataManagerTemplate($site_root.'/templates/');
 $cache=new DataManagerCache;
