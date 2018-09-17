@@ -6,7 +6,8 @@ class DataManagerCache {
 		$this->redis=&$redis;
 	}
 	public function get($name){
-		return $this->redis->get('cache:'.$name);
+		$ret=$this->redis->get('cache:'.$name);
+		if($ret) return $ret;
 		return false;
 	}
 	public function set($name,$value,$expire=1800){

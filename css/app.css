@@ -133,11 +133,6 @@ a:hover{
 	font-family:'Roboto Slab',serif;
 	color:rgba(0,0,0,0.6);
 	overflow:hidden;
-	user-select: none;
-	-moz-user-select: none;
-	-khtml-user-select: none;
-	-webkit-user-select: none;
-	-o-user-select: none;
 }
 .header.shadow{
 	box-shadow: 0 2px 4px -1px rgba(0,0,0,0.07), 0 4px 5px 0 rgba(0,0,0,0.07), 0 1px 10px 0 rgba(0,0,0,0.1);
@@ -430,11 +425,6 @@ a.icon{
 .page.content .addon{
 	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
 	line-height:64px;
-	user-select: none;
-	-moz-user-select: none;
-	-khtml-user-select: none;
-	-webkit-user-select: none;
-	-o-user-select: none;
 }
 .page.content .addon .comments{
 	font-size:14px;
@@ -541,11 +531,6 @@ a.icon{
 .page.preview .addon{
 	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
 	line-height:32px;
-	user-select: none;
-	-moz-user-select: none;
-	-khtml-user-select: none;
-	-webkit-user-select: none;
-	-o-user-select: none;
 }
 .page.preview .addon .comments{
 	font-size:14px;
@@ -832,11 +817,6 @@ a.icon{
 	-moz-transition: all 0.2s linear;
 	-o-transition: all 0.2s linear;
 	transition: all 0.2s linear;
-	user-select: none;
-	-moz-user-select: none;
-	-khtml-user-select: none;
-	-webkit-user-select: none;
-	-o-user-select: none;
 }
 .page.comments .comment:hover .addon{
 	opacity:1.0;
@@ -871,4 +851,12 @@ a.load_more{
 	width:100%;
 	text-align:center;
 	padding:12px;
+}
+
+.unselectable{
+	user-select: none;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-o-user-select: none;
 }
