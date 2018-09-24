@@ -883,3 +883,11 @@ a.load_more{
 	-webkit-user-select: none;
 	-o-user-select: none;
 }
+
+.view_block{
+	display:inline-block;
+	max-height:80vh;
+	width:100%;
+	overflow:auto;
+	font-size:12px;
+}

@@ -123,14 +123,17 @@ if('blocks'==$path_array[1]){
 	else{
 		$id=(int)$path_array[2];
 		if($id==$path_array[2]){
-			$id_arr=$api->execute_method('get_ops_in_block',array($id,true));
+			$id_arr=$api->execute_method('get_ops_in_block',array($id,0));
 			if($id_arr[0]){
 				$replace['title']=htmlspecialchars('Обзор блока '.$id.'').' - '.$replace['title'];
 				print '<div class="page content">
 				<h1>Блокчейн VIZ, обзор блока #'.$id.'</h1>
 				<div class="article">';
-				print '<pre>';
-				print_r($id_arr);
+				print '<pre class="view_block">';
+				$view_block=print_r($id_arr,true);
+				$view_block=preg_replace('~\[(.[^\]]*)\] =\> (.*)\n~iUs','[<span style="color:red">$1</span>] => <span style="color:#1b72fa">$2</span>'.PHP_EOL,$view_block);
+				$view_block=str_replace('<span style="color:#1b72fa">Array</span>','<span style="color:#069c40">Array</span>',$view_block);
+				print $view_block;
 				print '</pre>';
 				print '<h3>Соседние блоки</h3>';
 				print '<div class="blocks">';
