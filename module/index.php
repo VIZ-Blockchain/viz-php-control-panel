@@ -98,6 +98,59 @@ if('@'==mb_substr($path_array[1],0,1)){
 		}
 	}
 }
+if('blocks'==$path_array[1]){
+	$dgp=$api->execute_method('get_dynamic_global_properties');
+	if(''==$path_array[2]){
+		$replace['title']=htmlspecialchars('Обзор блоков').' - '.$replace['title'];
+		print '<div class="page content">
+	<h1>Обзор блоков</h1>
+	<div class="article">';
+		$date=date_parse_from_format('Y-m-d\TH:i:s',$dgp['genesis_time']);
+		$genesis_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+		print '<p>Время запуска сети: <span class="timestamp" data-timestamp="'.$genesis_time.'">'.date('d.m.Y H:i:s',$genesis_time).'</span></p>';
+		print '<p>Количество блоков: '.$dgp['head_block_number'].'</p>';
+		print '<h3>Последние блоки</h3>';
+		print '<div class="blocks">';
+		$low_corner=max(0,(int)$dgp['head_block_number']-1000);
+		for($i=(int)$dgp['head_block_number'];$i>$low_corner;--$i){
+			print '<a href="/blocks/'.$i.'/">'.$i.'</a>';
+		}
+		print '<hr>';
+		print '<a href="/blocks/1/">1</a>';
+		print '</div>';
+		print '</div></div>';
+	}
+	else{
+		$id=(int)$path_array[2];
+		if($id==$path_array[2]){
+			$id_arr=$api->execute_method('get_ops_in_block',array($id,true));
+			if($id_arr[0]){
+				$replace['title']=htmlspecialchars('Обзор блока '.$id.'').' - '.$replace['title'];
+				print '<div class="page content">
+				<h1>Блокчейн VIZ, обзор блока #'.$id.'</h1>
+				<div class="article">';
+				print '<pre>';
+				print_r($id_arr);
+				print '</pre>';
+				print '<h3>Соседние блоки</h3>';
+				print '<div class="blocks">';
+				if($id+1 <= (int)$dgp['head_block_number']){
+					print '<a href="/blocks/'.($id+1).'/">&uarr; '.($id+1).'</a>';
+				}
+				if(0 <= ($id-1)){
+					print '<a href="/blocks/'.($id - 1).'/">&darr; '.($id - 1).'</a><hr>';
+				}
+				$high_corner=min((int)$dgp['head_block_number'],$id+50);
+				$low_corner=max(0,$id-50);
+				for($i=$high_corner;$i>$low_corner;--$i){
+					print '<a href="/blocks/'.$i.'/"'.($i==$id?' class="current"':'').'>'.$i.'</a>';
+				}
+				print '</div>';
+				print '</div></div>';
+			}
+		}
+	}
+}
 if('tags'==$path_array[1]){
 	if(''==$path_array[2]){
 		print '<div class="page content">

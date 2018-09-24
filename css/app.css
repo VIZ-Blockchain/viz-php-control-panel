@@ -404,6 +404,29 @@ a.icon{
 	margin: 0 21px;
 	margin-bottom:12px;
 }
+.page .blocks{
+	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	text-align: left;
+	font-size:14px;
+	margin: 0 21px 12px;
+}
+.page .blocks a{
+	color:#000;
+	display:inline-block;
+	padding:4px 8px 6px 8px;
+	background:rgba(0,0,0,0.1);
+	border-radius:4px;
+	text-decoration:none;
+	width:calc(20% - 2px);
+	margin-top:2px;
+	margin-right:2px;
+}
+.page .blocks a.current{
+	font-weight:bold;
+}
+.page .blocks a:hover{
+	background:rgba(0,0,0,0.15);
+}
 .page .tags a{
 	color:#000;
 	display:inline-block;
