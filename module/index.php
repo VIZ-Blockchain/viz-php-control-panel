@@ -97,6 +97,52 @@ if('@'==mb_substr($path_array[1],0,1)){
 			print $buf;
 		}
 	}
+	else{
+		$account_login=mb_substr($path_array[1],1);
+		$account=$api->execute_method('get_accounts',array(array($account_login)));
+		if($account[0]['name']==$account_login){
+			$account_name=$account_login;
+			$account_json=@json_decode($account[0]['json_metadata'],true);
+			$account_avatar='/default-avatar.png';
+			$account_about='';
+
+			if($account_json['profile']['name']){
+				$account_name=htmlspecialchars($account_json['profile']['name']);
+			}
+			if($account_json['profile']['profile_image']){
+				$account_avatar=htmlspecialchars($account_json['profile']['profile_image']);
+			}
+			if($account_json['profile']['about']){
+				$account_about=htmlspecialchars(strip_tags($account_json['profile']['about']));
+			}
+			$account_name=str_replace('@','',$account_name);
+			print '<div class="page user-badge clearfix">
+			<a href="/@'.$account_login.'/" class="avatar" style="background-image:url(\''.$account_avatar.'\')"></a>
+			<div class="actions">
+				<div class="follow">Подписаться</div><br>
+				<div class="unfollow">Отписаться</div>
+			</div>
+			<div class="info">
+				<div class="login"><a href="/@'.$account_login.'/">'.$account_name.'</a></div>
+				<div class="descr">
+					<p>'.$account_about.'</p>
+					<p>Энергии: '.($account[0]['energy']/100).'%, Контента: '.$account[0]['content_count'].', Голосов: '.$account[0]['vote_count'].'</p>
+					<p>Баланс: '.$account[0]['balance'].', '.$account[0]['vesting_shares'].'</p>
+				</div>
+			</div>
+	</div>';
+
+			$buf='';
+			$buf.='
+			<div class="page content">
+				<h1>Контент пользователя:</h1>
+			</div>';
+			//print_r($api->execute_method('get_discussions_by_blog',array(array('raw'=>1,'limit'=>20,'truncate_body'=>1024,'start_author'=>$account_login,'select_authors'=>array($account_login))),true));
+
+			//print $buf;
+			//print_r($account);
+		}
+	}
 }
 if('blocks'==$path_array[1]){
 	$dgp=$api->execute_method('get_dynamic_global_properties');
