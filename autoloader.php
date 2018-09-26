@@ -7,6 +7,7 @@ include($site_root.'/class/viz_jsonrpc.php');
 include($site_root.'/class/parsedown/parsedown.php');
 include($site_root.'/class/parsedown/parsedownextra.php');
 include($site_root.'/class/comments_tree.php');
+include($site_root.'/class/viz_plugins.php');
 
 $parsedown = new Parsedown();
 $parsedownextra = new ParsedownExtra();
@@ -33,9 +34,12 @@ if(!$redis->auth($config['redis_password'])){
 	exit;
 }
 
+$ip='';
 if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
 	$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
 }
 else{
-	$ip=$_SERVER['REMOTE_ADDR'];
+	if(isset($_SERVER['REMOTE_ADDR'])){
+		$ip=$_SERVER['REMOTE_ADDR'];
+	}
 }
