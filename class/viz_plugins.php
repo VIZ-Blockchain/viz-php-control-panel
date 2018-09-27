@@ -1,8 +1,8 @@
 <?php
 class viz_plugin{
-	private $api;
-	private $redis;
-	private $mongo;
+	public $api;
+	public $redis;
+	public $mongo;
 	function viz_plugin($api,$redis,$mongo){
 		$this->api=&$api;
 		$this->redis=&$redis;
@@ -13,7 +13,10 @@ class viz_plugin{
 			$operation_name=$transaction['op'][0];
 			$operation_data=$transaction['op'][1];
 			if(method_exists($this,$operation_name)){
-				$this->$operation_name(array('block_id'=>$transaction['block'],'tx_id'=>$transaction['trx_in_block'],'op_id'=>$transaction['op_in_trx'],'tx_hash'=>$transaction['trx_id'],'timestamp'=>$transaction['timestamp']),$operation_data);
+				$date=date_parse_from_format('Y-m-d\TH:i:s',$transaction['timestamp']);
+				$unixtime=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+
+				$this->$operation_name(array('block_id'=>$transaction['block'],'tx_id'=>$transaction['trx_in_block'],'op_id'=>$transaction['op_in_trx'],'tx_hash'=>$transaction['trx_id'],'timestamp'=>$transaction['timestamp'],'unixtime'=>$unixtime),$operation_data);
 			}
 		}
 	}
@@ -38,6 +41,9 @@ class viz_plugins{
 		}
 	}
 	function block($id,$data){
+		if(!isset($data[0])){
+			return false;
+		}
 		foreach($this->listeners as $listener){
 			if(method_exists($listener,'get_block_header')){
 				$listener->get_block_header($this->api->execute_method('get_block_header',array($id)));
@@ -47,5 +53,6 @@ class viz_plugins{
 			}
 			$listener->execute($id,$data);
 		}
+		return true;
 	}
 }

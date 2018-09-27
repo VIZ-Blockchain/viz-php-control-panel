@@ -4,14 +4,14 @@ $replace['description']='';
 $replace['head_addon']='';
 $replace['header_menu']='';
 $replace['menu']='';
-$replace['script_change_time']=filemtime('./js/app.js');
-$replace['css_change_time']=filemtime('./css/app.css');
+$replace['script_change_time']=filemtime($site_root.'/js/app.js');
+$replace['css_change_time']=filemtime($site_root.'/css/app.css');
 
 function mongo_prepare($text){
 	return str_replace(array('\\',"\0","\n","\r","'",'"',"\x1a"),array('\\\\','\\0','\\n','\\r',"\\'",'\\"','\\Z'),$text);
 }
 function mdb_ai($collection_name,$increase=false){
-	global $mongo_connect;
+	global $mongo_connect,$config;
 	$rows=$mongo_connect->executeQuery($config['db_prefix'].'.auto_increment',new MongoDB\Driver\Query(['_id'=>$collection_name]));
 	$count=0;
 	foreach($rows as $row){
@@ -45,7 +45,7 @@ function mdb_ai($collection_name,$increase=false){
 	}
 }
 function mdb_ai_del($collection_name){
-	global $mongo_connect;
+	global $mongo_connect,$config;
 	$bulk=new MongoDB\Driver\BulkWrite;
 	$bulk->delete(['_id'=>$collection_name]);
 	try{
@@ -57,7 +57,7 @@ function mdb_ai_del($collection_name){
 	return true;
 }
 function mdb_ai_set($collection_name,$count){
-	global $mongo_connect;
+	global $mongo_connect,$config;
 	$bulk=new MongoDB\Driver\BulkWrite;
 	$bulk->update(['_id'=>$collection_name],['$set'=>['count'=>$count]]);
 	try{

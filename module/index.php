@@ -155,6 +155,7 @@ if('blocks'==$path_array[1]){
 		$genesis_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
 		print '<p>Время запуска сети: <span class="timestamp" data-timestamp="'.$genesis_time.'">'.date('d.m.Y H:i:s',$genesis_time).'</span></p>';
 		print '<p>Количество блоков: '.$dgp['head_block_number'].'</p>';
+		print '<p>Количество в базе данных: '.mdb_ai('blocks').'</p>';
 		print '<h3>Последние блоки</h3>';
 		print '<div class="blocks">';
 		$low_corner=max(0,(int)$dgp['head_block_number']-1000);
