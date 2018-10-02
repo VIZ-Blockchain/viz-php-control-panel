@@ -141,6 +141,54 @@ if('@'==mb_substr($path_array[1],0,1)){
 	}
 }
 else
+if('witnesses'==$path_array[1]){
+	$replace['title']=htmlspecialchars('Делегаты').' - '.$replace['title'];
+	if(''==$path_array[2]){
+		print '<div class="page content">
+		<h1>Делегаты ТОП 100</h1>
+		<div class="article">';
+		$list=$api->execute_method('get_witnesses_by_vote',array('',100));
+		$num=1;
+		foreach($list as $witness_arr){
+			print '<p>#'.$num.' <a href="/@'.$witness_arr['owner'].'/">@'.$witness_arr['owner'].'</a> (<a href="'.htmlspecialchars($witness_arr['url']).'">url</a>), Голосов: '.number_format (floatval($witness_arr['votes'])/1000000/1000,1,'.',' ').'k SHARES, <a href="/witnesses/'.$witness_arr['owner'].'/">параметры</a></p>';
+			$num++;
+		}
+		print '</div></div>';
+	}
+	else{
+		$witness_arr=$api->execute_method('get_witness_by_account',array($path_array[2]));
+		if($witness_arr['id']){
+			$replace['title']=htmlspecialchars($witness_arr['owner']).' - '.$replace['title'];
+			print '<div class="page content">
+			<a class="right" href="/witnesses/">&larr; Вернуться к списку делегатов</a>
+			<h1>Делегат '.$witness_arr['owner'].'</h1>
+			<div class="article">';
+			$date=date_parse_from_format('Y-m-d\TH:i:s',$witness_arr['created']);
+			$created_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+			print '<p>Дата заявления о намерениях: <span class="timestamp" data-timestamp="'.$created_time.'">'.date('d.m.Y H:i:s',$created_time).'</span></p>';
+			print '<p>Последний блок: <a href="/blocks/'.$witness_arr['last_confirmed_block_num'].'/">'.$witness_arr['last_confirmed_block_num'].'</a></p>';
+			print '<p>Публичный ключ подписи: '.$witness_arr['signing_key'].'</p>';
+			print '<h2>Голосуемые параметры цепи</h2>';
+			print '<pre class="view_block">';
+			$view_props=print_r($witness_arr['props'],true);
+			$view_props=preg_replace('~\[(.[^\]]*)\] =\> (.*)\n~iUs','[<span style="color:red">$1</span>] => <span style="color:#1b72fa">$2</span>'.PHP_EOL,$view_props);
+			$view_props=str_replace('<span style="color:#1b72fa">Array</span>','<span style="color:#069c40">Array</span>',$view_props);
+
+			$chain_properties=$api->execute_method('get_chain_properties');
+			foreach($chain_properties as $prop_name=>$prop_value){
+				if($witness_arr['props'][$prop_name]==$prop_value){
+					$view_props=str_replace($prop_name,' <span style="color:#069c40;">&plus;</span> '.$prop_name,$view_props);
+				}
+				else{
+					$view_props=str_replace($prop_name,' <span style="color:#000;">&minus;</span> '.$prop_name,$view_props);
+				}
+			}
+			print $view_props;
+			print '</pre>';
+		}
+	}
+}
+else
 if('committee'==$path_array[1]){
 	$replace['title']=htmlspecialchars('Комитет').' - '.$replace['title'];
 	$committee_status_arr=array(
@@ -246,6 +294,14 @@ if('blocks'==$path_array[1]){
 		print '<p>Время запуска сети: <span class="timestamp" data-timestamp="'.$genesis_time.'">'.date('d.m.Y H:i:s',$genesis_time).'</span></p>';
 		print '<p>Количество блоков: '.$dgp['head_block_number'].'</p>';
 		print '<p>Количество в базе данных: '.mdb_ai('blocks').'</p>';
+		print '<h3>Голосуемые параметры сети</h3>';
+		print '<pre class="view_block">';
+		$chain_properties=$api->execute_method('get_chain_properties');
+		$view_props=print_r($chain_properties,true);
+		$view_props=preg_replace('~\[(.[^\]]*)\] =\> (.*)\n~iUs','[<span style="color:red">$1</span>] => <span style="color:#1b72fa">$2</span>'.PHP_EOL,$view_props);
+		$view_props=str_replace('<span style="color:#1b72fa">Array</span>','<span style="color:#069c40">Array</span>',$view_props);
+		print $view_props;
+		print '</pre>';
 		print '<h3>Последние блоки</h3>';
 		print '<div class="blocks">';
 		$low_corner=max(0,(int)$dgp['head_block_number']-1000);

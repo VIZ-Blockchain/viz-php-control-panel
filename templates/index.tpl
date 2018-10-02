@@ -64,7 +64,7 @@
 		<div class="menu-el inactive"><i class="fas fa-fw fa-bell"></i><a href="#/notifications/">Уведомления</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-users"></i><a href="#/users/">Пользователи</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-user-friends"></i><a href="#/social/">Социальные связи</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-user-shield"></i><a href="#/witnesses/">Делегаты</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-user-shield"></i><a href="/witnesses/">Делегаты</a></div>
 		<div class="menu-el"><i class="fas fa-fw fa-university"></i><a href="/committee/">Комитет</a></div>
 		<hr>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-user-cog"></i><a href="#/accounts/">Аккаунты</a></div>
