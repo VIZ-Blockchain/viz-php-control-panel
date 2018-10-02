@@ -361,6 +361,17 @@ a.icon{
 	margin: 0 21px 12px;
 	line-height: 1.4;
 }
+.page .article ul{
+	list-style:disc;
+}
+.page .article ul ul{
+	margin-left:12px;
+	list-style:circle;
+}
+.page .article>ol,.page .article>ul{
+	margin: 0 21px 12px;
+	line-height: 1.4;
+}
 .page blockquote{
 	border-left:2px solid rgba(0,0,0,0.4);
 	margin-left:21px;

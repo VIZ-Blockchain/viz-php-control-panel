@@ -31,7 +31,6 @@ if($pid){
 }
 file_put_contents($site_root.'/module/waterfall.pid',$new_pid);
 
-$api=new viz_jsonrpc_web('https://testnet.viz.world/');
 $plugins=new viz_plugins();
 $block_id=mdb_ai('blocks');
 print 'STARTUP: Find last block #'.$block_id.', working...'.PHP_EOL;

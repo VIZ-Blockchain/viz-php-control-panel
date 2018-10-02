@@ -7,6 +7,62 @@ $replace['menu']='';
 $replace['script_change_time']=filemtime($site_root.'/js/app.js');
 $replace['css_change_time']=filemtime($site_root.'/css/app.css');
 
+$api=new viz_jsonrpc_web('https://testnet.viz.world/');
+
+$users_arr=array();
+function get_user_id($login){
+	global $users_arr,$api,$mongo_connect,$config;
+	if(!isset($users_arr[$login])){
+		$rows=$mongo_connect->executeQuery($config['db_prefix'].'.users',new MongoDB\Driver\Query(['login'=>$login],['limit'=>1]));
+		foreach($rows as $row){
+			$key=(int)$row->_id;
+			if($key){
+				$users_arr[$login]=$key;
+			}
+			else{
+				$check_user=$api->execute_method('get_accounts',array(array($login)));
+				if($check_user[0]['id']){
+					$bulk=new MongoDB\Driver\BulkWrite;
+					$bulk->insert(['_id'=>$check_user[0]['id'],'login'=>$check_user[0]['name']]);
+					try{
+						$mongo_connect->executeBulkWrite($config['db_prefix'].'.users',$bulk);
+					}
+					catch (MongoDB\Driver\Exception\Exception $e) {
+						return false;
+					}
+				}
+				return false;
+			}
+		}
+	}
+	return $users_arr[$login];
+}
+function get_user_login($id){
+	global $users_arr,$mongo_connect,$config;
+	$key=array_search($id,$users_arr);
+	if(false===$key){
+		$rows=$mongo_connect->executeQuery($config['db_prefix'].'.users',new MongoDB\Driver\Query(['_id'=>$id],['limit'=>1]));
+		foreach($rows as $row){
+			$key=(int)$row->login;
+			if($key){
+				$users_arr[$key]=(int)$id;
+			}
+			else{
+				return false;
+			}
+		}
+	}
+	return $key;
+}
+function get_user_link($user_1,$user_2,$what=1){
+	global $mongo_connect,$config;
+	$rows=$mongo_connect->executeQuery($config['db_prefix'].'.users_links',new MongoDB\Driver\Query(['user_1'=>(int)$user_1,'user_2'=>(int)$user_2,'what'=>(int)$what],['limit'=>1]));
+	foreach($rows as $row){
+		return $row->toArray();
+	}
+	return false;
+	//return $db->sql_row("SELECT `id`,`mutually`,`value` FROM `users_links` WHERE `user_1`='".(int)$user_1."' AND `user_2`='".(int)$user_2."' AND `value`='".(int)$what."' LIMIT 1");
+}
 function mongo_prepare($text){
 	return str_replace(array('\\',"\0","\n","\r","'",'"',"\x1a"),array('\\\\','\\0','\\n','\\r',"\\'",'\\"','\\Z'),$text);
 }

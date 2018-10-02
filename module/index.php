@@ -137,13 +137,103 @@ if('@'==mb_substr($path_array[1],0,1)){
 			<div class="page content">
 				<h1>Контент пользователя:</h1>
 			</div>';
-			//print_r($api->execute_method('get_discussions_by_blog',array(array('raw'=>1,'limit'=>20,'truncate_body'=>1024,'start_author'=>$account_login,'select_authors'=>array($account_login))),true));
-
-			//print $buf;
-			//print_r($account);
 		}
 	}
 }
+else
+if('committee'==$path_array[1]){
+	$replace['title']=htmlspecialchars('Комитет').' - '.$replace['title'];
+	$committee_status_arr=array(
+		0=>'Ожидает рассмотрения',
+		1=>'Отменена создателем',
+		2=>'Отказ (недостаток голосов)',
+		3=>'Отказ (итоговая сумма вне диапазона)',
+		4=>'Принята (идут выплаты)',
+		5=>'Завершена'
+	);
+	if(''==$path_array[2]){
+		print '<div class="page content">
+		<h1>Заявки в комитет</h1>
+		<div class="article">';
+		print '<ul>';
+		foreach($committee_status_arr as $committee_status_id=>$committee_status_name){
+			print '<li>'.$committee_status_name;
+			$list=$api->execute_method('get_committee_requests_list',array($committee_status_id));
+			if(0<count($list)){
+				print ' ('.count($list).')';
+				print '<ul>';
+				foreach($list as $request){
+					$request_arr=$api->execute_method('get_committee_request',array($request,0));
+					$date=date_parse_from_format('Y-m-d\TH:i:s',$request_arr['end_time']);
+					$end_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+					print '<li><a href="/committee/'.$request_arr['request_id'].'/">#'.$request_arr['request_id'].' от '.$request_arr['creator'].'</a>, диапазон заявки: '.$request_arr['required_amount_min'].'&ndash;'.$request_arr['required_amount_max'].', окончание <span class="timestamp" data-timestamp="'.$end_time.'">'.date('d.m.Y H:i:s',$end_time).'</span></li>';
+				}
+				print '</ul>';
+			}
+			print '</li><hr>';
+		}
+		print '</ul>';
+		print '</div></div>';
+	}
+	else{
+		$request_id=(int)$path_array[2];
+		$request_arr=$api->execute_method('get_committee_request',array($request_id,-1));
+		if($request_arr){
+			$replace['title']=htmlspecialchars('Заявка #'.$request_id).' - '.$replace['title'];
+			$replace['title']=htmlspecialchars('Комитет').' - '.$replace['title'];
+			print '<div class="page content">
+			<a class="right" href="/committee/">&larr; Вернуться в комитет</a>
+			<h1>Заявка #'.$request_id.' в комитет</h1>
+			<div class="article">';
+			print '<p>Статус заявки: '.$committee_status_arr[$request_arr['status']].'</p>';
+			print '<p>Создатель заявки: <a href="/@'.$request_arr['creator'].'/">@'.$request_arr['creator'].'</a></p>';
+			print '<p>Ссылка на описание заявки: <a href="'.htmlspecialchars($request_arr['url']).'">'.htmlspecialchars($request_arr['url']).'</a></p>';
+			print '<p>Получатель средств с комитета: <a href="/@'.$request_arr['worker'].'/">@'.$request_arr['worker'].'</a></p>';
+			print '<p>Минимальная сумма токенов для удовлетворения заявки: '.$request_arr['required_amount_min'].'</p>';
+			print '<p>Максимальная сумма токенов заявки: '.$request_arr['required_amount_max'].'</p>';
+			$date=date_parse_from_format('Y-m-d\TH:i:s',$request_arr['start_time']);
+			$start_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+			$date=date_parse_from_format('Y-m-d\TH:i:s',$request_arr['end_time']);
+			$end_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+			print '<p>Время создания заявки: <span class="timestamp" data-timestamp="'.$start_time.'">'.date('d.m.Y H:i:s',$start_time).'</span></p>';
+			print '<p>Время окончания заявки: <span class="timestamp" data-timestamp="'.$end_time.'">'.date('d.m.Y H:i:s',$end_time).'</span></p>';
+			if($request_arr['status']>=2){
+				$date=date_parse_from_format('Y-m-d\TH:i:s',$request_arr['conclusion_time']);
+				$conclusion_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+				print '<p>Время принятия решения: <span class="timestamp" data-timestamp="'.$conclusion_time.'">'.date('d.m.Y H:i:s',$conclusion_time).'</span></p>';
+			}
+			if($request_arr['status']>=4){
+				print '<p>Согласованная сумма: '.$request_arr['conclusion_payout_amount'].'</p>';
+				print '<p>Выплачено: '.$request_arr['payout_amount'].'</p>';
+				print '<p>Осталось выплатить: '.$request_arr['remain_payout_amount'].'</p>';
+				$date=date_parse_from_format('Y-m-d\TH:i:s',$request_arr['last_payout_time']);
+				$last_payout_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+				print '<p>Время последней выплаты: <span class="timestamp" data-timestamp="'.$last_payout_time.'">'.date('d.m.Y H:i:s',$last_payout_time).'</span></p>';
+			}
+			if(count($request_arr['votes'])){
+				$max_rshares=0;
+				$actual_rshares=0;
+				print '<h2>Голоса</h2>';
+				foreach($request_arr['votes'] as $vote_arr){
+					$voter=$api->execute_method('get_accounts',array(array($vote_arr['voter'])));
+					$effective_vesting_shares=floatval($voter[0]['vesting_shares'])-floatval($voter[0]['delegated_vesting_shares'])+floatval($voter[0]['received_vesting_shares']);
+					$max_rshares+=$effective_vesting_shares;
+					$actual_rshares+=$effective_vesting_shares*$vote_arr['vote_percent']/10000;
+					$date=date_parse_from_format('Y-m-d\TH:i:s',$vote_arr['last_update']);
+					$vote_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+					print '<p><span class="timestamp" data-timestamp="'.$vote_time.'">'.date('d.m.Y H:i:s',$vote_time).'</span>: <a href="/@'.$vote_arr['voter'].'/">@'.$vote_arr['voter'].'</a> проголосовал за обеспечение заявки в размере '.($vote_arr['vote_percent']/100).'%</p>';
+				}
+				$dgp=$api->execute_method('get_dynamic_global_properties');
+				$chain_properties=$api->execute_method('get_chain_properties');
+				$net_percent=$max_rshares/floatval($dgp['total_vesting_shares'])*100;
+				$request_calced_payout=floatval($request_arr['required_amount_max'])*$actual_rshares/$max_rshares;
+				print '<hr><p>Количество голосов: '.count($request_arr['votes']).', доля проголосовавших от всей сети: '.round($net_percent,2).'% (требуется >='.($chain_properties['committee_request_approve_min_percent']/100).'%), расчитанная сумма заявки на текущий момент: '.round($request_calced_payout,3).' VIZ.</p>';
+			}
+			print '</div></div>';
+		}
+	}
+}
+else
 if('blocks'==$path_array[1]){
 	$dgp=$api->execute_method('get_dynamic_global_properties');
 	if(''==$path_array[2]){
