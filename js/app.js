@@ -24,7 +24,7 @@ function load_session(){
 }
 function view_session(){
 	if(''!=current_user){
-		$('.header .account').html('<a href="/@'+current_user+'/">'+current_user+'</a> <a class="auth-logout"><i class="fas fa-fw fa-sign-out-alt"></i></a>');
+		$('.header .account').html('<a href="/@'+current_user+'/">'+current_user+'</a> <a class="auth-logout icon"><i class="fas fa-fw fa-sign-out-alt"></i></a>');
 	}
 	else{
 		$('.header .account').html('<a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
