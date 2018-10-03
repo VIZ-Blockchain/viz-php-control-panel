@@ -48,7 +48,7 @@
 		<div class="header-menu-el"><a href="/blocks/">Block</a> #<span class="setter" rel="current_block"></span></div>
 		<div class="header-menu-el telegram"><a href="https://t.me/viz_world" target="_blank" class="icon"><i class="fas fa-fw fa-paper-plane"></i></a></div>
 		<div class="header-menu-el energy"><!--<i class="fas fa-battery-empty"></i><i class="fas fa-battery-quarter"></i><i class="fas fa-battery-half"></i><i class="fas fa-battery-three-quarters"></i>--><a href="#" class="icon"><i class="fas fa-battery-full"></i></a></div>
-		<div class="header-menu-el account"><a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a><!--<i class="fas fa-fw fa-key"></i>--></div>
+		<div class="header-menu-el account"><a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a></div>
 	</div>
 
 </div>
@@ -67,7 +67,7 @@
 		<div class="menu-el"><i class="fas fa-fw fa-user-shield"></i><a href="/witnesses/">Делегаты</a></div>
 		<div class="menu-el"><i class="fas fa-fw fa-university"></i><a href="/committee/">Комитет</a></div>
 		<hr>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-user-cog"></i><a href="#/accounts/">Аккаунты</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-user-cog"></i><a href="/accounts/">Аккаунты</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-toolbox"></i><a href="#/tools/">Инструменты</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-book"></i><a href="#/documentation/">Документация</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-cloud"></i><a href="#/services/">Сервисы</a></div>

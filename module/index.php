@@ -156,12 +156,12 @@ if('login'==$path_array[1]){
 	print '</div></div>';
 }
 else
-if('session'==$path_array[1]){
-	$replace['title']=htmlspecialchars('Авторизиация').' - '.$replace['title'];
+if('accounts'==$path_array[1]){
+	$replace['title']=htmlspecialchars('Аккаунты').' - '.$replace['title'];
 	print '<div class="page content">
-	<h1>Сессия</h1>
+	<h1><i class="fas fa-fw fa-user-cog"></i> Аккаунты</h1>
 	<div class="article control">';
-	print '<p>Внимание! Авторизовать дополнительный аккаунты вы можете <a href="/login/">по этой ссылке</a>. Выход из аккаунта значит выход из сессии конкретным аккаунтом. Для очистки сессии выйдите из всех аккаунтов.<br>';
+	print '<p>Внимание! Авторизовать дополнительный аккаунты вы можете <a href="/login/">по этой ссылке</a>. Выход из аккаунта значит выход из сессии конкретным аккаунтом.<br>Для очистки сессии отключите все аккаунты.<br>';
 	print '<div class="session-control"></div>';
 	print '</div></div>';
 }

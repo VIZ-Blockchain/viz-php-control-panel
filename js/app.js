@@ -9,6 +9,8 @@ function save_session(){
 	let users_json=JSON.stringify(users);
 	localStorage.setItem('users',users_json);
 	localStorage.setItem('current_user',current_user);
+	view_session();
+	session_control();
 }
 function load_session(){
 	if(null!=localStorage.getItem('users')){
@@ -18,6 +20,7 @@ function load_session(){
 		current_user=localStorage.getItem('current_user');
 	}
 	view_session();
+	session_control();
 }
 function view_session(){
 	if(''!=current_user){
@@ -25,6 +28,16 @@ function view_session(){
 	}
 	else{
 		$('.header .account').html('<a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
+	}
+}
+function session_control(){
+	if(0!=$('.control .session-control').length){
+		let session_html='';
+		for(key in users){
+			console.log(key);
+			session_html+='<p class="clearfix">'+(users[key]['active_key']!=''?'<span class="right" title="Сохранен Active ключ"><i class="fas fa-fw fa-key"></i></span>':'')+'<a href="/@'+key+'/">'+key+'</a>, '+(current_user==key?'<b>используется</b>':'<a class="auth-change" data-login="'+key+'">переключиться</a>')+', <a class="auth-logout" data-login="'+key+'">отключить</a></p>';
+		}
+		$('.control .session-control').html(session_html);
 	}
 }
 function logout(login='',redirect=true){
@@ -184,12 +197,28 @@ function app_mouse(e){
 	if(!e)e=window.event;
 	var target=e.target || e.srcElement;
 	if($(target).hasClass('auth-action')){
+		e.preventDefault();
 		if($(target).closest('.control').length){
 			try_auth($('input[name=login]').val(),$('input[name=posting_key]').val(),$('input[name=active_key]').val());
 		}
 	}
+	if($(target).hasClass('auth-change')){
+		e.preventDefault();
+		var proper_target=$(target);
+		let login=proper_target.attr('data-login');
+		if(typeof users[login] !== 'undefined'){
+			current_user=login;
+			save_session();
+		}
+	}
 	if($(target).hasClass('auth-logout') || $(target).parent().hasClass('auth-logout')){
-		logout();
+		e.preventDefault();
+		var proper_target=$(target);
+		if($(target).parent().hasClass('reply-action')){
+			proper_target=$(target).parent();
+		}
+		let login=proper_target.attr('data-login');
+		logout(login,login?false:true);
 	}
 	if($(target).hasClass('reply-action') || $(target).parent().hasClass('reply-action')){
 			e.preventDefault();

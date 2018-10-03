@@ -105,6 +105,9 @@ body{
 	font-family:Georgia,Cambria,'Times New Roman',serif;
 	font-size:16px;
 }
+b{
+	font-weight:700;
+}
 a{
 	color:#000;
 	cursor:pointer;
