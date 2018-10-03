@@ -21,6 +21,7 @@ function load_session(){
 	}
 	view_session();
 	session_control();
+	witness_control();
 }
 function view_session(){
 	if(''!=current_user){
@@ -65,11 +66,44 @@ function view_energy(){
 		$('.header .energy').css('display','none');
 	}
 }
+function vote_witness(witness_login,value){
+	gate.broadcast.accountWitnessVote(users[current_user]['active_key'],current_user,witness_login,value,function(err, result){
+		console.log(err,result);
+		witness_control();
+	});
+}
+function witness_control(){
+	if(0!=$('.control .witness-control').length){
+		$('.witness-control').each(function(){
+			let witness_login=$(this).attr('data-witness');
+			let witness_control=$(this);
+			let result='';
+			if(''==users[current_user].active_key){
+				result+='<h3>Голосование за делегата '+witness_login+'</h3>';
+				result+='Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.';
+				witness_control.html(result);
+			}
+			else{
+				gate.api.getAccounts([current_user],function(err,response){
+					if(typeof response[0] !== 'undefined'){
+						result+='<h3>Голосование за делегата '+witness_login+'</h3>';
+						if(response[0].witness_votes.includes(witness_login)){
+							result+='<input type="button" class="witness-vote-action button negative" data-value="false" value="Снять голос с делегата">';
+						}
+						else{
+							result+='<input type="button" class="witness-vote-action button" data-value="true" value="Отдать голос за делегата">';
+						}
+						witness_control.html(result);
+					}
+				});
+			}
+		});
+	}
+}
 function session_control(){
 	if(0!=$('.control .session-control').length){
 		let session_html='';
 		for(key in users){
-			console.log(key);
 			session_html+='<p class="clearfix">'+(users[key]['active_key']!=''?'<span class="right" title="Сохранен Active ключ"><i class="fas fa-fw fa-key"></i></span>':'')+'<a href="/@'+key+'/">'+key+'</a>, '+(current_user==key?'<b>используется</b>':'<a class="auth-change" data-login="'+key+'">переключиться</a>')+', <a class="auth-logout" data-login="'+key+'">отключить</a></p>';
 		}
 		$('.control .session-control').html(session_html);
@@ -236,10 +270,17 @@ function app_mouse(e){
 			try_auth($('input[name=login]').val(),$('input[name=posting_key]').val(),$('input[name=active_key]').val());
 		}
 	}
+	if($(target).hasClass('witness-vote-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let witness_login=$(target).closest('.witness-control').attr('data-witness');
+			let value=('true'==$(target).attr('data-value'));
+			vote_witness(witness_login,value);
+		}
+	}
 	if($(target).hasClass('auth-change')){
 		e.preventDefault();
-		var proper_target=$(target);
-		let login=proper_target.attr('data-login');
+		let login=$(target).attr('data-login');
 		if(typeof users[login] !== 'undefined'){
 			current_user=login;
 			save_session();

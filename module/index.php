@@ -188,7 +188,7 @@ if('witnesses'==$path_array[1]){
 			print '<div class="page content">
 			<a class="right" href="/witnesses/">&larr; Вернуться к списку делегатов</a>
 			<h1>Делегат '.$witness_arr['owner'].'</h1>
-			<div class="article">';
+			<div class="article control">';
 			$date=date_parse_from_format('Y-m-d\TH:i:s',$witness_arr['created']);
 			$created_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
 			print '<p>Дата заявления о намерениях: <span class="timestamp" data-timestamp="'.$created_time.'">'.date('d.m.Y H:i:s',$created_time).'</span></p>';
@@ -211,6 +211,7 @@ if('witnesses'==$path_array[1]){
 			}
 			print $view_props;
 			print '</pre>';
+			print '<div class="witness-control" data-witness="'.$witness_arr['owner'].'"></div>';
 		}
 	}
 }

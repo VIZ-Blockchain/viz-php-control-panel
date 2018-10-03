@@ -254,6 +254,37 @@ a.icon{
 	padding-left:calc(256px + 64px);
 }
 
+.button{
+	display:inline-block;
+	padding:8px 16px;
+	margin:8px;
+	background:#fff;
+	color:#000;
+	outline:none;
+	border:none;
+	border-radius:16px;
+	text-decoration:none;
+	cursor:pointer !important;
+	box-shadow: 0 2px 4px -1px rgba(0,0,0,0.07), 0 4px 5px 0 rgba(0,0,0,0.07), 0 1px 10px 0 rgba(0,0,0,0.1);
+	-webkit-transition: all 0.2s linear;
+	-moz-transition: all 0.2s linear;
+	-o-transition: all 0.2s linear;
+	transition: all 0.2s linear;
+}
+.button:active {
+	outline:none;
+	border:none;
+}
+.button:hover{
+	box-shadow: 0 2px 4px -1px rgba(0, 21, 97, 0.07), 0 4px 5px 0 rgba(7, 0, 121, 0.07), 0 2px 10px 1px rgba(0, 78, 255, 0.25);
+}
+.button.positive:hover{
+	box-shadow: 0 2px 4px -1px rgba(0, 97, 21, 0.07), 0 4px 5px 0 rgba(7, 121, 0, 0.07), 0 2px 10px 1px rgba(0, 255, 78, 0.35);
+}
+.button.negative:hover{
+	box-shadow: 0 2px 4px -1px rgba(97, 21, 0, 0.07), 0 4px 5px 0 rgba(121, 7, 0, 0.07), 0 2px 10px 1px rgba(255, 39, 0, 0.35);
+}
+
 .page{
 	margin:0 auto;
 	max-width:732px;
