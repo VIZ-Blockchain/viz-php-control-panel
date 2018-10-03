@@ -3,8 +3,23 @@ var dgp={};
 var current_block=0;
 var current_user='';
 var users={};
+var notify_id=0;
 //gate.config.set('websocket','wss://testnet.viz.world');
 gate.api.stop();
+
+function del_notify(id){
+	$('.notify-list .notify[rel="'+id+'"]').remove();
+}
+function fade_notify(id){
+	$('.notify-list .notify[rel="'+id+'"]').css('opacity','0.0');
+	window.setTimeout('del_notify("'+id+'")',300);
+}
+function add_notify(html,dark=false,fade_time=10000){
+	notify_id++;
+	var element_html='<div class="notify'+(dark?' notify-dark':'')+'" rel="'+notify_id+'">'+html+'</div>';
+	$('.notify-list').append(element_html);
+	window.setTimeout('fade_notify('+notify_id+')',fade_time);
+}
 
 function save_session(){
 	let users_json=JSON.stringify(users);
@@ -82,22 +97,42 @@ function wallet_transfer(recipient,amount,memo){
 				var shares=$('.wallet-control input[name=shares]').prop('checked');
 				if(shares){
 					gate.broadcast.transferToVesting(users[current_user].active_key,current_user,login,fixed_amount,function(err,result){
-						wallet_control();
+						if(!err){
+							wallet_control();
+						}
+						else{
+							add_notify('Ошибка в переводе',true);
+							add_notify(err.payload.error.data.stack[0].format,true);
+						}
 					});
 				}
 				else{
 					gate.broadcast.transfer(users[current_user].active_key,current_user,login,fixed_amount,memo,function(err,result){
-						wallet_control();
+						if(!err){
+							wallet_control();
+						}
+						else{
+							add_notify('Ошибка в переводе',true);
+							add_notify(err.payload.error.data.stack[0].format,true);
+						}
 					});
 				}
+			}
+			else{
+				add_notify('Получатель не найден',true);
 			}
 		});
 	}
 }
 function vote_witness(witness_login,value){
 	gate.broadcast.accountWitnessVote(users[current_user]['active_key'],current_user,witness_login,value,function(err, result){
-		console.log(err,result);
-		witness_control();
+		if(!err){
+			witness_control();
+		}
+		else{
+			add_notify('Вы не можете голосовать',true);
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
 	});
 }
 function witness_control(){
@@ -142,9 +177,6 @@ function wallet_control(){
 				if(typeof response[0] !== 'undefined'){
 					result+='<p>Баланс: <span class="token" data-symbol="VIZ"><span class="amount">'+parseFloat(response[0]['balance'])+'</span> VIZ</span></p>';
 					let network_share=100*(parseFloat(response[0]['vesting_shares'])/parseFloat(dgp.total_vesting_shares));
-					console.log(parseFloat(response[0]['vesting_shares']));
-					console.log(parseFloat(dgp.total_vesting_shares));
-					console.log(network_share);
 					result+='<p>Доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['vesting_shares'])+'</span> SHARES</span> ('+network_share.toFixed(5)+'%)</p>';
 					if(parseFloat(response[0]['delegated_vesting_shares'])){
 						result+='<p>Делегировано: <span class="delegated_vesting_shares" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['delegated_vesting_shares'])+'</span> SHARES</span></p>';

@@ -77,5 +77,6 @@
 <div class="main">
 {pages}
 </div>
+<div class="notify-list"></div>
 </body>
 </html>

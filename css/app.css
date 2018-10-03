@@ -941,3 +941,33 @@ a.load_more{
 	overflow:auto;
 	font-size:12px;
 }
+
+.notify-list{
+	position:fixed;
+	right:8px;
+	bottom:8px;
+	z-index:5000;
+}
+.notify-list .notify{
+	background:rgba(255,255,255,0.8);
+	padding:12px 16px;
+	border-radius:8px;
+	box-shadow: 0 0 15px rgba(0,0,0,0.3);
+	margin-top:12px;
+	color:#000;
+	opacity:1.0;
+	-webkit-transition: all 0.8s linear;
+	-moz-transition: all 0.8s linear;
+	-o-transition: all 0.8s linear;
+	transition: all 0.8s linear;
+}
+.notify-list .notify a{
+	color:#000 !important;
+}
+.notify-list .notify.notify-dark{
+	background:rgba(0,0,0,0.8);
+	color:#fff;
+}
+.notify-list .notify.notify-dark a{
+	color:#fff !important;
+}
