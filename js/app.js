@@ -27,7 +27,7 @@ function view_session(){
 		$('.header .account').html('<a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
 	}
 }
-function logout(login=''){
+function logout(login='',redirect=true){
 	if(''==login){
 		login=current_user;
 	}
@@ -40,7 +40,9 @@ function logout(login=''){
 			current_user='';
 		}
 		save_session();
-		document.location='/';
+		if(redirect){
+			document.location='/';
+		}
 	}
 }
 function try_auth(login,posting_key,active_key){
@@ -187,7 +189,7 @@ function app_mouse(e){
 		}
 	}
 	if($(target).hasClass('auth-logout') || $(target).parent().hasClass('auth-logout')){
-
+		logout();
 	}
 	if($(target).hasClass('reply-action') || $(target).parent().hasClass('reply-action')){
 			e.preventDefault();
