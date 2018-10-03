@@ -39,6 +39,7 @@ function load_session(){
 	session_control();
 	witness_control();
 	wallet_control();
+	committee_control();
 }
 function view_session(){
 	if(''!=current_user){
@@ -124,6 +125,16 @@ function wallet_transfer(recipient,amount,memo){
 		});
 	}
 }
+function committee_vote_request(request_id,percent){
+	gate.broadcast.committeeVoteRequest(users[current_user]['posting_key'],current_user,parseInt(request_id),percent*100,function(err,result) {
+		if(err){
+			add_notify('Ошибка при голосовании',true);
+		}
+		else{
+			add_notify('Вы успешно проголосовали');
+		}
+	});
+}
 function vote_witness(witness_login,value){
 	gate.broadcast.accountWitnessVote(users[current_user]['active_key'],current_user,witness_login,value,function(err, result){
 		if(!err){
@@ -199,6 +210,34 @@ function wallet_control(){
 			});
 			});
 		}
+	}
+}
+function committee_control(){
+	if(0!=$('.control .committee-control').length){
+		$('.committee-control').each(function(){
+			let request_id=$(this).attr('data-request-id');
+			let committee_control=$(this);
+			let result='';
+			result+='<h3>Голосование за заявку #'+request_id+'</h3>';
+			result+='<p><input type="range" name="vote_percent_range" min="-100" max="+100" value="0">';
+			result+=' <input type="text" name="vote_percent" value="0" size="4"> процентов от максимальной суммы заявки<br>';
+			result+='<input type="button" class="committee-vote-request-action button" value="Проголосовать"></p>';
+			committee_control.html(result);
+			committee_control.find('input[name=vote_percent_range]').bind('change',function(){
+				committee_control.find('input[name=vote_percent]').val($(this).val());
+			});
+			committee_control.find('input[name=vote_percent]').bind('change',function(){
+				let percent=parseInt($(this).val());
+				if(percent>100){
+					percent=100;
+				}
+				if(percent<-100){
+					percent=-100;
+				}
+				$(this).val(percent);
+				committee_control.find('input[name=vote_percent_range]').val(percent);
+			});
+		});
 	}
 }
 function session_control(){
@@ -378,6 +417,14 @@ function app_mouse(e){
 			let witness_login=$(target).closest('.witness-control').attr('data-witness');
 			let value=('true'==$(target).attr('data-value'));
 			vote_witness(witness_login,value);
+		}
+	}
+	if($(target).hasClass('committee-vote-request-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let request_id=$(target).closest('.committee-control').attr('data-request-id');
+			let percent=$(target).closest('.committee-control').find('input[name=vote_percent]').val();
+			committee_vote_request(request_id,percent);
 		}
 	}
 	if($(target).hasClass('wallet-transfer-action') || $(target).parent().hasClass('wallet-transfer-action')){

@@ -971,3 +971,8 @@ a.load_more{
 .notify-list .notify.notify-dark a{
 	color:#fff !important;
 }
+
+.committee-control input[name=vote_percent]{
+	display:inline-block;
+	margin:0 12px;
+}
