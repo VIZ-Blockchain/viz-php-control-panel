@@ -170,8 +170,9 @@ if('witnesses'==$path_array[1]){
 	$replace['title']=htmlspecialchars('Делегаты').' - '.$replace['title'];
 	if(''==$path_array[2]){
 		print '<div class="page content">
-		<h1>Делегаты ТОП 100</h1>
-		<div class="article">';
+		<h1><i class="fas fa-fw fa-user-shield"></i> Делегаты</h1>
+		<div class="article">
+		<h3>ТОП-100</h3>';
 		$list=$api->execute_method('get_witnesses_by_vote',array('',100));
 		$num=1;
 		foreach($list as $witness_arr){
@@ -226,8 +227,9 @@ if('committee'==$path_array[1]){
 	);
 	if(''==$path_array[2]){
 		print '<div class="page content">
-		<h1>Заявки в комитет</h1>
+		<h1><i class="fas fa-fw fa-university"></i>Комитет</h1>
 		<div class="article">';
+		print '<h3>Заявки в комитет</h3>';
 		print '<ul>';
 		foreach($committee_status_arr as $committee_status_id=>$committee_status_name){
 			print '<li>'.$committee_status_name;
