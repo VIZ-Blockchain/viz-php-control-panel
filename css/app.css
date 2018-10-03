@@ -258,6 +258,7 @@ a.icon{
 	display:inline-block;
 	padding:8px 16px;
 	margin:8px;
+	margin-left:0;
 	background:#fff;
 	color:#000;
 	outline:none;
@@ -276,6 +277,7 @@ a.icon{
 	border:none;
 }
 .button:hover{
+	color:#000;
 	box-shadow: 0 2px 4px -1px rgba(0, 21, 97, 0.07), 0 4px 5px 0 rgba(7, 0, 121, 0.07), 0 2px 10px 1px rgba(0, 78, 255, 0.25);
 }
 .button.positive:hover{
@@ -283,6 +285,9 @@ a.icon{
 }
 .button.negative:hover{
 	box-shadow: 0 2px 4px -1px rgba(97, 21, 0, 0.07), 0 4px 5px 0 rgba(121, 7, 0, 0.07), 0 2px 10px 1px rgba(255, 39, 0, 0.35);
+}
+label input[type=checkbox]{
+	vertical-align: middle;
 }
 
 .page{
@@ -367,7 +372,7 @@ a.icon{
 	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
 	font-weight: 700;
 	font-style: normal;
-	font-size: 30px;
+	font-size: 38px;
 	line-height: 32px;
 }
 .page h3{
@@ -376,7 +381,7 @@ a.icon{
 	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
 	font-weight: 700;
 	font-style: normal;
-	font-size: 28px;
+	font-size: 26px;
 	line-height: 30px;
 }
 .page h4{
@@ -385,7 +390,7 @@ a.icon{
 	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
 	font-weight: 700;
 	font-style: normal;
-	font-size: 26px;
+	font-size: 22px;
 	line-height: 28px;
 }
 .page p{

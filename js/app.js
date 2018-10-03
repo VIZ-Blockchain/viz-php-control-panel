@@ -1,4 +1,5 @@
 var gate=viz;
+var dgp={};
 var current_block=0;
 var current_user='';
 var users={};
@@ -22,6 +23,7 @@ function load_session(){
 	view_session();
 	session_control();
 	witness_control();
+	wallet_control();
 }
 function view_session(){
 	if(''!=current_user){
@@ -66,6 +68,32 @@ function view_energy(){
 		$('.header .energy').css('display','none');
 	}
 }
+function wallet_transfer(recipient,amount,memo){
+	let login=recipient.toLowerCase();
+	if('@'==login.substring(0,1)){
+		login=login.substring(1);
+	}
+	login=login.trim();
+	if(login){
+		gate.api.getAccounts([login],function(err,response){
+			if(typeof response[0] !== 'undefined'){
+				amount=parseFloat(amount);
+				let fixed_amount=''+amount.toFixed(3)+' VIZ';
+				var shares=$('.wallet-control input[name=shares]').prop('checked');
+				if(shares){
+					gate.broadcast.transferToVesting(users[current_user].active_key,current_user,login,fixed_amount,function(err,result){
+						wallet_control();
+					});
+				}
+				else{
+					gate.broadcast.transfer(users[current_user].active_key,current_user,login,fixed_amount,memo,function(err,result){
+						wallet_control();
+					});
+				}
+			}
+		});
+	}
+}
 function vote_witness(witness_login,value){
 	gate.broadcast.accountWitnessVote(users[current_user]['active_key'],current_user,witness_login,value,function(err, result){
 		console.log(err,result);
@@ -98,6 +126,47 @@ function witness_control(){
 				});
 			}
 		});
+	}
+}
+function wallet_control(){
+	if(0!=$('.control .wallet-control').length){
+		let wallet_control=$('.wallet-control');
+		let result='';
+		if(''==users[current_user].active_key){
+			result+='Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.';
+			wallet_control.html(result);
+		}
+		else{
+			gate.api.getDynamicGlobalProperties(function(err,dgp){
+			gate.api.getAccounts([current_user],function(err,response){
+				if(typeof response[0] !== 'undefined'){
+					result+='<p>Баланс: <span class="token" data-symbol="VIZ"><span class="amount">'+parseFloat(response[0]['balance'])+'</span> VIZ</span></p>';
+					let network_share=100*(parseFloat(response[0]['vesting_shares'])/parseFloat(dgp.total_vesting_shares));
+					console.log(parseFloat(response[0]['vesting_shares']));
+					console.log(parseFloat(dgp.total_vesting_shares));
+					console.log(network_share);
+					result+='<p>Доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['vesting_shares'])+'</span> SHARES</span> ('+network_share.toFixed(5)+'%)</p>';
+					if(parseFloat(response[0]['delegated_vesting_shares'])){
+						result+='<p>Делегировано: <span class="delegated_vesting_shares" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['delegated_vesting_shares'])+'</span> SHARES</span></p>';
+					}
+					if(parseFloat(response[0]['received_vesting_shares'])){
+						result+='<p>Получено делегированием: <span class="received_vesting_shares" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['received_vesting_shares'])+'</span> SHARES</span></p>';
+					}
+					if(parseFloat(response[0]['received_vesting_shares']) || parseFloat(response[0]['delegated_vesting_shares'])){
+						network_share=100*((parseFloat(response[0]['vesting_shares'])+parseFloat(response[0]['received_vesting_shares'])-parseFloat(response[0]['delegated_vesting_shares']))/parseFloat(dgp.total_vesting_shares));
+						result+='<p>Эффективная доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+(parseFloat(response[0]['vesting_shares'])+parseFloat(response[0]['received_vesting_shares'])-parseFloat(response[0]['delegated_vesting_shares']))+'</span> SHARES</span> ('+network_share.toFixed(5)+'%)</p>';
+					}
+					result+='<h3>Выполнить перевод</h3>';
+					result+='<p><label><input type="text" name="recipient"> &mdash; Получатель</label></p>';
+					result+='<p><label><input type="text" name="amount"> &mdash; Количество VIZ</label></p>';
+					result+='<p><label><input type="text" name="memo"> &mdash; Заметка</label></p>';
+					result+='<p><label><input type="checkbox" name="shares"> — Перевод в Долю сети</label></p>';
+					result+='<p><a class="wallet-transfer-action button"><i class="far fa-fw fa-credit-card"></i> Отправить перевод</a>';
+					wallet_control.html(result);
+				}
+			});
+			});
+		}
 	}
 }
 function session_control(){
@@ -194,6 +263,7 @@ function try_auth(login,posting_key,active_key){
 function update_dgp(){
 	gate.api.getDynamicGlobalProperties(function(e,r){
 		if(r){
+			dgp=r;
 			current_block=r.head_block_number;
 			$('.setter[rel=current_block]').html(current_block);
 		}
@@ -276,6 +346,16 @@ function app_mouse(e){
 			let witness_login=$(target).closest('.witness-control').attr('data-witness');
 			let value=('true'==$(target).attr('data-value'));
 			vote_witness(witness_login,value);
+		}
+	}
+	if($(target).hasClass('wallet-transfer-action') || $(target).parent().hasClass('wallet-transfer-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			var proper_target=$(target);
+			if($(target).parent().hasClass('wallet-transfer-action')){
+				proper_target=$(target).parent();
+			}
+			wallet_transfer($('.wallet-control input[name=recipient]').val(),$('.wallet-control input[name=amount]').val(),$('.wallet-control input[name=memo]').val());
 		}
 	}
 	if($(target).hasClass('auth-change')){

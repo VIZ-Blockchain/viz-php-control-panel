@@ -56,7 +56,7 @@
 	<div class="menu-list">
 {menu}
 		<div class="menu-el inactive"><i class="fas fa-fw fa-user-circle"></i><a href="#/profile/">Профиль</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-wallet"></i><a href="#/wallet/">Кошелек</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-wallet"></i><a href="/wallet/">Кошелек</a></div>
 		<hr>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-newspaper"></i><a href="#/feed/">Лента контента</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-plus-circle"></i><a href="#/publication/">Опубликовать контент</a></div>

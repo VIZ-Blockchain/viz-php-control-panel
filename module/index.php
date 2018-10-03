@@ -156,6 +156,15 @@ if('login'==$path_array[1]){
 	print '</div></div>';
 }
 else
+if('wallet'==$path_array[1]){
+	$replace['title']=htmlspecialchars('Кошелек').' - '.$replace['title'];
+	print '<div class="page content">
+	<h1><i class="fas fa-fw fa-wallet"></i> Кошелек</h1>
+	<div class="article control">';
+	print '<div class="wallet-control"></div>';
+	print '</div></div>';
+}
+else
 if('accounts'==$path_array[1]){
 	$replace['title']=htmlspecialchars('Аккаунты').' - '.$replace['title'];
 	print '<div class="page content">
