@@ -1,7 +1,112 @@
 var gate=viz;
 var current_block=0;
+var current_user='';
+var users={};
 //gate.config.set('websocket','wss://testnet.viz.world');
 gate.api.stop();
+
+function save_session(){
+	let users_json=JSON.stringify(users);
+	localStorage.setItem('users',users_json);
+	localStorage.setItem('current_user',current_user);
+}
+function load_session(){
+	if(null!=localStorage.getItem('users')){
+		users=JSON.parse(localStorage.getItem('users'));
+	}
+	if(null!=localStorage.getItem('current_user')){
+		current_user=localStorage.getItem('current_user');
+	}
+	view_session();
+}
+function view_session(){
+	if(''!=current_user){
+		$('.header .account').html('<a href="/@'+current_user+'/">'+current_user+'</a> <a class="auth-logout"><i class="fas fa-fw fa-sign-out-alt"></i></a>');
+	}
+	else{
+		$('.header .account').html('<a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
+	}
+}
+function logout(login=''){
+	if(''==login){
+		login=current_user;
+	}
+	if(typeof users[login] !== 'undefined'){
+		delete users[login];
+		if(typeof Object.keys(users)[0] !== 'undefined'){
+			current_user=Object.keys(users)[0];
+		}
+		else{
+			current_user='';
+		}
+		save_session();
+		document.location='/';
+	}
+}
+function try_auth(login,posting_key,active_key){
+	$('.auth-error').html('');
+	login=login.toLowerCase();
+	if('@'==login.substring(0,1)){
+		login=login.substring(1);
+	}
+	login=login.trim();
+	if(login){
+		gate.api.getAccounts([login],function(err,response){
+			if(typeof response[0] !== 'undefined'){
+				console.log(response[0]);
+				let posting_valid=false;
+				for(posting_check in response[0].active.key_auths){
+					if(response[0].posting.key_auths[posting_check][1]>=response[0].posting.weight_threshold){
+						try{
+							if(gate.auth.wifIsValid(posting_key,response[0].posting.key_auths[posting_check][0])){
+								posting_valid=true;
+							}
+						}
+						catch(e){
+							$('.auth-error').html('Posting ключ не валидный');
+							return;
+						}
+					}
+				}
+				if(!posting_valid){
+					$('.auth-error').html('Posting ключ не подходит');
+					return;
+				}
+				if(active_key){
+					let active_valid=false;
+					for(active_check in response[0].active.key_auths){
+						if(response[0].active.key_auths[active_check][1]>=response[0].active.weight_threshold){
+							try{
+								if(gate.auth.wifIsValid(active_key,response[0].active.key_auths[active_check][0])){
+									active_valid=true;
+								}
+							}
+							catch(e){
+								$('.auth-error').html('Active ключ не валидный');
+								return;
+							}
+						}
+					}
+					if(!active_valid){
+						$('.auth-error').html('Active ключ не подходит');
+						return;
+					}
+				}
+				users[login]={'posting_key':posting_key,'active_key':active_key};
+				current_user=login;
+				save_session();
+				$('.auth-error').html('Вы успешно авторизованы!');
+				document.location='/';
+			}
+			else{
+				$('.auth-error').html('Пользователь не найден');
+			}
+		});
+	}
+	else{
+		$('.auth-error').html('Пользователь не указан');
+	}
+}
 
 function update_dgp(){
 	gate.api.getDynamicGlobalProperties(function(e,r){
@@ -76,6 +181,14 @@ $(window).on('hashchange',function(e){
 function app_mouse(e){
 	if(!e)e=window.event;
 	var target=e.target || e.srcElement;
+	if($(target).hasClass('auth-action')){
+		if($(target).closest('.control').length){
+			try_auth($('input[name=login]').val(),$('input[name=posting_key]').val(),$('input[name=active_key]').val());
+		}
+	}
+	if($(target).hasClass('auth-logout') || $(target).parent().hasClass('auth-logout')){
+
+	}
 	if($(target).hasClass('reply-action') || $(target).parent().hasClass('reply-action')){
 			e.preventDefault();
 			var proper_target=$(target);
@@ -115,6 +228,7 @@ function app_mouse(e){
 		}
 }
 $(document).ready(function(){
+	load_session();
 	var hash_load=window.location.hash;
 	if(''!=hash_load){
 		window.location.hash='';

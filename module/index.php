@@ -141,6 +141,31 @@ if('@'==mb_substr($path_array[1],0,1)){
 	}
 }
 else
+if('login'==$path_array[1]){
+	$replace['title']=htmlspecialchars('Авторизиация').' - '.$replace['title'];
+	print '<div class="page content">
+	<h1>Авторизация</h1>
+	<div class="article control">';
+	print '<p>Внимание! При авторизации ключ записывается в ваш браузер и не передается на сервер. Если вы очистите кэш браузера или localStorage, то вам нужно будет вновь ввести свои данные для входа.<br>';
+	print '<label><input type="text" name="login"> &mdash; Логин</label><br>';
+	print '<label><input type="password" name="posting_key"> &mdash; Posting ключ</label><br>';
+	print '<label><input type="password" name="active_key"> &mdash; Active ключ (по желанию)</label><br>';
+	print '<span class="auth-error"></span>';
+	print '<br><input type="button" class="auth-action button" value="Сохранить доступ и авторизоваться">';
+	print '</p>';
+	print '</div></div>';
+}
+else
+if('session'==$path_array[1]){
+	$replace['title']=htmlspecialchars('Авторизиация').' - '.$replace['title'];
+	print '<div class="page content">
+	<h1>Сессия</h1>
+	<div class="article control">';
+	print '<p>Внимание! Авторизовать дополнительный аккаунты вы можете <a href="/login/">по этой ссылке</a>. Выход из аккаунта значит выход из сессии конкретным аккаунтом. Для очистки сессии выйдите из всех аккаунтов.<br>';
+	print '<div class="session-control"></div>';
+	print '</div></div>';
+}
+else
 if('witnesses'==$path_array[1]){
 	$replace['title']=htmlspecialchars('Делегаты').' - '.$replace['title'];
 	if(''==$path_array[2]){
