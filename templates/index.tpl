@@ -47,7 +47,7 @@
 		{header_menu}
 		<div class="header-menu-el"><a href="/blocks/">Block</a> #<span class="setter" rel="current_block"></span></div>
 		<div class="header-menu-el telegram"><a href="https://t.me/viz_world" target="_blank" class="icon"><i class="fas fa-fw fa-paper-plane"></i></a></div>
-		<div class="header-menu-el energy"><!--<i class="fas fa-battery-empty"></i><i class="fas fa-battery-quarter"></i><i class="fas fa-battery-half"></i><i class="fas fa-battery-three-quarters"></i>--><a href="#" class="icon"><i class="fas fa-battery-full"></i></a></div>
+		<div class="header-menu-el energy" title="Состояние энергии аккаунта">&hellip;</div>
 		<div class="header-menu-el account"><a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a></div>
 	</div>
 

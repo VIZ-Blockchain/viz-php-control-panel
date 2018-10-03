@@ -237,7 +237,7 @@ a.icon{
 	margin-right:8px;
 }
 .header-menu-el.energy{
-	display:none;
+	display:inline-block;
 }
 
 .main{

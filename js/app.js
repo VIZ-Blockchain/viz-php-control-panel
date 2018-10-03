@@ -29,6 +29,41 @@ function view_session(){
 	else{
 		$('.header .account').html('<a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
 	}
+	view_energy();
+}
+function view_energy(){
+	$('.header .energy').html('&hellip;');
+	if(''!=current_user){
+		$('.header .energy').css('display','inline-block');
+		gate.api.getAccounts([current_user],function(err,response){
+			if(typeof response[0] !== 'undefined'){
+				let last_vote_time=Date.parse(response[0].last_vote_time);
+				let delta_time=parseInt((new Date().getTime() - last_vote_time+(new Date().getTimezoneOffset()*60000))/1000);
+				let energy=response[0].energy;
+				let new_energy=parseInt(energy+(delta_time*10000/432000));//CHAIN_ENERGY_REGENERATION_SECONDS 5 days
+				if(new_energy>10000){
+					new_energy=10000;
+				}
+				let energy_icon='<i class="fas fa-battery-empty"></i>';
+				if(new_energy>=2000){
+					energy_icon='<i class="fas fa-battery-quarter"></i>';
+				}
+				if(new_energy>=4000){
+					energy_icon='<i class="fas fa-battery-half"></i>';
+				}
+				if(new_energy>=6000){
+					energy_icon='<i class="fas fa-battery-three-quarters"></i>';
+				}
+				if(new_energy>=9000){
+					energy_icon='<i class="fas fa-battery-full"></i>';
+				}
+				$('.header .energy').html((new_energy/100)+'% '+energy_icon);
+			}
+		});
+	}
+	else{
+		$('.header .energy').css('display','none');
+	}
 }
 function session_control(){
 	if(0!=$('.control .session-control').length){
@@ -68,7 +103,6 @@ function try_auth(login,posting_key,active_key){
 	if(login){
 		gate.api.getAccounts([login],function(err,response){
 			if(typeof response[0] !== 'undefined'){
-				console.log(response[0]);
 				let posting_valid=false;
 				for(posting_check in response[0].active.key_auths){
 					if(response[0].posting.key_auths[posting_check][1]>=response[0].posting.weight_threshold){
