@@ -185,14 +185,23 @@ if('witnesses'==$path_array[1]){
 		$list=$api->execute_method('get_witnesses_by_vote',array('',100));
 		$num=1;
 		foreach($list as $witness_arr){
-			print '<p'.('VIZ1111111111111111111111111111111114T1Anm'==$witness_arr['signing_key']?' style="opacity:0.5"':'').'>#'.$num.' <a href="/@'.$witness_arr['owner'].'/">@'.$witness_arr['owner'].'</a> (<a href="'.htmlspecialchars($witness_arr['url']).'">url</a>), Голосов: '.number_format (floatval($witness_arr['votes'])/1000000/1000,1,'.',' ').'k SHARES, <a href="/witnesses/'.$witness_arr['owner'].'/">параметры</a></p>';
+			print '<p'.('VIZ1111111111111111111111111111111114T1Anm'==$witness_arr['signing_key']?' style="opacity:0.5"':'').'>#'.$num.' <a href="/@'.$witness_arr['owner'].'/">@'.$witness_arr['owner'].'</a> (<a href="'.htmlspecialchars($witness_arr['url']).'">url</a>), Голосов: '.number_format (floatval($witness_arr['votes'])/1000000/1000,1,'.',' ').'k SHARES, <a href="/witnesses/'.$witness_arr['owner'].'/">параметры</a>, версия: '.$witness_arr['running_version'];
+			if('0.0.0'!=$witness_arr['hardfork_version_vote']){
+				if($witness_arr['hardfork_version_vote']!=$witness_arr['running_version']){
+					print ', голосует за переход с версии: '.$witness_arr['hardfork_version_vote'].' начиная с: ';
+					$date=date_parse_from_format('Y-m-d\TH:i:s',$witness_arr['hardfork_time_vote']);
+					$vote_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+					print '<span class="timestamp" data-timestamp="'.$vote_time.'">'.date('d.m.Y H:i:s',$vote_time).'</span>';
+				}
+			}
+			print '</p>';
 			$num++;
 		}
 		print '</div></div>';
 	}
 	else{
 		$witness_arr=$api->execute_method('get_witness_by_account',array($path_array[2]));
-		if($witness_arr['id']){
+		if($witness_arr['owner']){
 			$replace['title']=htmlspecialchars($witness_arr['owner']).' - '.$replace['title'];
 			print '<div class="page content">
 			<a class="right" href="/witnesses/">&larr; Вернуться к списку делегатов</a>

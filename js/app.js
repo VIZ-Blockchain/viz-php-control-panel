@@ -35,11 +35,13 @@ function load_session(){
 	if(null!=localStorage.getItem('current_user')){
 		current_user=localStorage.getItem('current_user');
 	}
-	view_session();
-	session_control();
-	witness_control();
-	wallet_control();
-	committee_control();
+	if(current_user){
+		view_session();
+		session_control();
+		witness_control();
+		wallet_control();
+		committee_control();
+	}
 }
 function view_session(){
 	if(''!=current_user){
