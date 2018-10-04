@@ -333,7 +333,7 @@ function try_auth(login,posting_key,active_key){
 	}
 }
 
-function update_dgp(){
+function update_dgp(auto=false){
 	gate.api.getDynamicGlobalProperties(function(e,r){
 		if(r){
 			dgp=r;
@@ -341,7 +341,9 @@ function update_dgp(){
 			$('.setter[rel=current_block]').html(current_block);
 		}
 	});
-	setTimeout("update_dgp()",3000);
+	if(auto){
+		setTimeout("update_dgp(true)",3000);
+	}
 }
 
 function fast_str_replace(search,replace,str){
