@@ -42,6 +42,7 @@ function load_session(){
 		wallet_control();
 		committee_control();
 		witness_votes();
+		delegation_control();
 	}
 }
 function view_session(){
@@ -85,6 +86,33 @@ function view_energy(){
 	}
 	else{
 		$('.header .energy').css('display','none');
+	}
+}
+function wallet_delegate(recipient,amount){
+	let login=recipient.toLowerCase();
+	if('@'==login.substring(0,1)){
+		login=login.substring(1);
+	}
+	login=login.trim();
+	if(login){
+		gate.api.getAccounts([login],function(err,response){
+			if(typeof response[0] !== 'undefined'){
+				amount=parseFloat(amount);
+				let fixed_amount=''+amount.toFixed(6)+' SHARES';
+				gate.broadcast.delegateVestingShares(users[current_user].active_key,current_user,login,fixed_amount,function(err,result){
+					if(!err){
+						delegation_control();
+					}
+					else{
+						add_notify('Ошибка в переводе',true);
+						add_notify(err.payload.error.data.stack[0].format,true);
+					}
+				});
+			}
+			else{
+				add_notify('Получатель не найден',true);
+			}
+		});
 	}
 }
 function wallet_transfer(recipient,amount,memo){
@@ -189,6 +217,80 @@ function witness_control(){
 				});
 			}
 		});
+	}
+}
+function delegation_control(){
+	if(0!=$('.control .delegation-control').length){
+		let delegation_control=$('.delegation-control');
+		let result='';
+		if(''==current_user){
+			result+='<p>Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
+			delegation_control.html(result);
+		}
+		else{
+			delegation_control.html('<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+			gate.api.getAccounts([current_user],function(err,response){
+				if(typeof response[0] !== 'undefined'){
+					result+='<p>Доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['vesting_shares'])+'</span> SHARES</span></p>';
+					if(parseFloat(response[0]['delegated_vesting_shares'])){
+						result+='<p>Делегировано: <span class="delegated_vesting_shares" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['delegated_vesting_shares'])+'</span> SHARES</span></p>';
+					}
+					if(parseFloat(response[0]['received_vesting_shares'])){
+						result+='<p>Получено делегированием: <span class="received_vesting_shares" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['received_vesting_shares'])+'</span> SHARES</span></p>';
+					}
+					if(parseFloat(response[0]['received_vesting_shares']) || parseFloat(response[0]['delegated_vesting_shares'])){
+						result+='<p>Эффективная доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+(parseFloat(response[0]['vesting_shares'])+parseFloat(response[0]['received_vesting_shares'])-parseFloat(response[0]['delegated_vesting_shares']))+'</span> SHARES</span></p>';
+					}
+					result+='<h3>Назначить делегирование</h3>';
+					if(''==users[current_user].active_key){
+						result+='<p>Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
+					}
+					else{
+						result+='<p>Для того чтобы отозвать делегирование, укажите в количестве SHARES нулевое значение. Возврат делегированной доли может занять время.</p>';
+						result+='<p><label><input type="text" name="recipient"> &mdash; Получатель</label></p>';
+						result+='<p><label><input type="text" name="amount"> &mdash; Количество SHARES</label></p>';
+						result+='<p><a class="delegation-action button"><i class="far fa-fw fa-credit-card"></i> Делегировать</a>';
+					}
+					delegation_control.html(result);
+				}
+			});
+		}
+	}
+	if(0!=$('.control .delegation-received-shares').length){
+		let delegation_control=$('.delegation-received-shares');
+		let result='';
+		if(''!=current_user){
+			gate.api.getVestingDelegations(current_user,0,1000,0,function(err,response){
+				if(!err){
+					result+='<h3>Список делегированной доли</h3>';
+					if(0==response.length){
+						result+='<p>Вы никому не делегировали долю.</p>';
+					}
+					for(delegation in response){
+						result+='<p><a href="/@'+response[delegation].delegatee+'/">'+response[delegation].delegatee+'</a> держит '+response[delegation].vesting_shares+', отозвать можно '+response[delegation].min_delegation_time+'</p>';
+					}
+					delegation_control.html(result);
+				}
+			});
+		}
+	}
+	if(0!=$('.control .delegation-delegated-shares').length){
+		let delegation_control=$('.delegation-delegated-shares');
+		let result='';
+		if(''!=current_user){
+			gate.api.getVestingDelegations(current_user,0,1000,1,function(err,response){
+				if(!err){
+					result+='<h3>Держание доли</h3>';
+					if(0==response.length){
+						result+='<p>Никто не делегировал вам долю.</p>';
+					}
+					for(delegation in response){
+						result+='<p>'+response[delegation].vesting_shares+' от <a href="/@'+response[delegation].delegatee+'/">'+response[delegation].delegator+'</a>, отзыв возможен с '+response[delegation].min_delegation_time+'</p>';
+					}
+					delegation_control.html(result);
+				}
+			});
+		}
 	}
 }
 function wallet_control(){
@@ -450,6 +552,16 @@ function app_mouse(e){
 			let request_id=$(target).closest('.committee-control').attr('data-request-id');
 			let percent=$(target).closest('.committee-control').find('input[name=vote_percent]').val();
 			committee_vote_request(request_id,percent);
+		}
+	}
+	if($(target).hasClass('delegation-action') || $(target).parent().hasClass('delegation-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			var proper_target=$(target);
+			if($(target).parent().hasClass('delegation-action')){
+				proper_target=$(target).parent();
+			}
+			wallet_delegate($('.delegation-control input[name=recipient]').val(),$('.delegation-control input[name=amount]').val());
 		}
 	}
 	if($(target).hasClass('wallet-transfer-action') || $(target).parent().hasClass('wallet-transfer-action')){

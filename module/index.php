@@ -141,6 +141,28 @@ if('@'==mb_substr($path_array[1],0,1)){
 	}
 }
 else
+if('tools'==$path_array[1]){
+	$replace['title']=htmlspecialchars('Инструменты').' - '.$replace['title'];
+	if(''==$path_array[2]){
+		print '<div class="page content">
+		<h1><i class="fas fa-fw fa-toolbox"></i> Инструменты</h1>
+		<div class="article control">';
+		print '<p><a href="/tools/delegation/">Делегирование доли</a></p>';
+		print '</div></div>';
+	}
+	elseif('delegation'==$path_array[2]){
+		$replace['title']=htmlspecialchars('Делегирование доли').' - '.$replace['title'];
+		print '<div class="page content">
+		<a class="right" href="/tools/">&larr; Вернуться к списку инструментов</a>
+		<h1><i class="fas fa-fw fa-toolbox"></i> Делегирование доли</h1>
+		<div class="article control">';
+		print '<div class="delegation-control"></div>';
+		print '<div class="delegation-received-shares"></div>';
+		print '<div class="delegation-delegated-shares"></div>';
+		print '</div></div>';
+	}
+}
+else
 if('login'==$path_array[1]){
 	$replace['title']=htmlspecialchars('Авторизиация').' - '.$replace['title'];
 	print '<div class="page content">

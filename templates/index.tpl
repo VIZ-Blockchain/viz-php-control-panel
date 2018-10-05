@@ -68,7 +68,7 @@
 		<div class="menu-el"><i class="fas fa-fw fa-university"></i><a href="/committee/">Комитет</a></div>
 		<hr>
 		<div class="menu-el"><i class="fas fa-fw fa-user-cog"></i><a href="/accounts/">Аккаунты</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-toolbox"></i><a href="#/tools/">Инструменты</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-toolbox"></i><a href="/tools/">Инструменты</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-book"></i><a href="#/documentation/">Документация</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-cloud"></i><a href="#/services/">Сервисы</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-cogs"></i><a href="#/settings/">Настройки</a></div>
