@@ -195,36 +195,42 @@ function wallet_control(){
 	if(0!=$('.control .wallet-control').length){
 		let wallet_control=$('.wallet-control');
 		let result='';
-		if(''==users[current_user].active_key){
-			result+='Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.';
+		if(''==current_user){
+			result+='<p>Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
 			wallet_control.html(result);
 		}
 		else{
+			wallet_control.html('<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
 			gate.api.getDynamicGlobalProperties(function(err,dgp){
-			gate.api.getAccounts([current_user],function(err,response){
-				if(typeof response[0] !== 'undefined'){
-					result+='<p>Баланс: <span class="token" data-symbol="VIZ"><span class="amount">'+parseFloat(response[0]['balance'])+'</span> VIZ</span></p>';
-					let network_share=100*(parseFloat(response[0]['vesting_shares'])/parseFloat(dgp.total_vesting_shares));
-					result+='<p>Доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['vesting_shares'])+'</span> SHARES</span> ('+network_share.toFixed(5)+'%)</p>';
-					if(parseFloat(response[0]['delegated_vesting_shares'])){
-						result+='<p>Делегировано: <span class="delegated_vesting_shares" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['delegated_vesting_shares'])+'</span> SHARES</span></p>';
+				gate.api.getAccounts([current_user],function(err,response){
+					if(typeof response[0] !== 'undefined'){
+						result+='<p>Баланс: <span class="token" data-symbol="VIZ"><span class="amount">'+parseFloat(response[0]['balance'])+'</span> VIZ</span></p>';
+						let network_share=100*(parseFloat(response[0]['vesting_shares'])/parseFloat(dgp.total_vesting_shares));
+						result+='<p>Доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['vesting_shares'])+'</span> SHARES</span> ('+network_share.toFixed(5)+'%)</p>';
+						if(parseFloat(response[0]['delegated_vesting_shares'])){
+							result+='<p>Делегировано: <span class="delegated_vesting_shares" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['delegated_vesting_shares'])+'</span> SHARES</span></p>';
+						}
+						if(parseFloat(response[0]['received_vesting_shares'])){
+							result+='<p>Получено делегированием: <span class="received_vesting_shares" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['received_vesting_shares'])+'</span> SHARES</span></p>';
+						}
+						if(parseFloat(response[0]['received_vesting_shares']) || parseFloat(response[0]['delegated_vesting_shares'])){
+							network_share=100*((parseFloat(response[0]['vesting_shares'])+parseFloat(response[0]['received_vesting_shares'])-parseFloat(response[0]['delegated_vesting_shares']))/parseFloat(dgp.total_vesting_shares));
+							result+='<p>Эффективная доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+(parseFloat(response[0]['vesting_shares'])+parseFloat(response[0]['received_vesting_shares'])-parseFloat(response[0]['delegated_vesting_shares']))+'</span> SHARES</span> ('+network_share.toFixed(5)+'%)</p>';
+						}
+						result+='<h3>Выполнить перевод</h3>';
+						if(''==users[current_user].active_key){
+							result+='<p>Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
+						}
+						else{
+							result+='<p><label><input type="text" name="recipient"> &mdash; Получатель</label></p>';
+							result+='<p><label><input type="text" name="amount"> &mdash; Количество VIZ</label></p>';
+							result+='<p><label><input type="text" name="memo"> &mdash; Заметка</label></p>';
+							result+='<p><label><input type="checkbox" name="shares"> — Перевод в Долю сети</label></p>';
+							result+='<p><a class="wallet-transfer-action button"><i class="far fa-fw fa-credit-card"></i> Отправить перевод</a>';
+						}
+						wallet_control.html(result);
 					}
-					if(parseFloat(response[0]['received_vesting_shares'])){
-						result+='<p>Получено делегированием: <span class="received_vesting_shares" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['received_vesting_shares'])+'</span> SHARES</span></p>';
-					}
-					if(parseFloat(response[0]['received_vesting_shares']) || parseFloat(response[0]['delegated_vesting_shares'])){
-						network_share=100*((parseFloat(response[0]['vesting_shares'])+parseFloat(response[0]['received_vesting_shares'])-parseFloat(response[0]['delegated_vesting_shares']))/parseFloat(dgp.total_vesting_shares));
-						result+='<p>Эффективная доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+(parseFloat(response[0]['vesting_shares'])+parseFloat(response[0]['received_vesting_shares'])-parseFloat(response[0]['delegated_vesting_shares']))+'</span> SHARES</span> ('+network_share.toFixed(5)+'%)</p>';
-					}
-					result+='<h3>Выполнить перевод</h3>';
-					result+='<p><label><input type="text" name="recipient"> &mdash; Получатель</label></p>';
-					result+='<p><label><input type="text" name="amount"> &mdash; Количество VIZ</label></p>';
-					result+='<p><label><input type="text" name="memo"> &mdash; Заметка</label></p>';
-					result+='<p><label><input type="checkbox" name="shares"> — Перевод в Долю сети</label></p>';
-					result+='<p><a class="wallet-transfer-action button"><i class="far fa-fw fa-credit-card"></i> Отправить перевод</a>';
-					wallet_control.html(result);
-				}
-			});
+				});
 			});
 		}
 	}
