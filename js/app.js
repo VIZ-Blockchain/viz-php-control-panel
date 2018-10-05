@@ -41,6 +41,7 @@ function load_session(){
 		witness_control();
 		wallet_control();
 		committee_control();
+		witness_votes();
 	}
 }
 function view_session(){
@@ -146,6 +147,20 @@ function vote_witness(witness_login,value){
 			add_notify('Вы не можете голосовать',true);
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
+	});
+}
+function witness_votes(){
+	let view=$('.witness-votes');
+	let result='';
+	result+='<h3>Ваши голоса</h3>';
+	view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+	gate.api.getAccounts([current_user],function(err,response){
+		result+='<p>';
+		for(vote_id in response[0].witness_votes){
+			result+=(0==vote_id?'':', ')+'<a href="/witnesses/'+response[0].witness_votes[vote_id]+'/">'+response[0].witness_votes[vote_id]+'</a>';
+		}
+		result+='</p>';
+		view.html(result);
 	});
 }
 function witness_control(){

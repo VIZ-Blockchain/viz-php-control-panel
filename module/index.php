@@ -181,6 +181,7 @@ if('witnesses'==$path_array[1]){
 		print '<div class="page content">
 		<h1><i class="fas fa-fw fa-user-shield"></i> Делегаты</h1>
 		<div class="article">
+		<div class="witness-votes"></div>
 		<h3>ТОП-100</h3>';
 		$hf=$api->execute_method('get_hardfork_version',array());
 		print '<p>Текущая версия hardfork: '.$hf.'</p>';
