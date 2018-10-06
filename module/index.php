@@ -148,6 +148,7 @@ if('tools'==$path_array[1]){
 		<h1><i class="fas fa-fw fa-toolbox"></i> Инструменты</h1>
 		<div class="article control">';
 		print '<p><a href="/tools/delegation/">Делегирование доли</a></p>';
+        print '<p><a href="/tools/schedule/">Расписание делегатов</a></p>';
 		print '</div></div>';
 	}
 	elseif('delegation'==$path_array[2]){
@@ -161,6 +162,38 @@ if('tools'==$path_array[1]){
 		print '<div class="delegation-delegated-shares"></div>';
 		print '</div></div>';
 	}
+    elseif ('schedule'==$path_array[2]) {
+        $replace['title'] = htmlspecialchars('Расписание делегатов VIZ') . ' - ' . $replace['title'];
+        $replace['description']='Расписание делегатов и резервных делегатов VIZ';
+        print '<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/bignumber.js/2.4.0/bignumber.min.js"></script>
+            <script src="/js/schedule.js"></script>
+            
+            <div class="page content">
+                <div class="article control">
+                    <h1>Расписание делегатов VIZ</h1>
+                    <center>
+                        <span style="display:inline-block; border:1px dotted #ccc; width: 100%; padding:1em; margin:1em; vertical-align:top">
+                            <span style="font-size:medium; font-weight:bold; color:#4F81BD">
+                                Расписание делегатов
+                            </span>
+                            <div id="consoleschedule" style="margin:0.7em 0;">...</div>
+                        </span>
+                        <span style="display:inline-block; border:1px dotted #ccc; width: 100%; padding:1em; margin:1em; vertical-align:top; position:relative;">
+                            <span style="font-size:medium; font-weight:bold; color:#4F81BD">
+                                Резервные делегаты
+                            </span>
+                            <div id="consolewitnesses" style="margin:0.7em 0;">...</div>
+                        </span>
+                    </center>
+                    <div style="text-align: center">
+                        Powered by <a href="https://arcange.eu/schedule/" target="_blank">arcange</a>,
+                        <a href="https://github.com/t3ran13/" target="_blank">t3ran13</a>,
+                        <a href="https://github.com/dignitycf" target="_blank">dignity</a>
+                    </div>
+                </div>
+            </div>';
+    }
 }
 else
 if('login'==$path_array[1]){
