@@ -7,7 +7,8 @@ $replace['menu']='';
 $replace['script_change_time']=filemtime($site_root.'/js/app.js');
 $replace['css_change_time']=filemtime($site_root.'/css/app.css');
 
-$api=new viz_jsonrpc_web('https://testnet.viz.world/');
+$api_ws_arr=array('https://ws.viz.ropox.tools/','https://testnet.viz.world/');
+$api=new viz_jsonrpc_web(array_rand($api_ws_arr));
 
 $users_arr=array();
 function get_user_id($login){
