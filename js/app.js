@@ -44,6 +44,7 @@ function load_session(){
 		witness_votes();
 		delegation_control();
 	}
+	invite_control();
 }
 function view_session(){
 	if(''!=current_user){
@@ -124,6 +125,58 @@ function wallet_withdraw_shares(disable=false){
 			}
 		});
 	}
+}
+function download(filename, text) {
+	var link = document.createElement('a');
+	link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+	link.setAttribute('download', filename);
+
+	if (document.createEvent) {
+		var event = document.createEvent('MouseEvents');
+		event.initEvent('click', true, true);
+		link.dispatchEvent(event);
+	}
+	else {
+		link.click();
+	}
+}
+function invite_register(secret_key,receiver,private_key){
+	public_key=gate.auth.wifToPublic(private_key);
+	gate.broadcast.inviteRegistration('5KcfoRuDfkhrLCxVcE9x51J6KN9aM9fpb78tLrvvFckxVV6FyFW','invite',receiver,secret_key,public_key,function(err,result){
+		if(!err){
+			add_notify('Код успешно активирован');
+			download('viz-registration.txt','VIZ.World registration\r\nAccount login: '+receiver+'\r\nPrivate key: '+private_key+'');
+		}
+		else{
+			add_notify('Ошибка при активации кода',true);
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+	});
+}
+function invite_claim(secret_key,receiver){
+	gate.broadcast.claimInviteBalance('5KcfoRuDfkhrLCxVcE9x51J6KN9aM9fpb78tLrvvFckxVV6FyFW','invite',receiver,secret_key,function(err,result){
+		if(!err){
+			add_notify('Код успешно активирован');
+		}
+		else{
+			add_notify('Ошибка при активации кода',true);
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+	});
+}
+function invite_create(private_key,public_key,amount){
+	amount=parseFloat(amount);
+	let fixed_amount=''+amount.toFixed(3)+' VIZ';
+	gate.broadcast.createInvite(users[current_user].active_key,current_user,fixed_amount,public_key,function(err,result){
+		if(!err){
+			download('viz-invite.txt','VIZ.World Invite code with amount: '+fixed_amount+'\r\nPublic key (for check): '+public_key+'\r\nPrivate key (for activation): '+private_key+'\r\nYou can check code and claim or use it on https://viz.world/tools/invites/');
+			add_notify('Инвайт код создан успешно');
+		}
+		else{
+			add_notify('Ошибка при создании инвайт кода',true);
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+	});
 }
 function wallet_delegate(recipient,amount){
 	let login=recipient.toLowerCase();
@@ -254,6 +307,91 @@ function witness_control(){
 				});
 			}
 		});
+	}
+}
+function pass_gen(){
+	let length=100;
+	let charset='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-=_:;.,@!^&*$';
+	let ret='';
+	for (var i=0,n=charset.length;i<length;++i){
+		ret+=charset.charAt(Math.floor(Math.random()*n));
+	}
+	let wif=gate.auth.toWif('',ret,'')
+	return wif;
+}
+function generate_key(force=false){
+	if(force){
+		$('input.generate-private').val(pass_gen());
+		$('input.generate-public').val(gate.auth.wifToPublic($('input.generate-private').val()));
+	}
+	else{
+		if(0<$('input.generate-private').length){
+			if(''==$('input.generate-private').val()){
+				$('input.generate-private').val(pass_gen());
+				$('input.generate-public').val(gate.auth.wifToPublic($('input.generate-private').val()));
+			}
+		}
+	}
+}
+function invite_control(){
+	if(0!=$('.control .invite-control').length){
+		let invite_control=$('.invite-control');
+		let result='';
+		result+='<h3>Создание нового инвайт кода</h3>';
+		if(''==current_user){
+			result+='<p>Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
+			invite_control.html(result);
+		}
+		else{
+			invite_control.html('<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+			gate.api.getAccounts([current_user],function(err,response){
+				if(typeof response[0] !== 'undefined'){
+					result+='<p>Баланс: <span class="token" data-symbol="VIZ"><span class="amount">'+parseFloat(response[0]['balance'])+'</span> VIZ</span></p>';
+					if(''==users[current_user].active_key){
+						result+='<p>Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
+					}
+					else{
+						result+='<p>Для того чтобы создать инвайт код заполните количество токенов которые вы потратите и сгенерируйте пару ключей (приватный для передачи другому пользователю, публичный для проверки кода).</p>';
+						result+='<p><input type="text" name="private" class="generate-private"> &mdash; Приватный ключ (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">сгенерировать новый</a>)</p>';
+						result+='<p><input type="text" name="public" class="generate-public"> &mdash; Публичный ключ (для проверки)</p>';
+						result+='<p><label><input type="text" name="amount"> &mdash; Количество VIZ</label></p>';
+						result+='<p><a class="invite-action button"><i class="fas fa-fw fa-plus-circle"></i> Создать код</a>';
+					}
+					invite_control.html(result);
+					generate_key();
+				}
+			});
+		}
+	}
+	if(0!=$('.control .invite-lookup').length){
+		let invite_control=$('.invite-lookup');
+		let result='';
+		result+='<h3>Проверка инвайт кода</h3>';
+		result+='<p>Введите публичный код для проверки:</p>';
+		result+='<p><input type="text" name="public"> &mdash; Публичный ключ (для проверки)</p>';
+		result+='<p><a class="invite-lookup-action button"><i class="fas fa-fw fa-search"></i> Поиск и проверка кода</a>';
+		result+='<div class="search-result"></div>';
+		invite_control.html(result);
+	}
+	if(0!=$('.control .invite-claim').length){
+		let invite_control=$('.invite-claim');
+		let result='';
+		result+='<p>Введите код и имя аккаунта, куда перевести баланс кода:</p>';
+		result+='<p><label><input type="text" name="secret"> &mdash; Код</label></p>';
+		result+='<p><label><input type="text" name="receiver" value="'+current_user+'"> &mdash; Получатель</label></p>';
+		result+='<p><a class="invite-claim-action button"><i class="fas fa-fw fa-file-invoice-dollar"></i> Активировать код</a>';
+		invite_control.html(result);
+	}
+	if(0!=$('.control .invite-register').length){
+		let invite_control=$('.invite-register');
+		let result='';
+		result+='<p>Введите код, имя аккаунта и приватный ключ для него (сформирован автоматически):</p>';
+		result+='<p><label><input type="text" name="secret"> &mdash; Код</label></p>';
+		result+='<p><label><input type="text" name="receiver"> &mdash; Имя аккаунта</label></p>';
+		result+='<p><input type="text" name="private" class="generate-private"> &mdash; Приватный ключ (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">сгенерировать новый</a>)</p>';
+		result+='<p><a class="invite-register-action button"><i class="fas fa-fw fa-file-invoice-dollar"></i> Активировать код</a>';
+		invite_control.html(result);
+		generate_key();
 	}
 }
 function delegation_control(){
@@ -603,6 +741,12 @@ function app_mouse(e){
 			try_auth($('input[name=login]').val(),$('input[name=posting_key]').val(),$('input[name=active_key]').val());
 		}
 	}
+	if($(target).hasClass('generate-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			generate_key(true);
+		}
+	}
 	if($(target).hasClass('witness-vote-action')){
 		e.preventDefault();
 		if($(target).closest('.control').length){
@@ -617,6 +761,63 @@ function app_mouse(e){
 			let request_id=$(target).closest('.committee-control').attr('data-request-id');
 			let percent=$(target).closest('.committee-control').find('input[name=vote_percent]').val();
 			committee_vote_request(request_id,percent);
+		}
+	}
+	if($(target).hasClass('invite-register-action') || $(target).parent().hasClass('invite-register-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let secret_key=$('.invite-register input[name=secret]').val();
+			let receiver=$('.invite-register input[name=receiver]').val();
+			let private_key=$('.invite-register input[name=private]').val();
+			invite_register(secret_key,receiver,private_key);
+		}
+	}
+	if($(target).hasClass('invite-claim-action') || $(target).parent().hasClass('invite-claim-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let secret_key=$('.invite-claim input[name=secret]').val();
+			let receiver=$('.invite-claim input[name=receiver]').val();
+			invite_claim(secret_key,receiver);
+		}
+	}
+	if($(target).hasClass('invite-lookup-action') || $(target).parent().hasClass('invite-lookup-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let public_key=$('.invite-lookup input[name=public]').val();
+			gate.api.getInviteByKey(public_key,function(err, response){
+				if(!err){
+					let result='';
+					result+='<p>Создатель: <a href="/@'+response.creator+'/">'+response.creator+'</a></p>';
+					result+='<p>Дата создания: '+response.create_time+'</p>';
+					result+='<p>Баланс кода: '+response.balance+'</p>';
+					if(0==response.status){
+						result+='<p>Статус: ожидает активации</p>';
+					}
+					if(1==response.status){
+						result+='<p>Статус: активирован '+response.claim_time+', баланс переведен пользователю '+response.receiver+'</p>';
+						result+='<p>Использованный баланс: '+response.claimed_balance+'</p>';
+						result+='<p>Проверочный приватный ключ: '+response.invite_secret+'</p>';
+					}
+					if(2==response.status){
+						result+='<p>Статус: активирован '+response.claim_time+', зарегистрирован пользователь '+response.receiver+'</p>';
+						result+='<p>Использованный баланс: '+response.claimed_balance+'</p>';
+						result+='<p>Проверочный приватный ключ: '+response.invite_secret+'</p>';
+					}
+					$('.invite-lookup .search-result').html(result);
+				}
+				else{
+					add_notify('Ошибка',true);
+				}
+			});
+		}
+	}
+	if($(target).hasClass('invite-action') || $(target).parent().hasClass('invite-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let private_key=$('.invite-control input[name=private]').val();
+			let public_key=$('.invite-control input[name=public]').val();
+			let amount=$('.invite-control input[name=amount]').val();
+			invite_create(private_key,public_key,amount);
 		}
 	}
 	if($(target).hasClass('delegation-action') || $(target).parent().hasClass('delegation-action')){

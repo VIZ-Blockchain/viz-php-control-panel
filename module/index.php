@@ -251,8 +251,40 @@ if('tools'==$path_array[1]){
 		print '<div class="page content">
 		<h1><i class="fas fa-fw fa-toolbox"></i> Инструменты</h1>
 		<div class="article control">';
+		print '<p><a href="/tools/invites/">Система инвайтов</a></p>';
 		print '<p><a href="/tools/delegation/">Делегирование доли</a></p>';
 		print '</div></div>';
+	}
+	elseif('invites'==$path_array[2]){
+		if('claim'==$path_array[3]){
+			$replace['title']=htmlspecialchars('Забрать баланс кода').' - '.$replace['title'];
+			print '<div class="page content">
+			<a class="right" href="/tools/invites/">&larr; Вернуться к инвайтам</a>
+			<h1><i class="fas fa-fw fa-toolbox"></i> Забрать баланс кода</h1>
+			<div class="article control">';
+			print '<div class="invite-claim"></div>';
+			print '</div></div>';
+		}
+		if('register'==$path_array[3]){
+			$replace['title']=htmlspecialchars('Регистрация используя инвайт код').' - '.$replace['title'];
+			print '<div class="page content">
+			<h1><i class="fas fa-fw fa-toolbox"></i> Регистрация используя инвайт код</h1>
+			<div class="article control">';
+			print '<p>Внимание! Вы можете <a href="/tools/invites/">проверить баланс кода до регистрации</a> с помощью публичного ключа. После регистрации весь баланс кода будет переведен в SHARES нового аккаунта. Все ключи аккаунта будут идентичны указанным в форме, при желании вы сможете изменить их позже.</p>';
+			print '<div class="invite-register"></div>';
+			print '</div></div>';
+		}
+		if(''==$path_array[3]){
+			$replace['title']=htmlspecialchars('Система инвайтов').' - '.$replace['title'];
+			print '<div class="page content">
+			<a class="right" href="/tools/">&larr; Вернуться к списку инструментов</a>
+			<h1><i class="fas fa-fw fa-toolbox"></i> Система инвайтов</h1>
+			<div class="article control">';
+			print '<p>Инвайты (они же ваучеры) &mdash; универсальный инструмент для передачи фиксированного количества токенов VIZ другим людям (или ботам) вне блокчейна. Погасить код можно двумя способами: <a href="/tools/invites/claim/">перевести его баланс себе на аккаунт</a> или <a href="/tools/invites/register/">зарегистрировать с его помощью новый аккаунт</a>.</p>';
+			print '<div class="invite-control"></div>';
+			print '<div class="invite-lookup"></div>';
+			print '</div></div>';
+		}
 	}
 	elseif('delegation'==$path_array[2]){
 		$replace['title']=htmlspecialchars('Делегирование доли').' - '.$replace['title'];
