@@ -64,6 +64,7 @@ if('@'==mb_substr($path_array[1],0,1)){
 			if($tags){
 				$tags_list=array();
 				foreach($tags as $tag){
+					if($tag)
 					$tags_list[]='<a href="/tags/'.htmlspecialchars($tag).'/">'.htmlspecialchars($tag).'</a>';
 				}
 				$buf.='<div class="tags">'.implode($tags_list).'</div>';
@@ -788,6 +789,7 @@ if(''==$path_array[1]){
 			if($tags){
 				$tags_list=array();
 				foreach($tags as $tag){
+					if($tag)
 					$tags_list[]='<a href="/tags/'.htmlspecialchars($tag).'/">'.htmlspecialchars($tag).'</a>';
 				}
 				$buf.='<div class="tags">'.implode($tags_list).'</div>';
