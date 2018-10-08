@@ -709,7 +709,6 @@ if(''==$path_array[1]){
 					'raw'=>1
 					)
 				)
-				,true
 			);
 		}
 		else{
@@ -721,7 +720,6 @@ if(''==$path_array[1]){
 					'raw'=>1
 					)
 				)
-				,true
 			);
 		}
 		$cache->set($cache_name,json_encode($content_arr),5);
