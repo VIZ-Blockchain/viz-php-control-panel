@@ -88,6 +88,43 @@ function view_energy(){
 		$('.header .energy').css('display','none');
 	}
 }
+function wallet_withdraw_shares(disable=false){
+	if(disable){
+		gate.broadcast.withdrawVesting(users[current_user].active_key,current_user,'0.000000 SHARES',function(err,response){
+			if(!err){
+				wallet_control();
+				add_notify('Понижение доли отменено');
+			}
+			else{
+				add_notify('Ошибка',true);
+				add_notify(err.payload.error.data.stack[0].format,true);
+			}
+		});
+	}
+	else{
+		gate.api.getAccounts([current_user],function(err,response){
+			if(typeof response[0] !== 'undefined'){
+				vesting_shares=parseFloat(response[0].vesting_shares);
+				delegated_vesting_shares=parseFloat(response[0].delegated_vesting_shares);
+				shares=vesting_shares-delegated_vesting_shares;
+				let fixed_shares=''+shares.toFixed(6)+' SHARES';
+				gate.broadcast.withdrawVesting(users[current_user].active_key,current_user,fixed_shares,function(err,response){
+					if(!err){
+						wallet_control();
+						add_notify('Понижение доли запущено');
+					}
+					else{
+						add_notify('Ошибка',true);
+						add_notify(err.payload.error.data.stack[0].format,true);
+					}
+				});
+			}
+			else{
+				add_notify('Информация по аккаунту не получена',true);
+			}
+		});
+	}
+}
 function wallet_delegate(recipient,amount){
 	let login=recipient.toLowerCase();
 	if('@'==login.substring(0,1)){
@@ -324,6 +361,17 @@ function wallet_control(){
 				gate.api.getAccounts([current_user],function(err,response){
 					if(typeof response[0] !== 'undefined'){
 						result+='<p>Баланс: <span class="token" data-symbol="VIZ"><span class="amount">'+parseFloat(response[0]['balance'])+'</span> VIZ</span></p>';
+						if('0.000000 SHARES'==response[0].vesting_withdraw_rate){
+							result+='<div class="right"><a class="enable-withdraw-shares-action">Включить понижение</a></div>';
+						}
+						else{
+							result+='<div class="right">';
+							let powerdown_time=Date.parse(response[0].next_vesting_withdrawal);
+							if(powerdown_time>0){
+								result+='<i class="fas fa-fw fa-level-down-alt" title="'+date_str(powerdown_time-(new Date().getTimezoneOffset()*60000),true,false,true)+': '+response[0].vesting_withdraw_rate+'"></i> ';
+							}
+							result+='<a class="disable-withdraw-shares-action">Отключить понижение</a></div>';
+						}
 						let network_share=100*(parseFloat(response[0]['vesting_shares'])/parseFloat(dgp.total_vesting_shares));
 						result+='<p>Доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['vesting_shares'])+'</span> SHARES</span> ('+network_share.toFixed(5)+'%)</p>';
 						if(parseFloat(response[0]['delegated_vesting_shares'])){
@@ -579,6 +627,18 @@ function app_mouse(e){
 				proper_target=$(target).parent();
 			}
 			wallet_delegate($('.delegation-control input[name=recipient]').val(),$('.delegation-control input[name=amount]').val());
+		}
+	}
+	if($(target).hasClass('disable-withdraw-shares-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			wallet_withdraw_shares(true);
+		}
+	}
+	if($(target).hasClass('enable-withdraw-shares-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			wallet_withdraw_shares();
 		}
 	}
 	if($(target).hasClass('wallet-transfer-action') || $(target).parent().hasClass('wallet-transfer-action')){
