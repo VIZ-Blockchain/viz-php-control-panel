@@ -584,6 +584,16 @@ label input[type=checkbox]{
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+.page.preview .subtitle.repost::before{
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+	content: '\f079';
+	font-size:21px;
+	line-height: 30px;
+	text-decoration: none;
+	float: left;
+	margin-right: 5px;
+}
 .page.preview .cover{
 	float:left;
 	margin-left:21px;

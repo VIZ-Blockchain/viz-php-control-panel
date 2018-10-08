@@ -131,12 +131,115 @@ if('@'==mb_substr($path_array[1],0,1)){
 				</div>
 			</div>
 	</div>';
+			if(!isset($_GET['offset'])){
+				$_GET['offset']='0';
+			}
+			$cache_name='blog_'.$account_login.':'.$_GET['offset'];
+			if($buf=$cache->get($cache_name)){
+				$content_arr=json_decode($buf,true);
+			}
+			else{
+				$content_arr=$api->execute_method('get_blog',array($account_login,$_GET['offset'],10));
+				$cache->set($cache_name,json_encode($content_arr),5);
+			}
+			if($content_arr){
+				$buf='';
+				$buf.='
+				<div class="page content">
+					<h1>Контент пользователя:</h1>
+				</div>';
+				$last_offset=-1;
+				foreach($content_arr as $k=>$entry){
+					$content=$entry['content'];
+					$date=date_parse_from_format('Y-m-d\TH:i:s',$entry['reblog_on']);
+					$reblog_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+					$last_author=$content['author'];
+					$last_permlink=$content['permlink'];
+					$date=date_parse_from_format('Y-m-d\TH:i:s',$content['created']);
+					$content_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+					$json=json_decode($content['json_metadata'],true);
 
-			$buf='';
-			$buf.='
-			<div class="page content">
-				<h1>Контент пользователя:</h1>
-			</div>';
+					$cover=false;
+					if($json['image'][0]){
+						$cover=$json['image'][0];
+					}
+					$preview_text=mb_substr($content['body'],0,1024);
+					$preview_text=str_replace('<br>',"\n",$preview_text);
+					$preview_text=str_replace('<hr>',"\n",$preview_text);
+					$preview_text=htmlspecialchars_decode($preview_text);
+					$preview_text=str_replace('&nbsp;',' ',$preview_text);
+					$preview_text=str_replace('<br />',"\n",$preview_text);
+					$preview_text=str_replace('<br/>',"\n",$preview_text);
+					$preview_text=str_replace('<p>',"\n",$preview_text);
+					$preview_text=str_replace('</p>',"\n",$preview_text);
+					$preview_text=mb_ereg_replace("\r",'',$preview_text);
+					$preview_text=mb_ereg_replace("\t",'',$preview_text);
+					$preview_text=str_replace('  ',' ',$preview_text);
+					$preview_text=str_replace("\n\n","\n",$preview_text);
+					$preview_text=strip_tags($preview_text);
+					$preview_text=trim($preview_text,"\r\n\t ");
+					$preview_text_arr=explode("\n",$preview_text);
+					$preview_text_final=$preview_text_arr[0];
+					if(mb_strlen($preview_text_final)<250){
+						if($preview_text_arr[1]){
+							$preview_text_final.='</p><p>'.(mb_strlen($preview_text_arr[1])>250?mb_substr($preview_text_arr[1],0,255,'utf-8').'&hellip;':$preview_text_arr[1]);
+						}
+					}
+					if(mb_strlen($preview_text_final)<250){
+						if($preview_text_arr[2]){
+							$preview_text_final.='</p><p>'.(mb_strlen($preview_text_arr[2])>250?mb_substr($preview_text_arr[2],0,255,'utf-8').'&hellip;':$preview_text_arr[2]);
+						}
+					}
+					else{
+						$preview_text_final=mb_substr($preview_text_final,0,255,'utf-8').'&hellip;';
+					}
+					if($preview_text_final){
+						$preview_text_final='<p>'.$preview_text_final.'</p>';
+					}
+
+					$buf.='
+					<div class="page preview">
+						<a href="/@'.$content['author'].'/'.htmlspecialchars($content['permlink']).'/" class="subtitle'.($reblog_time?' repost':'').'">'.htmlspecialchars($content['title']).'</a>';
+					if($cover){
+						$buf.='<div class="cover"><img src="https://i.goldvoice.club/0x0/'.htmlspecialchars($cover).'" alt=""></div>';
+					}
+					$buf.='
+						<div class="article'.($cover?' cover-exist clearfix':'').'">';
+					$buf.=$preview_text_final;
+					$buf.='</div>';
+					$tags=$json['tags'];
+					if($tags){
+						$tags_list=array();
+						foreach($tags as $tag){
+							$tags_list[]='<a href="/tags/'.htmlspecialchars($tag).'/">'.htmlspecialchars($tag).'</a>';
+						}
+						$buf.='<div class="tags">'.implode($tags_list).'</div>';
+					}
+					$buf.='<div class="info">
+						<div class="author"><a href="/@'.$content['author'].'/" class="avatar" style=""></a><a href="/@'.$content['author'].'/">@'.$content['author'].'</a></div>
+						<div class="timestamp" data-timestamp="'.$content_time.'">'.date('d.m.Y H:i:s',$content_time).'</div>
+						<div class="right">
+							<a class="award"></a>
+							<a class="flag"></a>
+							<div class="votes_count">'.$content['active_votes_count'].' голосов</div>
+							<div class="comments">'.$content['children'].'<a href="/@'.$content['author'].'/'.htmlspecialchars($content['permlink']).'/#comments" class="icon"><i class="far fa-comment"></i></a></div>
+						</div>
+					</div>
+				</div>';
+					if($last_offset>$entry['entry_id']){
+						$last_offset=$entry['entry_id'];
+					}
+					if(-1==$last_offset){
+						$last_offset=$entry['entry_id'];
+					}
+				}
+				if($last_offset!=0){
+					$buf.='<div class="page">';
+					$buf.='<a class="load_more" href="?offset='.$last_offset.'">Загрузить еще&hellip;</a>';
+					$buf.='</div>';
+				}
+				print $buf;
+			}
 		}
 	}
 }
@@ -228,12 +331,14 @@ if('witnesses'==$path_array[1]){
 			else{
 				print $witness_arr['running_version'];
 			}
-			if('0.0.0'!=$witness_arr['hardfork_version_vote']){
-				if($witness_arr['hardfork_version_vote']!=$witness_arr['running_version']){
-					print ', голосует за переход с версии: '.$witness_arr['hardfork_version_vote'].' начиная с: ';
-					$date=date_parse_from_format('Y-m-d\TH:i:s',$witness_arr['hardfork_time_vote']);
-					$vote_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
-					print '<span class="timestamp" data-timestamp="'.$vote_time.'">'.date('d.m.Y H:i:s',$vote_time).'</span>';
+			if($witness_hf!=$hf){
+				if('0.0.0'!=$witness_arr['hardfork_version_vote']){
+					if($witness_arr['hardfork_version_vote']!=$witness_arr['running_version']){
+						print ', голосует за переход с версии: '.$witness_arr['hardfork_version_vote'].' начиная с: ';
+						$date=date_parse_from_format('Y-m-d\TH:i:s',$witness_arr['hardfork_time_vote']);
+						$vote_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+						print '<span class="timestamp" data-timestamp="'.$vote_time.'">'.date('d.m.Y H:i:s',$vote_time).'</span>';
+					}
 				}
 			}
 			print '</p>';
