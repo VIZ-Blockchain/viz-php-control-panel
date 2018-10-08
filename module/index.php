@@ -157,6 +157,7 @@ if('tools'==$path_array[1]){
 		<h1><i class="fas fa-fw fa-toolbox"></i> Делегирование доли</h1>
 		<div class="article control">';
 		print '<div class="delegation-control"></div>';
+		print '<div class="delegation-returning-shares"></div>';
 		print '<div class="delegation-received-shares"></div>';
 		print '<div class="delegation-delegated-shares"></div>';
 		print '</div></div>';

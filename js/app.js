@@ -256,6 +256,23 @@ function delegation_control(){
 			});
 		}
 	}
+	if(0!=$('.control .delegation-returning-shares').length){
+		let delegation_control=$('.delegation-returning-shares');
+		let result='';
+		if(''!=current_user){
+			gate.api.getExpiringVestingDelegations(current_user,new Date().toISOString().substr(0,19),1000,function(err,response){
+				if(!err){
+					if(0!=response.length){
+						result+='<h3>Возврат делегированной доли</h3>';
+						for(delegation in response){
+							result+='<p>'+response[delegation].expiration+' вернется '+response[delegation].vesting_shares+'</p>';
+						}
+						delegation_control.html(result);
+					}
+				}
+			});
+		}
+	}
 	if(0!=$('.control .delegation-received-shares').length){
 		let delegation_control=$('.delegation-received-shares');
 		let result='';
