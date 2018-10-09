@@ -280,8 +280,8 @@ if('tools'==$path_array[1]){
 			<h1><i class="fas fa-fw fa-toolbox"></i> Система инвайтов</h1>
 			<div class="article control">';
 			print '<p>Инвайты (они же ваучеры) &mdash; универсальный инструмент для передачи фиксированного количества токенов VIZ другим людям (или ботам) вне блокчейна. Погасить код можно двумя способами: <a href="/tools/invites/claim/">перевести его баланс себе на аккаунт</a> или <a href="/tools/invites/register/">зарегистрировать с его помощью новый аккаунт</a>.</p>';
-			print '<div class="invite-control"></div>';
 			print '<div class="invite-lookup"></div>';
+			print '<div class="invite-control"></div>';
 			print '</div></div>';
 		}
 	}

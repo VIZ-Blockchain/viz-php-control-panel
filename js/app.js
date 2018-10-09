@@ -322,7 +322,9 @@ function pass_gen(){
 function generate_key(force=false){
 	if(force){
 		$('input.generate-private').val(pass_gen());
-		$('input.generate-public').val(gate.auth.wifToPublic($('input.generate-private').val()));
+		if(0<$('input.generate-public').length){
+			$('input.generate-public').val(gate.auth.wifToPublic($('input.generate-private').val()));
+		}
 	}
 	else{
 		if(0<$('input.generate-private').length){
@@ -343,7 +345,7 @@ function invite_control(){
 			invite_control.html(result);
 		}
 		else{
-			invite_control.html('<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+			invite_control.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
 			gate.api.getAccounts([current_user],function(err,response){
 				if(typeof response[0] !== 'undefined'){
 					result+='<p>Баланс: <span class="token" data-symbol="VIZ"><span class="amount">'+parseFloat(response[0]['balance'])+'</span> VIZ</span></p>';
@@ -352,9 +354,9 @@ function invite_control(){
 					}
 					else{
 						result+='<p>Для того чтобы создать инвайт код заполните количество токенов которые вы потратите и сгенерируйте пару ключей (приватный для передачи другому пользователю, публичный для проверки кода).</p>';
-						result+='<p><input type="text" name="private" class="generate-private"> &mdash; Приватный ключ (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">сгенерировать новый</a>)</p>';
-						result+='<p><input type="text" name="public" class="generate-public"> &mdash; Публичный ключ (для проверки)</p>';
-						result+='<p><label><input type="text" name="amount"> &mdash; Количество VIZ</label></p>';
+						result+='<p class="input-descr">Приватный ключ (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">сгенерировать новый</a>):<br><input type="text" name="private" class="generate-private round wide"></p>';
+						result+='<p class="input-descr">Публичный ключ (для проверки):<br><input type="text" name="public" class="generate-public round wide"></p>';
+						result+='<p><label class="input-descr">Количество VIZ:<br><input type="text" name="amount" class="round"></label></p>';
 						result+='<p><a class="invite-action button"><i class="fas fa-fw fa-plus-circle"></i> Создать код</a>';
 					}
 					invite_control.html(result);
@@ -368,7 +370,7 @@ function invite_control(){
 		let result='';
 		result+='<h3>Проверка инвайт кода</h3>';
 		result+='<p>Введите публичный код для проверки:</p>';
-		result+='<p><input type="text" name="public"> &mdash; Публичный ключ (для проверки)</p>';
+		result+='<p class="input-descr"><input type="text" name="public" class="round wide"></p>';
 		result+='<p><a class="invite-lookup-action button"><i class="fas fa-fw fa-search"></i> Поиск и проверка кода</a>';
 		result+='<div class="search-result"></div>';
 		invite_control.html(result);
@@ -377,8 +379,8 @@ function invite_control(){
 		let invite_control=$('.invite-claim');
 		let result='';
 		result+='<p>Введите код и имя аккаунта, куда перевести баланс кода:</p>';
-		result+='<p><label><input type="text" name="secret"> &mdash; Код</label></p>';
-		result+='<p><label><input type="text" name="receiver" value="'+current_user+'"> &mdash; Получатель</label></p>';
+		result+='<p><label class="input-descr">Код:<br><input type="text" name="secret" class="round wide"></label></p>';
+		result+='<p><label class="input-descr">Получатель:<br><input type="text" name="receiver" class="round" value="'+current_user+'"></label></p>';
 		result+='<p><a class="invite-claim-action button"><i class="fas fa-fw fa-file-invoice-dollar"></i> Активировать код</a>';
 		invite_control.html(result);
 	}
@@ -386,9 +388,9 @@ function invite_control(){
 		let invite_control=$('.invite-register');
 		let result='';
 		result+='<p>Введите код, имя аккаунта и приватный ключ для него (сформирован автоматически):</p>';
-		result+='<p><label><input type="text" name="secret"> &mdash; Код</label></p>';
-		result+='<p><label><input type="text" name="receiver"> &mdash; Имя аккаунта</label></p>';
-		result+='<p><input type="text" name="private" class="generate-private"> &mdash; Приватный ключ (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">сгенерировать новый</a>)</p>';
+		result+='<p><label class="input-descr">Код:<br><input type="text" name="secret" class="round wide"></label></p>';
+		result+='<p><label class="input-descr">Имя аккаунта:<br><input type="text" name="receiver" class="round wide"></label></p>';
+		result+='<p class="input-descr">Приватный ключ (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">сгенерировать новый</a>):<br><input type="text" name="private" class="generate-private round wide"></p>';
 		result+='<p><a class="invite-register-action button"><i class="fas fa-fw fa-file-invoice-dollar"></i> Активировать код</a>';
 		invite_control.html(result);
 		generate_key();

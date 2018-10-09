@@ -986,3 +986,15 @@ a.load_more{
 	display:inline-block;
 	margin:0 12px;
 }
+input.round{
+	border-radius: 4px;
+	border: 1px solid #aaa;
+	padding: 4px 8px;
+}
+input.wide{
+	width: 100%;
+	font-size: 14px;
+}
+.input-descr{
+	font-size: 14px;
+}
