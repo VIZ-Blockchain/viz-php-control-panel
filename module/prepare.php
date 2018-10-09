@@ -191,6 +191,7 @@ function clear_html_tags($text){
 	$allowed_style_arr=array('text-align','float','text-indent','clear','margin-left','margin-right','margin-top','padding-left','margin-bottom','display','list-style-type','text-decoration','color','font-style','font-size');
 	$allowed_class_arr=array('spoiler','pull-left','pull-right','language-markup','language-javascript','language-css','language-php','language-ruby','language-python','language-java','language-c','language-csharp','language-cpp','text-justify');
 	$denied_tags=array('script','style');
+	$denied_href_arr=array('javascript:');
 	preg_match_all('~<(.[^>]*)>~iUs',$text,$matches);
 	foreach($matches[1] as $match_k=>$match){
 		$full_match=$matches[0][$match_k];
@@ -257,6 +258,15 @@ function clear_html_tags($text){
 					$full_classes=implode(' ',$classes_arr);
 					if($attr_arr[2][$attr_k]!=$full_classes){
 						$full_match=str_replace($attr_arr[2][$attr_k],$full_classes,$full_match);
+					}
+				}
+				if('href'==$attr){
+					$full_link=$attr_arr[2][$attr_k];
+					$styles_arr=explode(';',$full_styles);
+					foreach($denied_href_arr as $denied_href){
+						if(strpos($full_link,$denied_href)!==false){
+							$full_match=str_replace($attr_arr[2][$attr_k],str_replace($denied_href,'',$full_link),$full_match);
+						}
 					}
 				}
 			}
