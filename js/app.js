@@ -424,8 +424,8 @@ function delegation_control(){
 					}
 					else{
 						result+='<p>Для того чтобы отозвать делегирование, укажите в количестве SHARES нулевое значение. Возврат делегированной доли может занять время.</p>';
-						result+='<p><label><input type="text" name="recipient"> &mdash; Получатель</label></p>';
-						result+='<p><label><input type="text" name="amount"> &mdash; Количество SHARES</label></p>';
+						result+='<p><label><input type="text" name="recipient" class="round"> &mdash; получатель</label></p>';
+						result+='<p><label><input type="text" name="amount" class="round"> &mdash; количество SHARES</label></p>';
 						result+='<p><a class="delegation-action button"><i class="far fa-fw fa-credit-card"></i> Делегировать</a>';
 					}
 					delegation_control.html(result);
@@ -529,10 +529,10 @@ function wallet_control(){
 							result+='<p>Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
 						}
 						else{
-							result+='<p><label><input type="text" name="recipient"> &mdash; Получатель</label></p>';
-							result+='<p><label><input type="text" name="amount"> &mdash; Количество VIZ</label></p>';
-							result+='<p><label><input type="text" name="memo"> &mdash; Заметка</label></p>';
-							result+='<p><label><input type="checkbox" name="shares"> — Перевод в Долю сети</label></p>';
+							result+='<p><label><input type="text" name="recipient" class="round"> &mdash; получатель</label></p>';
+							result+='<p><label><input type="text" name="amount" class="round"> &mdash; количество VIZ</label></p>';
+							result+='<p><label><input type="text" name="memo" class="round"> &mdash; заметка</label></p>';
+							result+='<p><label><input type="checkbox" name="shares"> — перевод в долю сети</label></p>';
 							result+='<p><a class="wallet-transfer-action button"><i class="far fa-fw fa-credit-card"></i> Отправить перевод</a>';
 						}
 						wallet_control.html(result);
@@ -550,7 +550,7 @@ function committee_control(){
 			let result='';
 			result+='<h3>Голосование за заявку #'+request_id+'</h3>';
 			result+='<p><input type="range" name="vote_percent_range" min="-100" max="+100" value="0">';
-			result+=' <input type="text" name="vote_percent" value="0" size="4"> процентов от максимальной суммы заявки<br>';
+			result+=' <input type="text" name="vote_percent" value="0" size="4" class="round"> процентов от максимальной суммы заявки<br>';
 			result+='<input type="button" class="committee-vote-request-action button" value="Проголосовать"></p>';
 			committee_control.html(result);
 			committee_control.find('input[name=vote_percent_range]').bind('change',function(){
