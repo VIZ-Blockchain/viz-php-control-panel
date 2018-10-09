@@ -1,6 +1,5 @@
 <?php
 ob_start();
-$api=new viz_jsonrpc_web('https://testnet.viz.world/');
 if('@'==mb_substr($path_array[1],0,1)){
 	if($path_array[2]){
 		$author=mb_substr($path_array[1],1);
@@ -342,7 +341,7 @@ if('witnesses'==$path_array[1]){
 		<div class="article">
 		<div class="witness-votes"></div>
 		<h3>ТОП-100</h3>';
-		$hf=$api->execute_method('get_hardfork_version',array());
+		$hf=$api->execute_method('get_hardfork_version',array(),true);
 		print '<p>Текущая версия hardfork: '.$hf.'</p>';
 		$hf=intval(str_replace('.','',$hf));
 		$list=$api->execute_method('get_witnesses_by_vote',array('',100));
