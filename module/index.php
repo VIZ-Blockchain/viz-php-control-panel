@@ -265,11 +265,11 @@ if('tools'==$path_array[1]){
 			print '</div></div>';
 		}
 		if('register'==$path_array[3]){
-			$replace['title']=htmlspecialchars('Регистрация используя инвайт код').' - '.$replace['title'];
+			$replace['title']=htmlspecialchars('Регистрация по инвайт-коду').' - '.$replace['title'];
 			print '<div class="page content">
-			<h1><i class="fas fa-fw fa-toolbox"></i> Регистрация используя инвайт код</h1>
+			<h1><i class="fas fa-fw fa-toolbox"></i> Регистрация по инвайт-коду</h1>
 			<div class="article control">';
-			print '<p>Внимание! Вы можете <a href="/tools/invites/">проверить баланс кода до регистрации</a> с помощью публичного ключа. После регистрации весь баланс кода будет переведен в SHARES нового аккаунта. Все ключи аккаунта будут идентичны указанным в форме, при желании вы сможете изменить их позже.</p>';
+			print '<p>Внимание! Вы можете <a href="/tools/invites/">проверить баланс кода до регистрации</a> с помощью публичного ключа. После регистрации весь баланс кода будет переведен в SHARES нового аккаунта. Все ключи аккаунта будут идентичны указанному в форме, при желании вы сможете изменить их позже.</p>';
 			print '<div class="invite-register"></div>';
 			print '</div></div>';
 		}
