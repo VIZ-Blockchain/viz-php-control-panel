@@ -4,7 +4,8 @@ var current_block=0;
 var current_user='';
 var users={};
 var notify_id=0;
-//gate.config.set('websocket','wss://testnet.viz.world');
+var api_gate='wss://testnet.viz.world';
+gate.config.set('websocket',api_gate);
 gate.api.stop();
 
 function del_notify(id){

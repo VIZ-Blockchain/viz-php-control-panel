@@ -1,6 +1,5 @@
 $(document).ready(function(){
 	var empty_signing_key='VIZ1111111111111111111111111111111114T1Anm';
-	var wssServer='wss://testnet.viz.world';
 
 	var WebSocketWrapper;
 	WebSocketWrapper=function(){
@@ -65,7 +64,7 @@ $(document).ready(function(){
 	var witness_rank=[];
 
 	function main(){
-		var server=wssServer;
+		var server=api_gate;
 		var ws=new WebSocketWrapper(server);
 		ws.connect().then(function(response){
 			var gate=new api_wrapper(ws);
