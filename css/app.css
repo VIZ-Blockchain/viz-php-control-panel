@@ -998,3 +998,11 @@ input.wide{
 .input-descr{
 	font-size: 14px;
 }
+.witness_schedule{
+	text-align:center;
+	font-family:Arial,sans-serif;
+}
+.witness_support_queue{
+	text-align:center;
+	font-family:Arial,sans-serif;
+}
