@@ -1,6 +1,4 @@
 $(document).ready(function(){
-	var empty_signing_key='VIZ1111111111111111111111111111111114T1Anm';
-
 	var WebSocketWrapper;
 	WebSocketWrapper=function(){
 		var ws=WebSocketWrapper.prototype;

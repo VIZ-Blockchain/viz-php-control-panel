@@ -425,6 +425,7 @@ if('witnesses'==$path_array[1]){
 			}
 			print $view_props;
 			print '</pre>';
+			print '<div class="witness-vote" data-witness="'.$witness_arr['owner'].'"></div>';
 			print '<div class="witness-control" data-witness="'.$witness_arr['owner'].'"></div>';
 		}
 	}

@@ -4,6 +4,7 @@ var current_block=0;
 var current_user='';
 var users={};
 var notify_id=0;
+var empty_signing_key='VIZ1111111111111111111111111111111114T1Anm';
 var api_gate='wss://testnet.viz.world';
 gate.config.set('websocket',api_gate);
 gate.api.stop();
@@ -42,7 +43,6 @@ function load_session(){
 		witness_control();
 		wallet_control();
 		committee_control();
-		witness_votes();
 		delegation_control();
 	}
 	invite_control();
@@ -257,6 +257,59 @@ function committee_vote_request(request_id,percent){
 		}
 	});
 }
+function witness_update(witness_login,url,signing_key){
+	if(current_user!=witness_login){
+		add_notify('Текущий пользователь не совпадает с делегатом для обновления',true);
+	}
+	else{
+		if(''==signing_key){
+			signing_key=empty_signing_key;
+		}
+		gate.broadcast.witnessUpdate(users[current_user]['active_key'],current_user,url,signing_key,function(err,result){
+			if(!err){
+				witness_control();
+				add_notify('Данные успешно транслированы в сеть');
+			}
+			else{
+				add_notify('Ошибка',true);
+			}
+		});
+	}
+}
+function witness_chain_properties_update(witness_login,url,signing_key){
+	if(current_user!=witness_login){
+		add_notify('Текущий пользователь не совпадает с делегатом для обновления',true);
+	}
+	else{
+		gate.api.getWitnessByAccount(witness_login,function(err,response){
+			if(!err){
+				let props=response.props;
+				props.account_creation_fee=$('.witness-control[data-witness='+witness_login+'] input[name=account_creation_fee]').val();
+				props.create_account_delegation_ratio=$('.witness-control[data-witness='+witness_login+'] input[name=create_account_delegation_ratio]').val();
+				props.create_account_delegation_time=$('.witness-control[data-witness='+witness_login+'] input[name=create_account_delegation_time]').val();
+				props.bandwidth_reserve_percent=100*parseInt($('.witness-control[data-witness='+witness_login+'] input[name=bandwidth_reserve_percent]').val());
+				props.bandwidth_reserve_below=$('.witness-control[data-witness='+witness_login+'] input[name=bandwidth_reserve_below]').val();
+				props.committee_request_approve_min_percent=100*parseInt($('.witness-control[data-witness='+witness_login+'] input[name=committee_request_approve_min_percent]').val());
+				props.flag_energy_additional_cost=100*parseInt($('.witness-control[data-witness='+witness_login+'] input[name=flag_energy_additional_cost]').val());
+				props.min_curation_percent=100*parseInt($('.witness-control[data-witness='+witness_login+'] input[name=min_curation_percent]').val());
+				props.max_curation_percent=100*parseInt($('.witness-control[data-witness='+witness_login+'] input[name=max_curation_percent]').val());
+				props.min_delegation=$('.witness-control[data-witness='+witness_login+'] input[name=min_delegation]').val();
+				props.vote_accounting_min_rshares=$('.witness-control[data-witness='+witness_login+'] input[name=vote_accounting_min_rshares]').val();
+				props.maximum_block_size=$('.witness-control[data-witness='+witness_login+'] input[name=maximum_block_size]').val();
+				gate.broadcast.chainPropertiesUpdate(users[current_user]['active_key'],current_user,props,function(err,response){
+					if(!err){
+						witness_control();
+						add_notify('Параметры успешно транслированы в сеть');
+					}
+					else{
+						add_notify('Ошибка',true);
+						add_notify(err.payload.error.data.stack[0].format,true);
+					}
+				});
+			}
+		});
+	}
+}
 function vote_witness(witness_login,value){
 	gate.broadcast.accountWitnessVote(users[current_user]['active_key'],current_user,witness_login,value,function(err, result){
 		if(!err){
@@ -268,44 +321,83 @@ function vote_witness(witness_login,value){
 		}
 	});
 }
-function witness_votes(){
-	let view=$('.witness-votes');
-	let result='';
-	result+='<h3>Ваши голоса</h3>';
-	view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
-	gate.api.getAccounts([current_user],function(err,response){
-		result+='<p>';
-		for(vote_id in response[0].witness_votes){
-			result+=(0==vote_id?'':', ')+'<a href="/witnesses/'+response[0].witness_votes[vote_id]+'/">'+response[0].witness_votes[vote_id]+'</a>';
-		}
-		result+='</p>';
-		view.html(result);
-	});
-}
 function witness_control(){
-	if(0!=$('.control .witness-control').length){
-		$('.witness-control').each(function(){
+	if(0!=$('.control .witness-votes').length){
+		let view=$('.witness-votes');
+		let result='';
+		result+='<h3>Ваши голоса</h3>';
+		view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+		gate.api.getAccounts([current_user],function(err,response){
+			result+='<p>';
+			for(vote_id in response[0].witness_votes){
+				result+=(0==vote_id?'':', ')+'<a href="/witnesses/'+response[0].witness_votes[vote_id]+'/">'+response[0].witness_votes[vote_id]+'</a>';
+			}
+			result+='</p>';
+			view.html(result);
+		});
+	}
+	if(0!=$('.control .witness-vote').length){
+		$('.witness-vote').each(function(){
 			let witness_login=$(this).attr('data-witness');
-			let witness_control=$(this);
+			let view=$(this);
 			let result='';
+			result+='<h3>Голосование за делегата '+witness_login+'</h3>';
+			view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
 			if(''==users[current_user].active_key){
-				result+='<h3>Голосование за делегата '+witness_login+'</h3>';
 				result+='Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.';
-				witness_control.html(result);
+				view.html(result);
 			}
 			else{
 				gate.api.getAccounts([current_user],function(err,response){
 					if(typeof response[0] !== 'undefined'){
-						result+='<h3>Голосование за делегата '+witness_login+'</h3>';
 						if(response[0].witness_votes.includes(witness_login)){
 							result+='<input type="button" class="witness-vote-action button negative" data-value="false" value="Снять голос с делегата">';
 						}
 						else{
 							result+='<input type="button" class="witness-vote-action button" data-value="true" value="Отдать голос за делегата">';
 						}
-						witness_control.html(result);
+						view.html(result);
 					}
 				});
+			}
+		});
+	}
+	if(0!=$('.control .witness-control').length){
+		$('.witness-control').each(function(){
+			let witness_login=$(this).attr('data-witness');
+			if(current_user==witness_login){
+				let view=$(this);
+				let result='';
+				result+='<h3>Управление делегатом '+witness_login+'</h3>';
+				view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+				if(''==users[current_user].active_key){
+					result+='Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.';
+					view.html(result);
+				}
+				else{
+					gate.api.getWitnessByAccount(witness_login,function(err,response){
+						if(!err){
+							result+='<label class="input-descr">URL заявления о намерениях:<input type="text" name="url" class="round wide" value="'+response.url+'"></label>';
+							result+='<label class="input-descr">Публичный ключ подписи:<input type="text" name="signing_key" class="round wide" value="'+response.signing_key+'" placeholder="'+empty_signing_key+'"></label>';
+							result+='<input type="button" class="witness-update-action button" value="Сохранить">';
+							result+='<h4>Параметры сети</h4>';
+							result+='<label class="input-descr">Передаваемая комиссия при создании аккаунта:<input type="text" name="account_creation_fee" class="witness-chain-properties round wide" value="'+response.props.account_creation_fee+'"></label>';
+							result+='<label class="input-descr">Коэффициент делегирования при создании аккаунта:<input type="text" name="create_account_delegation_ratio" class="witness-chain-properties round wide" value="'+response.props.create_account_delegation_ratio+'"></label>';
+							result+='<label class="input-descr">Время делегирования при создании аккаунта (секунд):<input type="text" name="create_account_delegation_time" class="witness-chain-properties round wide" value="'+response.props.create_account_delegation_time+'"></label>';
+							result+='<label class="input-descr">Доля сети, выделяемая для резервной пропускной способности (процент):<input type="text" name="bandwidth_reserve_percent" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_percent/100+'"></label>';
+							result+='<label class="input-descr">Резервная пропускная способность действует для аккаунтов с долей сети до порога:<input type="text" name="bandwidth_reserve_below" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_below+'"></label>';
+							result+='<label class="input-descr">Минимальный процент доли сети голосующих необходимый для принятия решения по заявке в комитете:<input type="text" name="committee_request_approve_min_percent" class="witness-chain-properties round wide" value="'+response.props.committee_request_approve_min_percent/100+'"></label>';
+							result+='<label class="input-descr">Дополнительная трата энергии на флаг (процент):<input type="text" name="flag_energy_additional_cost" class="witness-chain-properties round wide" value="'+response.props.flag_energy_additional_cost/100+'"></label>';
+							result+='<label class="input-descr">Минимально-допустимый процент кураторской награды:<input type="text" name="min_curation_percent" class="witness-chain-properties round wide" value="'+response.props.min_curation_percent/100+'"></label>';
+							result+='<label class="input-descr">Максимально-допустимый процент кураторской награды:<input type="text" name="max_curation_percent" class="witness-chain-properties round wide" value="'+response.props.max_curation_percent/100+'"></label>';
+							result+='<label class="input-descr">Минимальное количество токенов при делегировании:<input type="text" name="min_delegation" class="witness-chain-properties round wide" value="'+response.props.min_delegation+'"></label>';
+							result+='<label class="input-descr">Минимальный вес голоса для учета при голосовании за контент (rshares):<input type="text" name="vote_accounting_min_rshares" class="witness-chain-properties round wide" value="'+response.props.vote_accounting_min_rshares+'"></label>';
+							result+='<label class="input-descr">Максимальный размер блока в сети (байт):<input type="text" name="maximum_block_size" class="witness-chain-properties round wide" value="'+response.props.maximum_block_size+'"></label>';
+							result+='<input type="button" class="witness-chain-properties-update-action button" value="Установить параметры сети делегата">';
+							view.html(result);
+						}
+					});
+				}
 			}
 		});
 	}
@@ -750,10 +842,26 @@ function app_mouse(e){
 			generate_key(true);
 		}
 	}
-	if($(target).hasClass('witness-vote-action')){
+	if($(target).hasClass('witness-chain-properties-update-action')){
 		e.preventDefault();
 		if($(target).closest('.control').length){
 			let witness_login=$(target).closest('.witness-control').attr('data-witness');
+			witness_chain_properties_update(witness_login);
+		}
+	}
+	if($(target).hasClass('witness-update-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let witness_login=$(target).closest('.witness-control').attr('data-witness');
+			let url=$(target).closest('.witness-control').find('input[name=url]').val();
+			let signing_key=$(target).closest('.witness-control').find('input[name=signing_key]').val();
+			witness_update(witness_login,url,signing_key);
+		}
+	}
+	if($(target).hasClass('witness-vote-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let witness_login=$(target).closest('.witness-vote').attr('data-witness');
 			let value=('true'==$(target).attr('data-value'));
 			vote_witness(witness_login,value);
 		}
