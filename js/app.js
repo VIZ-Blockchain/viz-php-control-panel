@@ -247,6 +247,17 @@ function wallet_transfer(recipient,amount,memo){
 		});
 	}
 }
+function committee_cancel_request(request_id){
+	gate.broadcast.committeeWorkerCancelRequest(users[current_user]['posting_key'],current_user,request_id,function(err,result) {
+		if(err){
+			add_notify('Ошибка',true);
+		}
+		else{
+			committee_control();
+			add_notify('Вы успешно отменили заявку');
+		}
+	});
+}
 function committee_vote_request(request_id,percent){
 	gate.broadcast.committeeVoteRequest(users[current_user]['posting_key'],current_user,parseInt(request_id),percent*100,function(err,result) {
 		if(err){
@@ -639,13 +650,14 @@ function committee_control(){
 	if(0!=$('.control .committee-control').length){
 		$('.committee-control').each(function(){
 			let request_id=$(this).attr('data-request-id');
+			let creator=$(this).attr('data-creator');
+			let status=$(this).attr('data-status');
 			let committee_control=$(this);
 			let result='';
 			result+='<h3>Голосование за заявку #'+request_id+'</h3>';
 			result+='<p><input type="range" name="vote_percent_range" min="-100" max="+100" value="0">';
 			result+=' <input type="text" name="vote_percent" value="0" size="4" class="round"> процентов от максимальной суммы заявки<br>';
 			result+='<input type="button" class="committee-vote-request-action button" value="Проголосовать"></p>';
-			committee_control.html(result);
 			committee_control.find('input[name=vote_percent_range]').bind('change',function(){
 				committee_control.find('input[name=vote_percent]').val($(this).val());
 			});
@@ -660,6 +672,13 @@ function committee_control(){
 				$(this).val(percent);
 				committee_control.find('input[name=vote_percent_range]').val(percent);
 			});
+			if(current_user==creator){
+				if(status==0){
+					result+='<h3>Управление заявкой</h3>';
+					result+='<p><input type="button" class="committee-cancel-request-action button" value="Отменить заявку"></p>';
+				}
+			}
+			committee_control.html(result);
 		});
 	}
 }
@@ -872,6 +891,13 @@ function app_mouse(e){
 			let request_id=$(target).closest('.committee-control').attr('data-request-id');
 			let percent=$(target).closest('.committee-control').find('input[name=vote_percent]').val();
 			committee_vote_request(request_id,percent);
+		}
+	}
+	if($(target).hasClass('committee-cancel-request-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let request_id=$(target).closest('.committee-control').attr('data-request-id');
+			committee_cancel_request(request_id);
 		}
 	}
 	if($(target).hasClass('invite-register-action') || $(target).parent().hasClass('invite-register-action')){

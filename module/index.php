@@ -501,7 +501,7 @@ if('committee'==$path_array[1]){
 				$last_payout_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
 				print '<p>Время последней выплаты: <span class="timestamp" data-timestamp="'.$last_payout_time.'">'.date('d.m.Y H:i:s',$last_payout_time).'</span></p>';
 			}
-			print '<div class="committee-control" data-request-id="'.$request_id.'"></div>';
+			print '<div class="committee-control" data-request-id="'.$request_id.'" data-creator="'.$request_arr['creator'].'" data-status="'.$request_arr['status'].'"></div>';
 			if(count($request_arr['votes'])){
 				$max_rshares=0;
 				$actual_rshares=0;
