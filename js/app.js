@@ -45,6 +45,7 @@ function load_session(){
 		committee_control();
 		delegation_control();
 	}
+	create_account_control();
 	invite_control();
 }
 function view_session(){
@@ -150,6 +151,11 @@ function invite_register(secret_key,receiver,private_key){
 		}
 		else{
 			add_notify('Ошибка при активации кода',true);
+			gate.api.getAccounts([receiver],function(err,response){
+				if(!err){
+					add_notify('Логин '+receiver+' недоступен',true);
+				}
+			});
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
 	});
@@ -161,6 +167,63 @@ function invite_claim(secret_key,receiver){
 		}
 		else{
 			add_notify('Ошибка при активации кода',true);
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+	});
+}
+function create_account_with_general_key(account_login,token_amount,shares_amount,general_key){
+	let fixed_token_amount=''+parseFloat(token_amount).toFixed(3)+' VIZ';
+	let fixed_shares_amount=''+parseFloat(shares_amount).toFixed(6)+' SHARES';
+	if(''==token_amount){
+		fixed_token_amount='0.000 VIZ';
+	}
+	if(''==shares_amount){
+		fixed_shares_amount='0.000000 SHARES';
+	}
+	let auth_types = ['posting','active','owner','memo'];
+	let keys=gate.auth.getPrivateKeys(account_login,general_key,auth_types);
+	var owner = {
+		"weight_threshold": 1,
+		"account_auths": [],
+		"key_auths": [
+			[keys.ownerPubkey, 1]
+		]
+	};
+	var active = {
+		"weight_threshold": 1,
+		"account_auths": [],
+		"key_auths": [
+			[keys.activePubkey, 1]
+		]
+	};
+	var posting = {
+		"weight_threshold": 1,
+		"account_auths": [],
+		"key_auths": [
+			[keys.postingPubkey, 1]
+		]
+	};
+	let memo_key=keys.memoPubkey;
+	let json_metadata='';
+	let referrer='';
+	gate.broadcast.accountCreate(users[current_user].active_key,fixed_token_amount,fixed_shares_amount,current_user,account_login,owner,active,posting,memo_key,json_metadata, referrer,[],function(err,result){
+		if(!err){
+			add_notify('Аккаунт успешно создан');
+			download('viz-account.txt','VIZ.World Account: '+account_login+'\r\nGeneral key (for private keys): '+general_key+'\r\nPrivate owner key: '+keys.owner+'\r\nPrivate active key: '+keys.active+'\r\nPrivate posting key: '+keys.posting+'\r\nPrivate memo key: '+keys.memo+'');
+			gate.api.getAccounts([current_user],function(err,response){
+				if(!err){
+					$('.control .create-account-control .token[data-symbol=VIZ] .amount').html(parseFloat(response[0]['balance']));
+					$('.control .create-account-control .token[data-symbol=SHARES] .amount').html(parseFloat(response[0]['vesting_shares']));
+				}
+			});
+		}
+		else{
+			add_notify('Ошибка при создании аккаунта',true);
+			gate.api.getAccounts([account_login],function(err,response){
+				if(!err){
+					add_notify('Логин '+account_login+' недоступен',true);
+				}
+			});
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
 	});
@@ -254,7 +317,6 @@ function committee_worker_create_request(url,worker,min_amount,max_amount,durati
 	gate.broadcast.committeeWorkerCreateRequest(users[current_user]['posting_key'],current_user,url,worker,min_amount,max_amount,duration,function(err,result) {
 		if(err){
 			add_notify('Ошибка',true);
-			console.log(err);
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
 		else{
@@ -349,7 +411,7 @@ function vote_witness(witness_login,value){
 	});
 }
 function witness_control(){
-	if(0!=$('.control .witness-votes').length){
+	if(0!=$('.witness-votes').length){
 		let view=$('.witness-votes');
 		let result='';
 		result+='<h3>Ваши голоса</h3>';
@@ -429,15 +491,29 @@ function witness_control(){
 		});
 	}
 }
-function pass_gen(){
-	let length=100;
+function pass_gen(length=100,to_wif=true){
 	let charset='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-=_:;.,@!^&*$';
 	let ret='';
 	for (var i=0,n=charset.length;i<length;++i){
 		ret+=charset.charAt(Math.floor(Math.random()*n));
 	}
+	if(!to_wif){
+		return ret;
+	}
 	let wif=gate.auth.toWif('',ret,'')
 	return wif;
+}
+function generate_general_key(force=false){
+	if(force){
+		$('input.generate-general').val(pass_gen(50,false));
+	}
+	else{
+		if(0<$('input.generate-general').length){
+			if(''==$('input.generate-general').val()){
+				$('input.generate-general').val(pass_gen(50,false));
+			}
+		}
+	}
 }
 function generate_key(force=false){
 	if(force){
@@ -452,6 +528,41 @@ function generate_key(force=false){
 				$('input.generate-private').val(pass_gen());
 				$('input.generate-public').val(gate.auth.wifToPublic($('input.generate-private').val()));
 			}
+		}
+	}
+}
+function create_account_control(){
+	if(0!=$('.control .create-account-control').length){
+		let view=$('.create-account-control');
+		let result='';
+		if(''==current_user){
+			result+='<p>Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
+			view.html(result);
+		}
+		else{
+			result+='<p>Для того чтобы создать аккаунт заполните количество токенов (которые вы передадите новому аккаунту), количество доли (которую делегируете аккаунту) и сгенерируйте главный пароль (приватные ключи будут сформированы автоматически).</p>';
+			view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+			gate.api.getChainProperties(function(err,response){
+				let props=response;
+				gate.api.getAccounts([current_user],function(err,response){
+					if(typeof response[0] !== 'undefined'){
+						result+='<p>Баланс: <span class="token" data-symbol="VIZ"><span class="amount">'+parseFloat(response[0]['balance'])+'</span> VIZ</span></p>';
+						result+='<p>Доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['vesting_shares'])+'</span> SHARES</span></p>';
+						if(''==users[current_user].active_key){
+							result+='<p>Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
+						}
+						else{
+							result+='<p><label class="input-descr">Логин:<br><input type="text" name="account_login" class="round"></label></p>';
+							result+='<p><label class="input-descr">Количество передаваемых VIZ:<br><input type="text" name="token_amount" class="round" placeholder="'+props.account_creation_fee+'" value="'+props.account_creation_fee+'"></label></p>';
+							result+='<p><label class="input-descr">Количество SHARES для делегирования:<br><input type="text" name="shares_amount" class="round" placeholder="'+(parseFloat(props.account_creation_fee)*props.create_account_delegation_ratio).toFixed(6)+' SHARES"></label></p>';
+							result+='<p class="input-descr">Главный пароль (<i class="fas fa-fw fa-random"></i> <a class="generate-general-action unselectable">сгенерировать новый</a>):<br><input type="text" name="general_key" class="generate-general round wide"></p>';
+							result+='<p><a class="create-account-action button"><i class="fas fa-fw fa-plus-circle"></i> Создать аккаунт</a>';
+						}
+						view.html(result);
+						generate_general_key();
+					}
+				});
+			});
 		}
 	}
 }
@@ -720,7 +831,7 @@ function session_control(){
 	if(0!=$('.control .session-control').length){
 		let session_html='';
 		for(key in users){
-			session_html+='<p class="clearfix">'+(users[key]['active_key']!=''?'<span class="right" title="Сохранен Active ключ"><i class="fas fa-fw fa-key"></i></span>':'')+'<a href="/@'+key+'/">'+key+'</a>, '+(current_user==key?'<b>используется</b>':'<a class="auth-change" data-login="'+key+'">переключиться</a>')+', <a class="auth-logout" data-login="'+key+'">отключить</a></p>';
+			session_html+='<p class="clearfix">'+(users[key]['active_key']!=''?'<span class="right" title="Сохранен Active ключ"><i class="fas fa-fw fa-key"></i></span>':'')+'<a href="/@'+key+'/">'+key+'</a>, '+(current_user==key?'<b>используется</b>':'<a href="#" class="auth-change" data-login="'+key+'">переключиться</a>')+', <a href="#" class="auth-logout" data-login="'+key+'">отключить</a></p>';
 		}
 		$('.control .session-control').html(session_html);
 	}
@@ -889,6 +1000,12 @@ function app_mouse(e){
 			try_auth($('input[name=login]').val(),$('input[name=posting_key]').val(),$('input[name=active_key]').val());
 		}
 	}
+	if($(target).hasClass('generate-general-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			generate_general_key(true);
+		}
+	}
 	if($(target).hasClass('generate-action')){
 		e.preventDefault();
 		if($(target).closest('.control').length){
@@ -991,6 +1108,16 @@ function app_mouse(e){
 					add_notify('Ошибка',true);
 				}
 			});
+		}
+	}
+	if($(target).hasClass('create-account-action') || $(target).parent().hasClass('create-account-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let general_key=$('.create-account-control input[name=general_key]').val();
+			let account_login=$('.create-account-control input[name=account_login]').val();
+			let token_amount=$('.create-account-control input[name=token_amount]').val();
+			let shares_amount=$('.create-account-control input[name=shares_amount]').val();
+			create_account_with_general_key(account_login,token_amount,shares_amount,general_key);
 		}
 	}
 	if($(target).hasClass('invite-action') || $(target).parent().hasClass('invite-action')){

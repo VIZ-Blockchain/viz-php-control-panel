@@ -251,6 +251,7 @@ if('tools'==$path_array[1]){
 		<h1><i class="fas fa-fw fa-toolbox"></i> Инструменты</h1>
 		<div class="article control">';
 		print '<p><a href="/tools/invites/">Система инвайтов</a></p>';
+		print '<p><a href="/tools/create-account/">Создание аккаунта</a></p>';
 		print '<p><a href="/tools/delegation/">Делегирование доли</a></p>';
 		print '<p><a href="/tools/schedule/">Расписание делегатов</a></p>';
 		print '</div></div>';
@@ -285,6 +286,15 @@ if('tools'==$path_array[1]){
 			print '<div class="invite-control"></div>';
 			print '</div></div>';
 		}
+	}
+	elseif('create-account'==$path_array[2]){
+		$replace['title']=htmlspecialchars('Создание аккаунта').' - '.$replace['title'];
+		print '<div class="page content">
+		<h1><i class="fas fa-fw fa-user-plus"></i> Создание аккаунта</h1>
+		<div class="article control">';
+		print '<p>Внимание! Данная форма создания аккаунта использует механизм главного пароля. С помощью него формируются приватные ключи и из них публичные, которые будут транслированы в блокчейн. Убедитесь, что сохранили дополнительно главный пароль или приватные ключи.</p>';
+		print '<div class="create-account-control"></div>';
+		print '</div></div>';
 	}
 	elseif('delegation'==$path_array[2]){
 		$replace['title']=htmlspecialchars('Делегирование доли').' - '.$replace['title'];
