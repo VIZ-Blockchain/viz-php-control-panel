@@ -192,7 +192,7 @@ $(document).ready(function(){
 			}
 
 			if(current_user !== 'undefined' && owner === current_user){
-				style='color:orange;';
+				style+='color:orange;';
 			}
 
 			if(signing_key !== empty_signing_key){
