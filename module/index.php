@@ -254,6 +254,7 @@ if('tools'==$path_array[1]){
 		print '<p><a href="/tools/create-account/">Создание аккаунта</a></p>';
 		print '<p><a href="/tools/delegation/">Делегирование доли</a></p>';
 		print '<p><a href="/tools/schedule/">Расписание делегатов</a></p>';
+		print '<p><a href="/tools/reset-account/">Сброс доступов к аккаунту</a></p>';
 		print '</div></div>';
 	}
 	elseif('invites'==$path_array[2]){
@@ -278,7 +279,7 @@ if('tools'==$path_array[1]){
 		if(''==$path_array[3]){
 			$replace['title']=htmlspecialchars('Система инвайтов').' - '.$replace['title'];
 			print '<div class="page content">
-			<a class="right" href="/tools/">&larr; Вернуться к списку инструментов</a>
+			<a class="right" href="/tools/">&larr; Инструменты</a>
 			<h1><i class="fas fa-fw fa-toolbox"></i> Система инвайтов</h1>
 			<div class="article control">';
 			print '<p>Инвайты (они же ваучеры) &mdash; универсальный инструмент для передачи фиксированного количества токенов VIZ другим людям (или ботам) вне блокчейна. Погасить код можно двумя способами: <a href="/tools/invites/claim/">перевести его баланс себе на аккаунт</a> или <a href="/tools/invites/register/">зарегистрировать с его помощью новый аккаунт</a>.</p>';
@@ -290,16 +291,27 @@ if('tools'==$path_array[1]){
 	elseif('create-account'==$path_array[2]){
 		$replace['title']=htmlspecialchars('Создание аккаунта').' - '.$replace['title'];
 		print '<div class="page content">
+		<a class="right" href="/tools/">&larr; Инструменты</a>
 		<h1><i class="fas fa-fw fa-user-plus"></i> Создание аккаунта</h1>
 		<div class="article control">';
 		print '<p>Внимание! Данная форма создания аккаунта использует механизм главного пароля. С помощью него формируются приватные ключи и из них публичные, которые будут транслированы в блокчейн. Убедитесь, что сохранили дополнительно главный пароль или приватные ключи.</p>';
 		print '<div class="create-account-control"></div>';
 		print '</div></div>';
 	}
+	elseif('reset-account'==$path_array[2]){
+		$replace['title']=htmlspecialchars('Сброс доступов к аккаунту').' - '.$replace['title'];
+		print '<div class="page content">
+		<a class="right" href="/tools/">&larr; Инструменты</a>
+		<h1><i class="fas fa-fw fa-exchange-alt"></i> Сброс доступов к аккаунту</h1>
+		<div class="article control">';
+		print '<p>Внимание! Данная форма сброса доступа использует механизм главного пароля. С помощью него формируются приватные ключи и из них публичные, которые будут транслированы в блокчейн. Убедитесь, что сохранили дополнительно главный пароль, иначе вы рискуете потерять доступ к аккаунту и его токенам навсегда.</p>';
+		print '<div class="reset-account-control"></div>';
+		print '</div></div>';
+	}
 	elseif('delegation'==$path_array[2]){
 		$replace['title']=htmlspecialchars('Делегирование доли').' - '.$replace['title'];
 		print '<div class="page content">
-		<a class="right" href="/tools/">&larr; Вернуться к списку инструментов</a>
+		<a class="right" href="/tools/">&larr; Инструменты</a>
 		<h1><i class="fas fa-fw fa-toolbox"></i> Делегирование доли</h1>
 		<div class="article control">';
 		print '<div class="delegation-control"></div>';
@@ -316,13 +328,13 @@ if('tools'==$path_array[1]){
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bignumber.js/2.4.0/bignumber.min.js"></script>
 <script src="/js/schedule.js"></script>
 		<div class="page content">
-			<div class="article control">
-				<h1>Расписание делегатов</h1>
-				<div class="witness_schedule">...</div>
-				<h3>Резервные делегаты</h3>
-				<div class="witness_support_queue">...</div>
-			</div>
-		</div>';
+		<a class="right" href="/tools/">&larr; Инструменты</a>
+		<h1>Расписание делегатов</h1>
+		<div class="article control">
+			<div class="witness_schedule">&hellip;</div>
+			<h3>Резервные делегаты</h3>
+			<div class="witness_support_queue">&hellip;</div>
+		</div></div>';
 	}
 }
 else
@@ -331,12 +343,12 @@ if('login'==$path_array[1]){
 	print '<div class="page content">
 	<h1>Авторизация</h1>
 	<div class="article control">';
-	print '<p>Внимание! При авторизации ключ записывается в ваш браузер и не передается на сервер. Если вы очистите кэш браузера или localStorage, то вам нужно будет вновь ввести свои данные для входа.<br>';
-	print '<label><input type="text" name="login"> &mdash; Логин</label><br>';
-	print '<label><input type="password" name="posting_key"> &mdash; Posting ключ</label><br>';
-	print '<label><input type="password" name="active_key"> &mdash; Active ключ (по желанию)</label><br>';
-	print '<span class="auth-error"></span>';
-	print '<br><input type="button" class="auth-action button" value="Сохранить доступ и авторизоваться">';
+	print '<p>Внимание! При авторизации ключ записывается в ваш браузер и не передается на сервер. Если вы очистите кэш браузера или localStorage, то вам нужно будет вновь ввести свои данные для входа.</p>';
+	print '<p><label><input type="text" name="login" class="round"> &mdash; логин</label></p>';
+	print '<p><input type="password" name="posting_key" class="round"> &mdash; posting ключ</label></p>';
+	print '<p><input type="password" name="active_key" class="round"> &mdash; active ключ (по желанию)</label></p>';
+	print '<p><span class="auth-error"></span></p>';
+	print '<p><input type="button" class="auth-action button" value="Сохранить доступ и авторизоваться"></p>';
 	print '</p>';
 	print '</div></div>';
 }

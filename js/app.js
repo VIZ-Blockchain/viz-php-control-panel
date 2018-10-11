@@ -46,6 +46,7 @@ function load_session(){
 		delegation_control();
 	}
 	create_account_control();
+	reset_account_control();
 	invite_control();
 }
 function view_session(){
@@ -171,6 +172,63 @@ function invite_claim(secret_key,receiver){
 		}
 	});
 }
+function reset_account_with_general_key(account_login,owner_key,general_key){
+	let auth_types = ['posting','active','owner','memo'];
+	let keys=gate.auth.getPrivateKeys(account_login,general_key,auth_types);
+	let owner = {
+		"weight_threshold": 1,
+		"account_auths": [],
+		"key_auths": [
+			[keys.ownerPubkey, 1]
+		]
+	};
+	let active = {
+		"weight_threshold": 1,
+		"account_auths": [],
+		"key_auths": [
+			[keys.activePubkey, 1]
+		]
+	};
+	let posting = {
+		"weight_threshold": 1,
+		"account_auths": [],
+		"key_auths": [
+			[keys.postingPubkey, 1]
+		]
+	};
+	let memo_key=keys.memoPubkey;
+	gate.api.getAccounts([account_login],function(err,response){
+		if(!err){
+			let json_metadata=response[0].json_metadata;
+			gate.broadcast.accountUpdate(owner_key,account_login,owner,active,posting,memo_key,json_metadata,function(err,result){
+				if(!err){
+					add_notify('Данные аккаунта успешно обновлены');
+					download('viz-reset-account.txt','VIZ.World Account: '+account_login+'\r\nGeneral key (for private keys): '+general_key+'\r\nPrivate owner key: '+keys.owner+'\r\nPrivate active key: '+keys.active+'\r\nPrivate posting key: '+keys.posting+'\r\nPrivate memo key: '+keys.memo+'');
+					if(typeof users[account_login] !== 'undefined'){
+						if(''!=users[account_login].posting_key){
+							users[account_login].posting_key=keys.posting;
+						}
+						if(''!=users[account_login].active_key){
+							users[account_login].active_key=keys.active;
+						}
+					}
+				}
+				else{
+					add_notify('Ошибка при обновлении аккаунта',true);
+					if(typeof err.message !== 'undefined'){
+						add_notify(err.message,true);
+					}
+					else{
+						add_notify(err.payload.error.data.stack[0].format,true);
+					}
+				}
+			});
+		}
+		else{
+			add_notify('Ошибка в получении аккаунта '+account_login,true);
+		}
+	});
+}
 function create_account_with_general_key(account_login,token_amount,shares_amount,general_key){
 	let fixed_token_amount=''+parseFloat(token_amount).toFixed(3)+' VIZ';
 	let fixed_shares_amount=''+parseFloat(shares_amount).toFixed(6)+' SHARES';
@@ -182,21 +240,21 @@ function create_account_with_general_key(account_login,token_amount,shares_amoun
 	}
 	let auth_types = ['posting','active','owner','memo'];
 	let keys=gate.auth.getPrivateKeys(account_login,general_key,auth_types);
-	var owner = {
+	let owner = {
 		"weight_threshold": 1,
 		"account_auths": [],
 		"key_auths": [
 			[keys.ownerPubkey, 1]
 		]
 	};
-	var active = {
+	let active = {
 		"weight_threshold": 1,
 		"account_auths": [],
 		"key_auths": [
 			[keys.activePubkey, 1]
 		]
 	};
-	var posting = {
+	let posting = {
 		"weight_threshold": 1,
 		"account_auths": [],
 		"key_auths": [
@@ -529,6 +587,19 @@ function generate_key(force=false){
 				$('input.generate-public').val(gate.auth.wifToPublic($('input.generate-private').val()));
 			}
 		}
+	}
+}
+function reset_account_control(){
+	if(0!=$('.control .reset-account-control').length){
+		let view=$('.reset-account-control');
+		let result='';
+		view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+		result+='<p><label class="input-descr">Логин:<br><input type="text" name="account_login" class="round" value="'+current_user+'"></label></p>';
+		result+='<p><label class="input-descr">Приватный ключ владельца (owner):<br><input type="text" name="owner_key" class="round wide"></label></p>';
+		result+='<p class="input-descr">Главный пароль (<i class="fas fa-fw fa-random"></i> <a class="generate-general-action unselectable">сгенерировать новый</a>):<br><input type="text" name="general_key" class="generate-general round wide"></p>';
+		result+='<p><a class="reset-account-action button">Установить новый доступ</a>';
+		view.html(result);
+		generate_general_key();
 	}
 }
 function create_account_control(){
@@ -1108,6 +1179,15 @@ function app_mouse(e){
 					add_notify('Ошибка',true);
 				}
 			});
+		}
+	}
+	if($(target).hasClass('reset-account-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let general_key=$('.reset-account-control input[name=general_key]').val();
+			let account_login=$('.reset-account-control input[name=account_login]').val();
+			let owner_key=$('.reset-account-control input[name=owner_key]').val();
+			reset_account_with_general_key(account_login,owner_key,general_key);
 		}
 	}
 	if($(target).hasClass('create-account-action') || $(target).parent().hasClass('create-account-action')){
