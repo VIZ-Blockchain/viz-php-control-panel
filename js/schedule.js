@@ -122,8 +122,10 @@ $(document).ready(function(){
 					for(var i=0; i < witnesses.length; i++){
 						if(witnesses[i] == "") continue; // current bug in response
 						var style='';
-						if(current_user != 'undefined' && witnesses[i] == current_user){
-							style=' style="color:orange;" class="highlighted"';
+						for(key in users){
+							if(key == witnesses[i]){
+								style+=' style="color:orange;" class="highlighted"';
+							}
 						}
 						list += '<div id="witness_' + witnesses[i] + '" class="witness" style="position:relative;">';
 						list += '<span class="rank" style="position:absolute; left:0; font-style:italic; font-size:small;">.</span>';
@@ -191,8 +193,10 @@ $(document).ready(function(){
 					index++;
 			}
 
-			if(current_user !== 'undefined' && owner === current_user){
-				style+='color:orange;';
+			for(key in users){
+				if(key == owner){
+					style+='color:orange;';
+				}
 			}
 
 			if(signing_key !== empty_signing_key){
