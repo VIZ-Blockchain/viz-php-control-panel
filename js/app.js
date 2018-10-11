@@ -247,6 +247,22 @@ function wallet_transfer(recipient,amount,memo){
 		});
 	}
 }
+function committee_worker_create_request(url,worker,min_amount,max_amount,duration){
+	if(duration<=30){
+		duration=duration*3600*24;
+	}
+	gate.broadcast.committeeWorkerCreateRequest(users[current_user]['posting_key'],current_user,url,worker,min_amount,max_amount,duration,function(err,result) {
+		if(err){
+			add_notify('Ошибка',true);
+			console.log(err);
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+		else{
+			add_notify('Вы успешно создали заявку');
+			document.location='/committee/';
+		}
+	});
+}
 function committee_cancel_request(request_id){
 	gate.broadcast.committeeWorkerCancelRequest(users[current_user]['posting_key'],current_user,request_id,function(err,result) {
 		if(err){
@@ -681,6 +697,24 @@ function committee_control(){
 			committee_control.html(result);
 		});
 	}
+	if(0!=$('.control .committee-create-request').length){
+		let view=$('.control .committee-create-request');
+		let result='';
+		if(''==current_user){
+			result+='<p>Вам необходимо <a href="/login/">авторизоваться</a>.</p>';
+			view.html(result);
+		}
+		else{
+			view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+			result+='<p><label>URL заявки:<input type="text" name="url" class="round wide"></label></p>';
+			result+='<p><label>Аккаунт-воркер: <input type="text" name="worker" class="round" value="'+current_user+'"></label></p>';
+			result+='<p><label>Минимальная сумма токенов: <input type="text" name="min_amount" class="round" value="0.000 VIZ"></label></p>';
+			result+='<p><label>Максимальная сумма токенов: <input type="text" name="max_amount" class="round" value="0.000 VIZ"></label></p>';
+			result+='<p><label>Длительность заявки в днях (от 5 до 30): <input type="text" name="duration" class="round" value="5"></label></p>';
+			result+='<p><a class="committee-worker-create-request-action button">Создать заявку</a>';
+			view.html(result);
+		}
+	}
 }
 function session_control(){
 	if(0!=$('.control .session-control').length){
@@ -891,6 +925,17 @@ function app_mouse(e){
 			let request_id=$(target).closest('.committee-control').attr('data-request-id');
 			let percent=$(target).closest('.committee-control').find('input[name=vote_percent]').val();
 			committee_vote_request(request_id,percent);
+		}
+	}
+	if($(target).hasClass('committee-worker-create-request-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let url=$('.committee-create-request input[name=url]').val();
+			let worker=$('.committee-create-request input[name=worker]').val();
+			let min_amount=$('.committee-create-request input[name=min_amount]').val();
+			let max_amount=$('.committee-create-request input[name=max_amount]').val();
+			let duration=$('.committee-create-request input[name=duration]').val();
+			committee_worker_create_request(url,worker,min_amount,max_amount,duration);
 		}
 	}
 	if($(target).hasClass('committee-cancel-request-action')){

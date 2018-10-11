@@ -441,10 +441,24 @@ if('committee'==$path_array[1]){
 		4=>'Принята (идут выплаты)',
 		5=>'Завершена'
 	);
+	if('create'==$path_array[2]){
+		$replace['title']=htmlspecialchars('Создать заявку').' - '.$replace['title'];
+		print '<div class="page content">
+		<a class="right" href="/committee/">&larr; Вернуться</a>
+		<h1><i class="fas fa-fw fa-university"></i>Создать заявку в комитет</h1>
+		<div class="article control">
+		<p>Любой аккаунт может создать заявку для рассмотрения в комитете. Участники сети принимая участие в голосовании сами определяют, на что будет направлен фонд комитета. Это могут быть не только технические новые разработки, но и внутренняя активность в сети (поддержка, конкурсы, работа с новичками), внешний пиар, компенсация за полезные регистрации, поддержка инфраструктуры проектов. Цель комитета &mdash; принести максимальную пользу сети и токену.</p>';
+		print '<div class="committee-create-request"></div>';
+		print '</div></div>';
+	}
+	else
 	if(''==$path_array[2]){
 		print '<div class="page content">
+		<a class="right button" href="/committee/create/">Создать заявку</a>
 		<h1><i class="fas fa-fw fa-university"></i>Комитет</h1>
 		<div class="article">';
+		$dgp=$api->execute_method('get_dynamic_global_properties');
+		print '<p>Фонд комитета: '.$dgp['committee_fund'].'</p>';
 		print '<h3>Заявки в комитет</h3>';
 		print '<ul>';
 		foreach($committee_status_arr as $committee_status_id=>$committee_status_name){
@@ -471,9 +485,8 @@ if('committee'==$path_array[1]){
 		$request_arr=$api->execute_method('get_committee_request',array($request_id,-1));
 		if($request_arr){
 			$replace['title']=htmlspecialchars('Заявка #'.$request_id).' - '.$replace['title'];
-			$replace['title']=htmlspecialchars('Комитет').' - '.$replace['title'];
 			print '<div class="page content">
-			<a class="right" href="/committee/">&larr; Вернуться в комитет</a>
+			<a class="right" href="/committee/">&larr; Вернуться</a>
 			<h1>Заявка #'.$request_id.' в комитет</h1>
 			<div class="article control">';
 			print '<p>Статус заявки: '.$committee_status_arr[$request_arr['status']].'</p>';
