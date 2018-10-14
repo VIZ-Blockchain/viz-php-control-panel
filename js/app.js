@@ -856,6 +856,13 @@ function committee_control(){
 			result+='<p><input type="range" name="vote_percent_range" min="-100" max="+100" value="0">';
 			result+=' <input type="text" name="vote_percent" value="0" size="4" class="round"> процентов от максимальной суммы заявки<br>';
 			result+='<input type="button" class="committee-vote-request-action button" value="Проголосовать"></p>';
+			if(current_user==creator){
+				if(status==0){
+					result+='<h3>Управление заявкой</h3>';
+					result+='<p><input type="button" class="committee-cancel-request-action button" value="Отменить заявку"></p>';
+				}
+			}
+			committee_control.html(result);
 			committee_control.find('input[name=vote_percent_range]').bind('change',function(){
 				committee_control.find('input[name=vote_percent]').val($(this).val());
 			});
@@ -870,13 +877,6 @@ function committee_control(){
 				$(this).val(percent);
 				committee_control.find('input[name=vote_percent_range]').val(percent);
 			});
-			if(current_user==creator){
-				if(status==0){
-					result+='<h3>Управление заявкой</h3>';
-					result+='<p><input type="button" class="committee-cancel-request-action button" value="Отменить заявку"></p>';
-				}
-			}
-			committee_control.html(result);
 		});
 	}
 	if(0!=$('.control .committee-create-request').length){
