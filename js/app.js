@@ -384,7 +384,7 @@ function committee_worker_create_request(url,worker,min_amount,max_amount,durati
 	});
 }
 function committee_cancel_request(request_id){
-	gate.broadcast.committeeWorkerCancelRequest(users[current_user]['posting_key'],current_user,request_id,function(err,result) {
+	gate.broadcast.committeeWorkerCancelRequest(users[current_user]['posting_key'],current_user,parseInt(request_id),function(err,result) {
 		if(err){
 			add_notify('Ошибка',true);
 		}
