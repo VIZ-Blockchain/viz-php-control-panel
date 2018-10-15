@@ -27,10 +27,10 @@ class viz_plugins{
 	private $redis;
 	private $mongo;
 	function viz_plugins(){
-		global $config,$site_root,$api,$redis,$mongo_connect;
+		global $config,$site_root,$api,$redis,$mongo;
 		$this->api=&$api;
 		$this->redis=&$redis;
-		$this->mongo=&$mongo_connect;
+		$this->mongo=&$mongo;
 		foreach($config['plugins'] as $plugin_name){
 			include_once($site_root.'/module/plugins/'.$plugin_name.'.php');
 			$plugin_class='viz_plugin_'.$plugin_name;

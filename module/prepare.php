@@ -16,9 +16,9 @@ $api=new viz_jsonrpc_web($api_ws_arr[array_rand($api_ws_arr)]);
 
 $users_arr=array();
 function get_user_id($login){
-	global $users_arr,$api,$mongo_connect,$config;
+	global $users_arr,$api,$mongo,$config;
 	if(!isset($users_arr[$login])){
-		$rows=$mongo_connect->executeQuery($config['db_prefix'].'.users',new MongoDB\Driver\Query(['login'=>$login],['limit'=>1]));
+		$rows=$mongo->executeQuery($config['db_prefix'].'.users',new MongoDB\Driver\Query(['login'=>$login],['limit'=>1]));
 		$key=false;
 		foreach($rows as $row){
 			$key=(int)$row->_id;
@@ -33,7 +33,7 @@ function get_user_id($login){
 				$bulk=new MongoDB\Driver\BulkWrite;
 				$bulk->insert(['_id'=>$check_user[0]['id'],'login'=>$check_user[0]['name']]);
 				try{
-					$mongo_connect->executeBulkWrite($config['db_prefix'].'.users',$bulk);
+					$mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
 					redis_add_ulist('update_user',$check_user[0]['name']);
 				}
 				catch (MongoDB\Driver\Exception\Exception $e) {
@@ -46,18 +46,26 @@ function get_user_id($login){
 	return $users_arr[$login];
 }
 function mongo_exist($collection,$find){
-	global $mongo_connect,$config;
-	$rows=$mongo_connect->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,['limit'=>1]));
+	global $mongo,$config;
+	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,['limit'=>1]));
 	foreach($rows as $row){
 		return true;
 	}
 	return false;
 }
+function mongo_count($collection,$find=array()){
+	global $mongo,$config;
+	$rows=$mongo->executeCommand($config['db_prefix'],new MongoDB\Driver\Command(['count'=>$collection,'query'=>$find]));
+	foreach($rows as $row){
+		return $row->n;
+	}
+	return false;
+}
 function get_user_login($id){
-	global $users_arr,$mongo_connect,$config;
+	global $users_arr,$mongo,$config;
 	$key=array_search($id,$users_arr);
 	if(false===$key){
-		$rows=$mongo_connect->executeQuery($config['db_prefix'].'.users',new MongoDB\Driver\Query(['_id'=>$id],['limit'=>1]));
+		$rows=$mongo->executeQuery($config['db_prefix'].'.users',new MongoDB\Driver\Query(['_id'=>$id],['limit'=>1]));
 		foreach($rows as $row){
 			$key=(int)$row->login;
 			if($key){
@@ -71,8 +79,8 @@ function get_user_login($id){
 	return $key;
 }
 function get_user_link($user_1,$user_2,$what=1){
-	global $mongo_connect,$config;
-	$rows=$mongo_connect->executeQuery($config['db_prefix'].'.users_links',new MongoDB\Driver\Query(['user_1'=>(int)$user_1,'user_2'=>(int)$user_2,'what'=>(int)$what],['limit'=>1]));
+	global $mongo,$config;
+	$rows=$mongo->executeQuery($config['db_prefix'].'.users_links',new MongoDB\Driver\Query(['user_1'=>(int)$user_1,'user_2'=>(int)$user_2,'what'=>(int)$what],['limit'=>1]));
 	foreach($rows as $row){
 		return $row->toArray();
 	}
@@ -92,16 +100,16 @@ function redis_get_ulist($name){
 function mongo_prepare($text){
 	return str_replace(array('\\',"\0","\n","\r","'",'"',"\x1a"),array('\\\\','\\0','\\n','\\r',"\\'",'\\"','\\Z'),$text);
 }
-function mdb_ai($collection_name,$increase=false){
-	global $mongo_connect,$config;
-	$rows=$mongo_connect->executeQuery($config['db_prefix'].'.auto_increment',new MongoDB\Driver\Query(['_id'=>$collection_name]));
+function mongo_counter($collection_name,$increase=false){
+	global $mongo,$config;
+	$rows=$mongo->executeQuery($config['db_prefix'].'.auto_increment',new MongoDB\Driver\Query(['_id'=>$collection_name]));
 	$count=0;
 	foreach($rows as $row){
 		if($increase){
 			$bulk=new MongoDB\Driver\BulkWrite;
 			$bulk->update(['_id'=>$collection_name],['$inc'=>['count'=>1]]);
 			try{
-				$mongo_connect->executeBulkWrite('cryptostorm.auto_increment',$bulk);
+				$mongo->executeBulkWrite('cryptostorm.auto_increment',$bulk);
 			}
 			catch (MongoDB\Driver\Exception\Exception $e) {
 				print 'Error: '.$e->getMessage();
@@ -117,7 +125,7 @@ function mdb_ai($collection_name,$increase=false){
 		$bulk=new MongoDB\Driver\BulkWrite;
 		$bulk->insert(['_id'=>$collection_name,'count'=>1]);
 		try{
-			$mongo_connect->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
+			$mongo->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
 		}
 		catch (MongoDB\Driver\Exception\Exception $e) {
 			print 'Error: '.$e->getMessage();
@@ -126,24 +134,24 @@ function mdb_ai($collection_name,$increase=false){
 		return 1;
 	}
 }
-function mdb_ai_del($collection_name){
-	global $mongo_connect,$config;
+function mongo_counter_del($collection_name){
+	global $mongo,$config;
 	$bulk=new MongoDB\Driver\BulkWrite;
 	$bulk->delete(['_id'=>$collection_name]);
 	try{
-		$mongo_connect->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
+		$mongo->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
 	}
 	catch (MongoDB\Driver\Exception\Exception $e) {
 		print 'Error: '.$e->getMessage();
 	}
 	return true;
 }
-function mdb_ai_set($collection_name,$count){
-	global $mongo_connect,$config;
+function mongo_counter_set($collection_name,$count){
+	global $mongo,$config;
 	$bulk=new MongoDB\Driver\BulkWrite;
 	$bulk->update(['_id'=>$collection_name],['$set'=>['count'=>$count]]);
 	try{
-		$mongo_connect->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
+		$mongo->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
 	}
 	catch (MongoDB\Driver\Exception\Exception $e) {
 		print 'Error: '.$e->getMessage();

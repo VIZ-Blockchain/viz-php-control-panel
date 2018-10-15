@@ -32,7 +32,7 @@ if($pid){
 file_put_contents($site_root.'/module/waterfall.pid',$new_pid);
 
 $plugins=new viz_plugins();
-$block_id=mdb_ai('blocks');
+$block_id=mongo_counter('blocks');
 print 'STARTUP: Find last block #'.$block_id.', working...'.PHP_EOL;
 if($block_id!=1){
 	$block_id++;

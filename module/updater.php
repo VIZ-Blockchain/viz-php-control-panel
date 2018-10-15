@@ -83,7 +83,7 @@ while($work){
 			else{
 				$bulk->insert($user_data);
 			}
-			$mongo_connect->executeBulkWrite($config['db_prefix'].'.users',$bulk);
+			$mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
 		}
 		$sleep=1000;
 	}

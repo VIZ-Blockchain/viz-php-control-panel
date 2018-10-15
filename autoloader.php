@@ -17,7 +17,7 @@ $cache=new DataManagerCache;
 $time=time();
 
 try{
-	$mongo_connect=new MongoDB\Driver\Manager('mongodb://'.$config['db_login'].':'.$config['db_password'].'@'.$config['db_host'].'/'.$config['db_base']);
+	$mongo=new MongoDB\Driver\Manager('mongodb://'.$config['db_login'].':'.$config['db_password'].'@'.$config['db_host'].'/'.$config['db_base']);
 }
 catch(MongoDB\Driver\Exception\Exception $e){
 	print 'MongoDB connection error';

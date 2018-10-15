@@ -572,7 +572,8 @@ if('blocks'==$path_array[1]){
 		$genesis_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
 		print '<p>Время запуска сети: <span class="timestamp" data-timestamp="'.$genesis_time.'">'.date('d.m.Y H:i:s',$genesis_time).'</span></p>';
 		print '<p>Количество блоков: '.$dgp['head_block_number'].'</p>';
-		print '<p>Количество в базе данных: '.mdb_ai('blocks').'</p>';
+		print '<p>Количество в базе данных (индекс): '.mongo_counter('blocks').'</p>';
+		print '<p>Количество в базе данных (курсор): '.mongo_count('blocks').'</p>';
 		print '<h3>Голосуемые параметры сети</h3>';
 		print '<pre class="view_block">';
 		$chain_properties=$api->execute_method('get_chain_properties');

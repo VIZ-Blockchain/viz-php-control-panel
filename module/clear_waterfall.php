@@ -1,25 +1,30 @@
 <?php
-$bulk=new MongoDB\Driver\BulkWrite;
-$bulk->delete(['_id'=>'blocks']);
-$mongo_connect->executeBulkWrite('viz.auto_increment',$bulk);
-try{
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'sessions']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'blocks']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'users']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'users_links']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'witnesses']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'transfers']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'tags']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'content']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'content_votes']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'content_tags']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'content_users']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'subcontent']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'subcontent_votes']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'subcontent_tags']));
-	$mongo_connect->executeCommand('viz', new \MongoDB\Driver\Command(['drop'=>'subcontent_users']));
-}
-catch(MongoDB\Driver\Exception\Exception $e){
-	print '<p>MongoDB drop error</p>';
+$collections_arr=array(
+	'blocks',
+	'sessions',
+	'users',
+	'users_links',
+	'witnesses',
+	'transfers',
+	'tags',
+	'content',
+	'content_votes',
+	'content_tags',
+	'content_users',
+	'subcontent',
+	'subcontent_votes',
+	'subcontent_tags',
+	'subcontent_users'
+);
+foreach($collections_arr as $collection){
+	$bulk=new MongoDB\Driver\BulkWrite;
+	$bulk->delete(['_id'=>$collection]);
+	$mongo->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
+	try{
+		$mongo->executeCommand($config['db_prefix'], new \MongoDB\Driver\Command(['drop'=>$collection]));
+	}
+	catch(MongoDB\Driver\Exception\Exception $e){
+		print '<p>MongoDB collection '.$collection.' drop error</p>';
+	}
 }
 exit;
