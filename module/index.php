@@ -383,10 +383,12 @@ if('witnesses'==$path_array[1]){
 		$hf=$api->execute_method('get_hardfork_version',array(),true);
 		print '<p>Текущая версия hardfork: '.$hf.'</p>';
 		$hf=intval(str_replace('.','',$hf));
+		$hf=intval($hf/10);
 		$list=$api->execute_method('get_witnesses_by_vote',array('',100));
 		$num=1;
 		foreach($list as $witness_arr){
 			$witness_hf=intval(str_replace('.','',$witness_arr['running_version']));
+			$witness_hf=intval($witness_hf/10);
 			print '<p'.('VIZ1111111111111111111111111111111114T1Anm'==$witness_arr['signing_key']?' style="opacity:0.5"':'').'>#'.$num.' <a href="/@'.$witness_arr['owner'].'/">@'.$witness_arr['owner'].'</a> (<a href="'.htmlspecialchars($witness_arr['url']).'">url</a>), Голосов: '.number_format (floatval($witness_arr['votes'])/1000000/1000,1,'.',' ').'k SHARES, <a href="/witnesses/'.$witness_arr['owner'].'/">параметры</a>, версия: ';
 			if($witness_hf>$hf){
 				print '<span style="color:#090">';

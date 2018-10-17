@@ -33,7 +33,6 @@ file_put_contents($site_root.'/module/updater.pid',$new_pid);
 
 $work=true;
 while($work){
-	$sleep=0;
 	$user_login=redis_get_ulist('update_user');
 	if($user_login){
 		$user_arr=$api->execute_method('get_accounts',array(array($user_login)));
@@ -84,12 +83,68 @@ while($work){
 				$bulk->insert($user_data);
 			}
 			$mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
+			print 'SUCCESS user update: '.$user_login.PHP_EOL;
 		}
-		$sleep=1000;
 	}
-	if($sleep>0){
-		usleep($sleep);
+	$content_id=redis_get_ulist('update_content');
+	if($content_id){
+		$content_arr=mongo_find('content',array('_id'=>(int)$content_id));
+		if($content_arr){
+			$content_info=$api->execute_method('get_content',array($content_arr['login'],$content_arr['permlink']));
+			if($content_info['permlink']==$content_arr['permlink']){
+				$date=date_parse_from_format('Y-m-d\TH:i:s',$content_info['cashout_time']);
+				$cashout_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+				$date=date_parse_from_format('Y-m-d\TH:i:s',$content_info['last_payout']);
+				$last_payout=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+				$update_arr=array(
+					'payout_value'=>$content_info['payout_value'],
+					'shares_payout_value'=>$content_info['shares_payout_value'],
+					'curator_payout_value'=>$content_info['curator_payout_value'],
+					'beneficiary_payout_value'=>$content_info['beneficiary_payout_value'],
+					'total_pending_payout_value'=>$content_info['total_pending_payout_value'],
+					'body'=>$content_info['body'],
+					'title'=>$content_info['title']
+					'cashout_time'=>(int)$cashout_time,
+					'last_payout'=>(int)$last_payout,
+					'parse_time'=>(int)time()
+				);
+				$bulk=new MongoDB\Driver\BulkWrite;
+				$bulk->update(['_id'=>(int)$content_id],['$set'=>$update_arr]);
+				$mongo->executeBulkWrite($config['db_prefix'].'.content',$bulk);
+				print 'SUCCESS content update: '.$content_id.PHP_EOL;
+			}
+		}
 	}
+	$subcontent_id=redis_get_ulist('update_subcontent');
+	if($subcontent_id){
+		$content_arr=mongo_find('content',array('_id'=>(int)$subcontent_id));
+		if($content_arr){
+			$content_info=$api->execute_method('get_content',array($content_arr['login'],$content_arr['permlink']));
+			if($content_info['permlink']==$content_arr['permlink']){
+				$date=date_parse_from_format('Y-m-d\TH:i:s',$content_info['cashout_time']);
+				$cashout_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+				$date=date_parse_from_format('Y-m-d\TH:i:s',$content_info['last_payout']);
+				$last_payout=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+				$update_arr=array(
+					'payout_value'=>$content_info['payout_value'],
+					'shares_payout_value'=>$content_info['shares_payout_value'],
+					'curator_payout_value'=>$content_info['curator_payout_value'],
+					'beneficiary_payout_value'=>$content_info['beneficiary_payout_value'],
+					'total_pending_payout_value'=>$content_info['total_pending_payout_value'],
+					'body'=>$content_info['body'],
+					'title'=>$content_info['title']
+					'cashout_time'=>(int)$cashout_time,
+					'last_payout'=>(int)$last_payout,
+					'parse_time'=>(int)time()
+				);
+				$bulk=new MongoDB\Driver\BulkWrite;
+				$bulk->update(['_id'=>(int)$subcontent_id],['$set'=>$update_arr]);
+				$mongo->executeBulkWrite($config['db_prefix'].'.subcontent',$bulk);
+				print 'SUCCESS subcontent update: '.$content_id.PHP_EOL;
+			}
+		}
+	}
+	usleep(100);
 	if(!file_exists($pid_file)){
 		print 'INFO: PID file was deleted, self-terminating...'.PHP_EOL;
 		exit;

@@ -45,6 +45,14 @@ function get_user_id($login){
 	}
 	return $users_arr[$login];
 }
+function mongo_find($collection,$find){
+	global $mongo,$config;
+	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,['limit'=>1]));
+	foreach($rows as $row){
+		return $row;
+	}
+	return false;
+}
 function mongo_exist($collection,$find){
 	global $mongo,$config;
 	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,['limit'=>1]));
