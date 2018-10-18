@@ -22,20 +22,22 @@ function get_user_id($login){
 		$key=false;
 		foreach($rows as $row){
 			$key=(int)$row->_id;
-			break;
 		}
 		if($key){
 			$users_arr[$login]=$key;
 		}
 		else{
-			$check_user=$api->execute_method('get_accounts',array(array($login)));
-			if($check_user[0]['id']){
+			$check_user=$api->execute_method('get_accounts',array(array($login)))[0];
+			if($check_user['id']){
 				$bulk=new MongoDB\Driver\BulkWrite;
-				$bulk->insert(['_id'=>$check_user[0]['id'],'login'=>$check_user[0]['name']]);
+				$bulk->insert(['_id'=>$check_user['id'],'login'=>$check_user['name']]);
 				$mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
-				redis_add_ulist('update_user',$check_user[0]['name']);
+				redis_add_ulist('update_user',$check_user['name']);
+				$users_arr[$check_user['name']]=$check_user['id'];
 			}
-			return false;
+			else{
+				return false;
+			}
 		}
 	}
 	return $users_arr[$login];
