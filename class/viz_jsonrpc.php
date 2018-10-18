@@ -187,7 +187,7 @@ class viz_jsonrpc_web{
 		if(count($params)>0){
 			foreach($params as $k => $v){
 				if(is_array($v)){
-					if($v['raw']){
+					if(isset($v['raw'])){
 						unset($v['raw']);
 						$params_arr[]=json_encode($v);
 						break;
