@@ -32,13 +32,8 @@ function get_user_id($login){
 			if($check_user[0]['id']){
 				$bulk=new MongoDB\Driver\BulkWrite;
 				$bulk->insert(['_id'=>$check_user[0]['id'],'login'=>$check_user[0]['name']]);
-				try{
-					$mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
-					redis_add_ulist('update_user',$check_user[0]['name']);
-				}
-				catch (MongoDB\Driver\Exception\Exception $e) {
-					return false;
-				}
+				$mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
+				redis_add_ulist('update_user',$check_user[0]['name']);
 			}
 			return false;
 		}
@@ -116,12 +111,7 @@ function mongo_counter($collection_name,$increase=false){
 		if($increase){
 			$bulk=new MongoDB\Driver\BulkWrite;
 			$bulk->update(['_id'=>$collection_name],['$inc'=>['count'=>1]]);
-			try{
-				$mongo->executeBulkWrite('cryptostorm.auto_increment',$bulk);
-			}
-			catch (MongoDB\Driver\Exception\Exception $e) {
-				print 'Error: '.$e->getMessage();
-			}
+			$mongo->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
 			return ++$row->count;
 		}
 		else{
@@ -132,13 +122,7 @@ function mongo_counter($collection_name,$increase=false){
 	if(0==$count){
 		$bulk=new MongoDB\Driver\BulkWrite;
 		$bulk->insert(['_id'=>$collection_name,'count'=>1]);
-		try{
-			$mongo->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
-		}
-		catch (MongoDB\Driver\Exception\Exception $e) {
-			print 'Error: '.$e->getMessage();
-			return false;
-		}
+		$mongo->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
 		return 1;
 	}
 }
@@ -146,24 +130,14 @@ function mongo_counter_del($collection_name){
 	global $mongo,$config;
 	$bulk=new MongoDB\Driver\BulkWrite;
 	$bulk->delete(['_id'=>$collection_name]);
-	try{
-		$mongo->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
-	}
-	catch (MongoDB\Driver\Exception\Exception $e) {
-		print 'Error: '.$e->getMessage();
-	}
+	$mongo->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
 	return true;
 }
 function mongo_counter_set($collection_name,$count){
 	global $mongo,$config;
 	$bulk=new MongoDB\Driver\BulkWrite;
-	$bulk->update(['_id'=>$collection_name],['$set'=>['count'=>$count]]);
-	try{
-		$mongo->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
-	}
-	catch (MongoDB\Driver\Exception\Exception $e) {
-		print 'Error: '.$e->getMessage();
-	}
+	$bulk->update(['_id'=>$collection_name],['$set'=>['count'=>(int)$count]]);
+	$mongo->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
 	return true;
 }
 

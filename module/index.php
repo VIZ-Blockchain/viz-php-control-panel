@@ -576,6 +576,7 @@ if('blocks'==$path_array[1]){
 		print '<p>Количество блоков: '.$dgp['head_block_number'].'</p>';
 		print '<p>Количество в базе данных (индекс): '.mongo_counter('blocks').'</p>';
 		print '<p>Количество в базе данных (курсор): '.mongo_count('blocks').'</p>';
+		print '<p>Количество пользователей в бд: '.mongo_count('users').'</p>';
 		print '<h3>Голосуемые параметры сети</h3>';
 		print '<pre class="view_block">';
 		$chain_properties=$api->execute_method('get_chain_properties');

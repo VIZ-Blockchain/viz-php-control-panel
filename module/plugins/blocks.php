@@ -1,21 +1,8 @@
 <?php
 class viz_plugin_blocks extends viz_plugin{
 	function witness_reward($info,$data){
-		$rows=$this->mongo->executeQuery('viz.auto_increment',new MongoDB\Driver\Query(['_id'=>'blocks']));
-		$current_id=0;
-		foreach($rows as $row){
-			$current_id=$row->count;
-		}
-		if(0==$current_id){
-			$bulk=new MongoDB\Driver\BulkWrite;
-			$bulk->insert(['_id'=>'blocks','count'=>$info['block_id']]);
-			$this->mongo->executeBulkWrite('viz.auto_increment',$bulk);
-		}
-		else{
-			$bulk=new MongoDB\Driver\BulkWrite;
-			$bulk->update(['_id'=>'blocks'],['$set'=>['count'=>$info['block_id']]]);
-			$this->mongo->executeBulkWrite('viz.auto_increment',$bulk);
-		}
+		$current_id=mongo_counter('blocks');
+
 		$block_arr=array(
 			'_id'=>(int)$info['block_id'],
 			'time'=>(int)$info['unixtime'],
@@ -25,5 +12,7 @@ class viz_plugin_blocks extends viz_plugin{
 		$bulk=new MongoDB\Driver\BulkWrite;
 		$bulk->insert($block_arr);
 		$this->mongo->executeBulkWrite('viz.blocks',$bulk);
+
+		mongo_counter_set('blocks',$info['block_id']);
 	}
 }

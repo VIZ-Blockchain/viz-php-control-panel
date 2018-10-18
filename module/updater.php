@@ -66,7 +66,7 @@ while($work){
 				'awarded_rshares'=>(int)$user_arr['awarded_rshares'],
 				'last_post'=>$last_post,
 
-				'avatar'=>$json_metadata['profile']['avatar'];
+				'avatar'=>$json_metadata['profile']['avatar'],
 				'balance'=>(int)substr($user_arr['balance'],0,strpos($user_arr['balance'],' '))*1000,
 				'shares'=>(int)substr($user_arr['vesting_shares'],0,strpos($user_arr['vesting_shares'],' '))*1000000,
 

@@ -30,7 +30,7 @@ if($pid){
 	}
 }
 file_put_contents($site_root.'/module/waterfall.pid',$new_pid);
-
+print 'STARTUP: pid file: '.$pid_file.', pid: '.$new_pid.PHP_EOL;
 $plugins=new viz_plugins();
 $block_id=mongo_counter('blocks');
 print 'STARTUP: Find last block #'.$block_id.', working...'.PHP_EOL;
@@ -62,6 +62,12 @@ while($work){
 			else{
 				$end_execute_time=microtime(true);
 				print 'SUCCESS block #'.$current_block.' (sleep '.($sleep/1000).'ms) ('.(int)(1000*($end_execute_time-$current_block_time)).'ms execute time)'.PHP_EOL;
+			}
+			if(0==$current_block%100){
+				if(!file_exists($pid_file)){
+					print 'INFO: PID file was deleted, self-terminating...'.PHP_EOL;
+					exit;
+				}
 			}
 		}
 	}

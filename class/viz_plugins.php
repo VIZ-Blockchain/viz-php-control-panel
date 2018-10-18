@@ -32,11 +32,11 @@ class viz_plugins{
 		$this->redis=&$redis;
 		$this->mongo=&$mongo;
 		foreach($config['plugins'] as $plugin_name){
-			include_once($site_root.'/module/plugins/'.$plugin_name.'.php');
+			include($site_root.'/module/plugins/'.$plugin_name.'.php');
 			$plugin_class='viz_plugin_'.$plugin_name;
 			if(class_exists($plugin_class)){
-				$plugin=new $plugin_class($this->api,$this->redis,$this->mongo);
-				$this->listeners[]=&$plugin;
+				$$plugin_class=new $plugin_class($this->api,$this->redis,$this->mongo);
+				$this->listeners[]=&$$plugin_class;
 			}
 		}
 	}
