@@ -1,5 +1,5 @@
 <?php
-error_reporting(255);
+error_reporting(0);
 if(!$_SERVER['PWD']){
 	exit;
 }
