@@ -563,6 +563,74 @@ if('committee'==$path_array[1]){
 	}
 }
 else
+if('mongo'==$path_array[1]){
+	$replace['title']=htmlspecialchars('Mongo admin').' - '.$replace['title'];
+	if(''!=$path_array[2]){
+		$collection=$path_array[2];
+		$collection_count=mongo_count($collection);
+		if($collection_count){
+			$replace['title']=htmlspecialchars($collection).' - '.$replace['title'];
+			print '<div class="page content">
+			<a class="right" href="/mongo/">&larr; Вернуться</a>
+			<h1>'.$collection.'</h1>
+			<div class="article">';
+			print '<p>Записей: '.$collection_count.'</p>';
+			$perpage=25;
+			$offset=0;
+			if(isset($_GET['offset'])){
+				$offset=(int)$_GET['offset'];
+			}
+			$pages=ceil($collection_count/$perpage);
+			$page=$offset/$perpage;
+			$prev_page=$page-1;
+			$next_page=$page+1;
+			$prev_page=max($prev_page,0);
+			$next_page=min($next_page,$pages);
+
+			$find=array();
+			$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,['sort'=>array('_id'=>1),'limit'=>(int)$perpage,'skip'=>(int)$offset]));
+			$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+			foreach($rows as $row){
+				print '<p>';
+				print_r($row);
+				print '</p>';
+			}
+
+			print '<div class="pages">';
+			print '<a>Текущая страница: '.($page+1).'</a>';
+			if($offset>0){
+				print '<a href="?offset='.($perpage*$prev_page).'">&larr; Предыдущая страница</a>';
+			}
+			if($next_page<$pages){
+				print '<a href="?offset='.($perpage*$next_page).'">Следующая страница &rarr;</a>';
+			}
+			print '</div>';
+			$indexes=$mongo->executeCommand($config['db_prefix'],new MongoDB\Driver\Command(['listIndexes'=>$collection]));
+			$indexes->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+			print '<h3>Индексы</h3><ul>';
+			foreach($indexes as $index){
+				print '<li>'.$index['name'].', ключи: '.json_encode($index['key']).($index['weights']?', weights: '.json_encode($index['weights']):'').'</li>';
+			}
+			print '</ul>';
+			print '</div></div>';
+		}
+	}
+	if(''==$path_array[2]){
+		print '<div class="page content">
+		<h1>Mongo admin, db: '.$config['db_prefix'].'</h1>
+		<div class="article">';
+		$collections=$mongo->executeCommand($config['db_prefix'],new MongoDB\Driver\Command(['listCollections'=>1,'sort'=>['name'=>1]]));
+		$collections->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+		foreach($collections as $collection){
+			print '<p>';
+			print '<a href="/mongo/'.$collection['name'].'/">'.$collection['name'].'</a>';
+			print ', записей: '.mongo_count($collection['name']);
+			print '</p>';
+		}
+		print '</div></div>';
+	}
+}
+else
 if('blocks'==$path_array[1]){
 	$dgp=$api->execute_method('get_dynamic_global_properties');
 	if(''==$path_array[2]){
