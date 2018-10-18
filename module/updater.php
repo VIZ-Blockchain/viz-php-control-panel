@@ -45,7 +45,7 @@ while($work){
 				'_id'=>(int)$user_id,
 				'login'=>$witness_login,
 				'url'=>$witness_arr['url'],
-				'created_time'=(int)$created_time,
+				'created_time'=>(int)$created_time,
 				'votes'=>(int)$witness_arr['votes'],
 				'last_confirmed_block_num'=>(int)$witness_arr['last_confirmed_block_num'],
 				'signing_key'=>$witness_arr['signing_key'],
@@ -53,10 +53,10 @@ while($work){
 			);
 			$bulk=new MongoDB\Driver\BulkWrite;
 			if(mongo_exist('witnesses',array('login'=>$witness_login))){
-				$bulk->update(['login'=>$user_login],['$set'=>$user_data]);
+				$bulk->update(['login'=>$witness_login],['$set'=>$witness_data]);
 			}
 			else{
-				$bulk->insert($user_data);
+				$bulk->insert($witness_data);
 			}
 			$mongo->executeBulkWrite($config['db_prefix'].'.witnesses',$bulk);
 			print 'SUCCESS witness update: '.$witness_login.PHP_EOL;
