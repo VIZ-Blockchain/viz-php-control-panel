@@ -15,4 +15,7 @@ class viz_plugin_blocks extends viz_plugin{
 
 		mongo_counter_set('blocks',$info['block_id']);
 	}
+	function witness_update($info,$data){
+		redis_add_ulist('update_witness',$data['owner']);
+	}
 }

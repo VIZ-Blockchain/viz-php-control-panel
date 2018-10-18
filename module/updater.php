@@ -33,6 +33,35 @@ file_put_contents($site_root.'/module/updater.pid',$new_pid);
 print 'STARTUP: pid file: '.$pid_file.', pid: '.$new_pid.PHP_EOL;
 $work=true;
 while($work){
+
+	$witness_login=redis_get_ulist('update_witness');
+	if($witness_login){
+		$user_id=get_user_id($witness_login);
+		$witness_arr=$api->execute_method('get_witness_by_account',array($witness_login));
+		if($witness_arr['owner']){
+			$date=date_parse_from_format('Y-m-d\TH:i:s',$witness_arr['created']);
+			$created_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+			$witness_data=array(
+				'_id'=>(int)$user_id,
+				'login'=>$witness_login,
+				'url'=>$witness_arr['url'],
+				'created_time'=(int)$created_time,
+				'votes'=>(int)$witness_arr['votes'],
+				'last_confirmed_block_num'=>(int)$witness_arr['last_confirmed_block_num'],
+				'signing_key'=>$witness_arr['signing_key'],
+				'props'=>json_encode($witness_arr['props'])
+			);
+			$bulk=new MongoDB\Driver\BulkWrite;
+			if(mongo_exist('witnesses',array('login'=>$witness_login))){
+				$bulk->update(['login'=>$user_login],['$set'=>$user_data]);
+			}
+			else{
+				$bulk->insert($user_data);
+			}
+			$mongo->executeBulkWrite($config['db_prefix'].'.witnesses',$bulk);
+			print 'SUCCESS witness update: '.$witness_login.PHP_EOL;
+		}
+	}
 	$user_login=redis_get_ulist('update_user');
 	if($user_login){
 		$user_arr=$api->execute_method('get_accounts',array(array($user_login)))[0];

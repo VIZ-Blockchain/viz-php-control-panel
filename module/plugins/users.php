@@ -72,9 +72,6 @@ class viz_plugin_users extends viz_plugin{
 			else{
 				$bulk->insert($user_data);
 			}
-			print_r($data);
-			print_r($user_data);
-			print_r($user_arr);
 			$this->mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
 		}
 	}
