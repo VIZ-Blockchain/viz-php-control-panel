@@ -30,13 +30,13 @@ if($pid){
 	}
 }
 file_put_contents($site_root.'/module/updater.pid',$new_pid);
-
+print 'STARTUP: pid file: '.$pid_file.', pid: '.$new_pid.PHP_EOL;
 $work=true;
 while($work){
 	$user_login=redis_get_ulist('update_user');
 	if($user_login){
-		$user_arr=$api->execute_method('get_accounts',array(array($user_login)));
-		if($user_arr[0]['name']){
+		$user_arr=$api->execute_method('get_accounts',array(array($user_login)))[0];
+		if($user_arr['name']){
 			$date=date_parse_from_format('Y-m-d\TH:i:s',$user_arr['created']);
 			$reg_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
 			$date=date_parse_from_format('Y-m-d\TH:i:s',$user_arr['last_post']);
@@ -103,7 +103,7 @@ while($work){
 					'beneficiary_payout_value'=>$content_info['beneficiary_payout_value'],
 					'total_pending_payout_value'=>$content_info['total_pending_payout_value'],
 					'body'=>$content_info['body'],
-					'title'=>$content_info['title']
+					'title'=>$content_info['title'],
 					'cashout_time'=>(int)$cashout_time,
 					'last_payout'=>(int)$last_payout,
 					'parse_time'=>(int)time()
@@ -132,7 +132,7 @@ while($work){
 					'beneficiary_payout_value'=>$content_info['beneficiary_payout_value'],
 					'total_pending_payout_value'=>$content_info['total_pending_payout_value'],
 					'body'=>$content_info['body'],
-					'title'=>$content_info['title']
+					'title'=>$content_info['title'],
 					'cashout_time'=>(int)$cashout_time,
 					'last_payout'=>(int)$last_payout,
 					'parse_time'=>(int)time()

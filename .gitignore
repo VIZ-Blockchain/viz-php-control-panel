@@ -1,6 +1,7 @@
 config.php
 robots.txt
 module/waterfall.pid
+module/updater.pid
 
 # ignore phpstorm project files
 .idea
