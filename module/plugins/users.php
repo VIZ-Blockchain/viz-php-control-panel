@@ -31,17 +31,7 @@ class viz_plugin_users extends viz_plugin{
 			$reg_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
 			$date=date_parse_from_format('Y-m-d\TH:i:s',$user_arr['last_post']);
 			$last_post=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
-			$gender=0;
 			$json_metadata=array();
-			if($user_arr['json_metadata']){
-				$json_metadata=json_decode($user_arr['json_metadata'],true);
-				if('male'==$json_metadata['profile']['gender']){
-					$gender=1;
-				}
-				if('female'==$json_metadata['profile']['gender']){
-					$gender=2;
-				}
-			}
 			$user_data=array(
 				'login'=>$user_login,
 				'_id'=>(int)$user_arr['id'],
@@ -56,15 +46,33 @@ class viz_plugin_users extends viz_plugin{
 				'awarded_rshares'=>(int)$user_arr['awarded_rshares'],
 				'last_post'=>$last_post,
 
-				'avatar'=>$json_metadata['profile']['avatar'],
 				'balance'=>(int)substr($user_arr['balance'],0,strpos($user_arr['balance'],' '))*1000,
 				'shares'=>(int)substr($user_arr['vesting_shares'],0,strpos($user_arr['vesting_shares'],' '))*1000000,
 
-				'nickname'=>$json_metadata['profile']['nickname'],
-				'about'=>$json_metadata['profile']['about'],
+				'avatar'=>'',
+				'nickname'=>'',
+				'about'=>'',
+				'gender'=>0,
 
 				'parse_time'=>(int)time(),
 			);
+			if($user_arr['json_metadata']){
+				$json_metadata=json_decode($user_arr['json_metadata'],true);
+				if(isset($json_metadata['profile'])){
+					if(isset($json_metadata['profile']['gender'])){
+						if('male'==$json_metadata['profile']['gender'])
+							$user_data['gender']=1;
+						if('female'==$json_metadata['profile']['gender'])
+							$user_data['gender']=2;
+					}
+					if(isset($json_metadata['profile']['avatar']))
+						$user_data['avatar']=$json_metadata['profile']['avatar'];
+					if(isset($json_metadata['profile']['nickname']))
+						$user_data['nickname']=$json_metadata['profile']['nickname'];
+					if(isset($json_metadata['profile']['about']))
+						$user_data['about']=$json_metadata['profile']['about'];
+				}
+			}
 			$bulk=new MongoDB\Driver\BulkWrite;
 			if(mongo_exist('users',array('login'=>$user_login))){
 				$bulk->update(['login'=>$user_login],['$set'=>$user_data]);
