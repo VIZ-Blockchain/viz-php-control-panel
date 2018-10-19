@@ -14,4 +14,7 @@ $config['redis_password']='';
 // Timezone:
 $config['server_timezone']='Etc/GMT';
 
+// Enabled plugins:
+$config['plugins']=array('blocks','users');
+
 $site_root=$_SERVER['DOCUMENT_ROOT'];
