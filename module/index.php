@@ -565,6 +565,37 @@ if('committee'==$path_array[1]){
 else
 if('mongo'==$path_array[1]){
 	$replace['title']=htmlspecialchars('Mongo admin').' - '.$replace['title'];
+	if(isset($_GET['action'])){
+		if('add_index'==$_GET['action']){
+			if('text'!=$_POST['index']){
+				$_POST['index']=(int)$_POST['index'];
+			}
+			$result=$mongo->executeCommand($_POST['db'],new MongoDB\Driver\Command(
+				[
+					'createIndexes'=>$_POST['collection'],
+					'indexes'=>[
+						[
+							'name'=>$_POST['attr'].'_index'.$_POST['index'],
+							'key'=>[$_POST['attr']=>$_POST['index']],
+							'ns'=>$_POST['db'].'.'.$_POST['collection']
+						]
+					]
+				])
+			);
+		}
+		if('drop_index'==$_GET['action']){
+			if(isset($_GET['index'])){
+				$result=$mongo->executeCommand($_GET['db'],new MongoDB\Driver\Command(
+					[
+						'dropIndexes'=>$_GET['collection'],
+						'index'=>$_GET['index']
+					])
+				);
+			}
+		}
+		header('location:'.$_SERVER['HTTP_REFERER']);
+		exit;
+	}
 	if(''!=$path_array[2]){
 		$collection=$path_array[2];
 		$collection_count=mongo_count($collection);
@@ -588,28 +619,40 @@ if('mongo'==$path_array[1]){
 			$next_page=min($next_page,$pages);
 
 			$find=array();
-			$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,['sort'=>array('_id'=>1),'limit'=>(int)$perpage,'skip'=>(int)$offset]));
+			$sort=array('_id'=>1);
+			$sort_str='';
+			if(isset($_GET['sort_attr'])){
+				$sort=array($_GET['sort_attr']=>(int)$_GET['sort_asc']);
+				$sort_str='&sort_attr='.$_GET['sort_attr'].'&sort_asc='.$_GET['sort_asc'];
+			}
+			$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,['sort'=>$sort,'limit'=>(int)$perpage,'skip'=>(int)$offset]));
 			$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 			foreach($rows as $row){
 				print '<p>';
 				print_r($row);
 				print '</p>';
 			}
-
 			print '<div class="pages">';
 			print '<a>Текущая страница: '.($page+1).'</a>';
 			if($offset>0){
-				print '<a href="?offset='.($perpage*$prev_page).'">&larr; Предыдущая страница</a>';
+				print '<a href="?offset='.($perpage*$prev_page).$sort_str.'">&larr; Предыдущая страница</a>';
 			}
 			if($next_page<$pages){
-				print '<a href="?offset='.($perpage*$next_page).'">Следующая страница &rarr;</a>';
+				print '<a href="?offset='.($perpage*$next_page).$sort_str.'">Следующая страница &rarr;</a>';
 			}
 			print '</div>';
 			$indexes=$mongo->executeCommand($config['db_prefix'],new MongoDB\Driver\Command(['listIndexes'=>$collection]));
 			$indexes->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 			print '<h3>Индексы</h3><ul>';
 			foreach($indexes as $index){
-				print '<li>'.$index['name'].', ключи: '.json_encode($index['key']).($index['weights']?', weights: '.json_encode($index['weights']):'').'</li>';
+				$sort_attr='';
+				$sort_asc=1;
+				foreach($index['key'] as $key=>$asc){
+					$sort_attr=$key;
+					$sort_asc=$asc;
+					break;
+				}
+				print '<li class="clearfix"><a class="right" href="/mongo/?action=drop_index&db='.$config['db_prefix'].'&collection='.$collection.'&index='.$index['name'].'">Удалить индекс '.$index['name'].'</a>'.$index['name'].', ключи: '.json_encode($index['key']).($index['weights']?', weights: '.json_encode($index['weights']):'').', <a href="?sort_attr='.$sort_attr.'&sort_asc='.$sort_asc.'">сортировать</a></li>';
 			}
 			print '</ul>';
 			print '</div></div>';
@@ -627,6 +670,14 @@ if('mongo'==$path_array[1]){
 			print ', записей: '.mongo_count($collection['name']);
 			print '</p>';
 		}
+		print '<h3>Добавить индекс</h3>';
+		print '<form action="/mongo/?action=add_index" method="POST"><p>
+		БД: <input type="text" name="db" value="'.$config['db_prefix'].'" class="round"><br>
+		Коллекция: <input type="text" name="collection" value="" class="round"><br>
+		Поле для индекса: <input type="text" name="attr" value="" class="round"><br>
+		Индекс: <input type="text" name="index" value="" class="round"><br>
+		<input type="submit" class="button" value="Создать индекс">
+		</p></form>';
 		print '</div></div>';
 	}
 }
