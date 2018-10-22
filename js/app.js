@@ -96,7 +96,7 @@ function wallet_withdraw_shares(disable=false){
 	if(disable){
 		gate.broadcast.withdrawVesting(users[current_user].active_key,current_user,'0.000000 SHARES',function(err,response){
 			if(!err){
-				wallet_control();
+				wallet_control(true);
 				add_notify('Понижение доли отменено');
 			}
 			else{
@@ -114,7 +114,7 @@ function wallet_withdraw_shares(disable=false){
 				let fixed_shares=''+shares.toFixed(6)+' SHARES';
 				gate.broadcast.withdrawVesting(users[current_user].active_key,current_user,fixed_shares,function(err,response){
 					if(!err){
-						wallet_control();
+						wallet_control(true);
 						add_notify('Понижение доли запущено');
 					}
 					else{
@@ -342,7 +342,7 @@ function wallet_transfer(recipient,amount,memo){
 				if(shares){
 					gate.broadcast.transferToVesting(users[current_user].active_key,current_user,login,fixed_amount,function(err,result){
 						if(!err){
-							wallet_control();
+							wallet_control(true);
 						}
 						else{
 							add_notify('Ошибка в переводе',true);
@@ -353,7 +353,7 @@ function wallet_transfer(recipient,amount,memo){
 				else{
 					gate.broadcast.transfer(users[current_user].active_key,current_user,login,fixed_amount,memo,function(err,result){
 						if(!err){
-							wallet_control();
+							wallet_control(true);
 						}
 						else{
 							add_notify('Ошибка в переводе',true);
@@ -789,9 +789,108 @@ function delegation_control(){
 		}
 	}
 }
-function wallet_control(){
+function update_wallet_history(){
+	if(0<$('.wallet-history').length){
+		$('.wallet-history tbody').html('<tr><td colspan="6"><center><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i> Загрузка&hellip;</center></td></tr>');
+		setTimeout(function(){
+			$.ajax({
+				type:'POST',
+				url:'/ajax/transfers_history_table/',
+				data:{'user':current_user},
+				success:function(data_html){
+					if(''!=data_html){
+						$('.wallet-history tbody').html(data_html);
+						update_datetime();
+					}
+					else{
+						$('.wallet-history tbody').html('<tr><td colspan="6"><center>Записи отсутствуют</center></td></tr>');
+					}
+				},
+			});
+		},1000);
+	}
+}
+function filter_wallet_history(){
+	var filter=$('input[name=wallet-history-filter]').val();
+	$('.wallet-history tbody tr').removeClass('filtered');
+	$('.wallet-history tbody tr').each(function(){
+		if('none'!=$(this).css('display')){
+			let pos=$(this).text().toLowerCase().indexOf(filter);
+			if(-1!==pos){
+
+			}
+			else{
+				$(this).addClass('filtered');
+			}
+		}
+	});
+	var filter_amount=parseFloat(parseFloat($('input[name=wallet-history-filter-amount1]').val().replace(',','.')).toFixed(3));
+	var filter_amount2=parseFloat(parseFloat($('input[name=wallet-history-filter-amount2]').val().replace(',','.')).toFixed(3));
+	$('.wallet-history tbody tr').each(function(){
+		var found_amount=parseFloat(parseFloat($(this).find('td[rel=amount]').text()).toFixed(3));
+		if('none'!=$(this).css('display')){
+			if(filter_amount>0){
+				if(filter_amount>found_amount){
+					$(this).addClass('filtered');
+				}
+			}
+			if(filter_amount2>0){
+				if(filter_amount2<found_amount){
+					$(this).addClass('filtered');
+				}
+			}
+		}
+	});
+}
+function bind_filter_wallet_history(){
+	$('input[name=wallet-history-filter]').bind('keyup',function(){
+		filter_wallet_history();
+	});
+	$('input[name=wallet-history-filter-amount1]').bind('keyup',function(){
+		filter_wallet_history();
+	});
+	$('input[name=wallet-history-filter-amount2]').bind('keyup',function(){
+		filter_wallet_history();
+	});
+}
+function wallet_control(update=false){
 	if(0!=$('.control .wallet-control').length){
 		let wallet_control=$('.wallet-control');
+		if(update){
+			gate.api.getDynamicGlobalProperties(function(err,dgp){
+				gate.api.getAccounts([current_user],function(err,response){
+					if(typeof response[0] !== 'undefined'){
+						wallet_control.find('.token[data-symbol=VIZ] .amount').html(parseFloat(response[0]['balance']));
+						if('0.000000 SHARES'==response[0].vesting_withdraw_rate){
+							wallet_control.find('.withdraw-shares-status').html('<a class="enable-withdraw-shares-action">Включить понижение</a>');
+						}
+						else{
+							let powerdown_time=Date.parse(response[0].next_vesting_withdrawal);
+							let powerdown_icon='';
+							if(powerdown_time>0){
+								powerdown_icon='<i class="fas fa-fw fa-level-down-alt" title="'+date_str(powerdown_time-(new Date().getTimezoneOffset()*60000),true,false,true)+': '+response[0].vesting_withdraw_rate+'"></i> ';
+							}
+							wallet_control.find('.withdraw-shares-status').html(powerdown_icon+'<a class="disable-withdraw-shares-action">Отключить понижение</a>');
+						}
+						let network_share=100*(parseFloat(response[0]['vesting_shares'])/parseFloat(dgp.total_vesting_shares));
+						wallet_control.find('.token[data-symbol=SHARES] .amount').html(parseFloat(response[0]['vesting_shares']));
+						wallet_control.find('.network_share').html(network_share.toFixed(5));
+						if(parseFloat(response[0]['delegated_vesting_shares'])){
+							wallet_control.find('.delegated_vesting_shares[data-symbol=SHARES] .amount').html(parseFloat(response[0]['delegated_vesting_shares']));
+						}
+						if(parseFloat(response[0]['received_vesting_shares'])){
+							wallet_control.find('.received_vesting_shares[data-symbol=SHARES] .amount').html(parseFloat(response[0]['received_vesting_shares']));
+						}
+						if(parseFloat(response[0]['received_vesting_shares']) || parseFloat(response[0]['delegated_vesting_shares'])){
+							network_share=100*((parseFloat(response[0]['vesting_shares'])+parseFloat(response[0]['received_vesting_shares'])-parseFloat(response[0]['delegated_vesting_shares']))/parseFloat(dgp.total_vesting_shares));
+							wallet_control.find('.effective_token[data-symbol=SHARES] .amount').html((parseFloat(response[0]['vesting_shares'])+parseFloat(response[0]['received_vesting_shares'])-parseFloat(response[0]['delegated_vesting_shares'])));
+							wallet_control.find('.effective_network_share').html(network_share.toFixed(5));
+						}
+					}
+				});
+			});
+			return;
+		}
 		let result='';
 		if(''==current_user){
 			result+='<p>Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
@@ -804,10 +903,10 @@ function wallet_control(){
 					if(typeof response[0] !== 'undefined'){
 						result+='<p>Баланс: <span class="token" data-symbol="VIZ"><span class="amount">'+parseFloat(response[0]['balance'])+'</span> VIZ</span></p>';
 						if('0.000000 SHARES'==response[0].vesting_withdraw_rate){
-							result+='<div class="right"><a class="enable-withdraw-shares-action">Включить понижение</a></div>';
+							result+='<div class="right withdraw-shares-status"><a class="enable-withdraw-shares-action">Включить понижение</a></div>';
 						}
 						else{
-							result+='<div class="right">';
+							result+='<div class="right withdraw-shares-status">';
 							let powerdown_time=Date.parse(response[0].next_vesting_withdrawal);
 							if(powerdown_time>0){
 								result+='<i class="fas fa-fw fa-level-down-alt" title="'+date_str(powerdown_time-(new Date().getTimezoneOffset()*60000),true,false,true)+': '+response[0].vesting_withdraw_rate+'"></i> ';
@@ -815,7 +914,7 @@ function wallet_control(){
 							result+='<a class="disable-withdraw-shares-action">Отключить понижение</a></div>';
 						}
 						let network_share=100*(parseFloat(response[0]['vesting_shares'])/parseFloat(dgp.total_vesting_shares));
-						result+='<p>Доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['vesting_shares'])+'</span> SHARES</span> ('+network_share.toFixed(5)+'%)</p>';
+						result+='<p>Доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['vesting_shares'])+'</span> SHARES</span> (<span class="network_share">'+network_share.toFixed(5)+'</span>%)</p>';
 						if(parseFloat(response[0]['delegated_vesting_shares'])){
 							result+='<p>Делегировано: <span class="delegated_vesting_shares" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['delegated_vesting_shares'])+'</span> SHARES</span></p>';
 						}
@@ -824,7 +923,7 @@ function wallet_control(){
 						}
 						if(parseFloat(response[0]['received_vesting_shares']) || parseFloat(response[0]['delegated_vesting_shares'])){
 							network_share=100*((parseFloat(response[0]['vesting_shares'])+parseFloat(response[0]['received_vesting_shares'])-parseFloat(response[0]['delegated_vesting_shares']))/parseFloat(dgp.total_vesting_shares));
-							result+='<p>Эффективная доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+(parseFloat(response[0]['vesting_shares'])+parseFloat(response[0]['received_vesting_shares'])-parseFloat(response[0]['delegated_vesting_shares']))+'</span> SHARES</span> ('+network_share.toFixed(5)+'%)</p>';
+							result+='<p>Эффективная доля сети: <span class="effective_token" data-symbol="SHARES"><span class="amount">'+(parseFloat(response[0]['vesting_shares'])+parseFloat(response[0]['received_vesting_shares'])-parseFloat(response[0]['delegated_vesting_shares']))+'</span> SHARES</span> (<span class="effective_network_share">'+network_share.toFixed(5)+'</span>%)</p>';
 						}
 						result+='<h3>Выполнить перевод</h3>';
 						if(''==users[current_user].active_key){
@@ -837,7 +936,17 @@ function wallet_control(){
 							result+='<p><label><input type="checkbox" name="shares"> — перевод в долю сети</label></p>';
 							result+='<p><a class="wallet-transfer-action button"><i class="far fa-fw fa-credit-card"></i> Отправить перевод</a>';
 						}
+						result+='<hr><h2>История переводов</h2>';
+						result+='<input class="bubble small-size right" type="text" name="wallet-history-filter-amount2" placeholder="До&hellip;" tabindex="3">';
+						result+='<input class="bubble small-size right" type="text" name="wallet-history-filter-amount1" placeholder="От&hellip;" tabindex="2">';
+						result+='<input class="bubble small-size right" type="text" name="wallet-history-filter" placeholder="Фильтр" tabindex="1">';
+						result+='<div class="action-button wallet-history-filter-all"><i class="fa fa-fw fa-globe" aria-hidden="true"></i> Все</div>';
+						result+='<div class="action-button wallet-history-filter-in"><i class="fa fa-fw fa-arrow-circle-down" aria-hidden="true"></i> Входящие</div>';
+						result+='<div class="action-button wallet-history-filter-out"><i class="fa fa-fw fa-arrow-circle-up" aria-hidden="true"></i> Исходящие</div>';
+						result+='<div class="wallet-history"><table><thead><tr><th>Дата</th><th>Отправитель</th><th>Получатель</th><th>Количество</th><th>Токен</th><th>Заметка</th></tr></thead><tbody></tbody></table></div>';
 						wallet_control.html(result);
+						update_wallet_history();
+						bind_filter_wallet_history();
 					}
 				});
 			});
@@ -1082,6 +1191,17 @@ function app_mouse(e){
 		if($(target).closest('.control').length){
 			generate_key(true);
 		}
+	}
+	if($(target).hasClass('wallet-history-filter-all') || $(target).parent().hasClass('wallet-history-filter-all')){
+		$('.wallet-history tbody tr').css('display','table-row');
+	}
+	if($(target).hasClass('wallet-history-filter-in') || $(target).parent().hasClass('wallet-history-filter-in')){
+		$('.wallet-history tbody tr').css('display','none');
+		$('.wallet-history tbody tr.wallet-history-in').css('display','table-row');
+	}
+	if($(target).hasClass('wallet-history-filter-out') || $(target).parent().hasClass('wallet-history-filter-out')){
+		$('.wallet-history tbody tr').css('display','none');
+		$('.wallet-history tbody tr.wallet-history-out').css('display','table-row');
 	}
 	if($(target).hasClass('witness-chain-properties-update-action')){
 		e.preventDefault();

@@ -1026,3 +1026,93 @@ input.wide{
 	text-align:center;
 	font-family:Arial,sans-serif;
 }
+
+.page table{
+	border:1px solid #ddd;
+	border-right:0;
+	border-top:0;
+	padding:0px;
+	margin:0 auto 10px;
+	width:100%;
+	font-size:14px;
+	font-family:Arial,sans-serif;
+}
+.page table th{
+	background-color:#eee;
+	border:0;
+	margin:0;
+	border-top:1px solid #ddd;
+	border-right:1px solid #ddd;
+	padding:5px;
+	text-align:center;
+	vertical-align:middle;
+}
+.page table td{
+	border-top:1px solid #ddd;
+	border-right:1px solid #ddd;
+	vertical-align: top;
+	padding:5px;
+	margin:0;
+}
+.wallet-history tr.filtered{
+	display:none !important;
+}
+.wallet-history p{
+	margin:0 !important;
+}
+.action-button{
+	display: inline-block;
+	padding: 6px 8px;
+	margin-right: 16px;
+	margin-bottom:8px;
+	background: #666;
+	color: #fff;
+	border-radius: 16px;
+	text-decoration:none;
+	cursor: pointer;
+	font-size: 14px;
+	font-family:Arial,sans-serif;
+	-webkit-transition: all 0.2s linear;
+	-moz-transition: all 0.2s linear;
+	-o-transition: all 0.2s linear;
+	transition: all 0.2s linear;
+}
+.action-button.waiting{
+	background:#999 !important;
+}
+.action-button.right{
+	margin-right:0;
+	margin-left:16px;
+	margin-bottom:4px;
+}
+.action-button:hover{
+	background:#000;
+	color:#fff;
+}
+
+input.bubble{
+	padding: 6px 16px;
+	outline: 0;
+	border-radius: 16px;
+	border: 1px solid #d8d8d8;
+	font-size: 14px;
+	font-family:Arial,sans-serif;
+}
+input.bubble.right{
+	margin-left:8px;
+}
+input.small-size{
+	width:100px;
+}
+select.bubble{
+	padding: 6px 16px;
+	outline: 0;
+	border-radius: 16px;
+	border: 1px solid #d8d8d8;
+}
+select.bubble.right{
+	margin-left:8px;
+}
+select.small-size{
+	width:100px;
+}
