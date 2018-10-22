@@ -15,6 +15,10 @@ class viz_plugin_users extends viz_plugin{
 		redis_add_ulist('update_user',$data['from']);
 		redis_add_ulist('update_user',$data['to']);
 	}
+	function delegate_vesting_shares($info,$data){
+		redis_add_ulist('update_user',$data['delegator']);
+		redis_add_ulist('update_user',$data['delegatee']);
+	}
 	function change_recovery_account($info,$data){
 		redis_add_ulist('update_user',$data['account_to_recover']);
 	}
