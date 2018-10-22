@@ -1,4 +1,20 @@
 <?php
+$keys=$redis->keys('*');
+print '<p>Redis keys:<p>';
+print '<pre>';
+print_r($keys);
+print '</pre>';
+print '<p>Redis before clear:<p>';
+print '<pre>';
+print_r($redis->info('memory'));
+print '</pre>';
+print PHP_EOL.'======================================'.PHP_EOL;
+$redis->flushall('async');
+print '<p>Redis after clear:</p>';
+print '<pre>';
+print_r($redis->info('memory'));
+print '</pre>';
+print PHP_EOL.'======================================'.PHP_EOL;
 $collections_arr=array(
 	'blocks',
 	'sessions',
