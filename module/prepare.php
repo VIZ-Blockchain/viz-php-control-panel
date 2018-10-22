@@ -14,6 +14,15 @@ $api_ws_arr=array(
 );
 $api=new viz_jsonrpc_web($api_ws_arr[array_rand($api_ws_arr)]);
 
+$currencies_arr=array(
+	'SHARES'=>1,
+	'VIZ'=>2
+);
+$currencies_id_arr=array(
+	1=>'SHARES',
+	2=>'VIZ'
+);
+
 $users_arr=array();
 function get_user_id($login){
 	global $users_arr,$api,$mongo,$config;
@@ -70,9 +79,9 @@ function get_user_login($id){
 	global $users_arr,$mongo,$config;
 	$key=array_search($id,$users_arr);
 	if(false===$key){
-		$rows=$mongo->executeQuery($config['db_prefix'].'.users',new MongoDB\Driver\Query(['_id'=>$id],['limit'=>1]));
+		$rows=$mongo->executeQuery($config['db_prefix'].'.users',new MongoDB\Driver\Query(['_id'=>(int)$id],['limit'=>1]));
 		foreach($rows as $row){
-			$key=(int)$row->login;
+			$key=$row->login;
 			if($key){
 				$users_arr[$key]=(int)$id;
 			}
