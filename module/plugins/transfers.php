@@ -14,7 +14,7 @@ class viz_plugin_transfers extends viz_plugin{
 		if($this->currencies_arr[$currency_str]){
 			$currency=$this->currencies_arr[$currency_str];
 		}
-		$memo=$arr['memo'];
+		$memo=$data['memo'];
 
 		$transfer_id=$this->redis->incr('id:transfers');
 
