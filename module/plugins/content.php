@@ -1,0 +1,169 @@
+<?php
+class viz_plugin_content extends viz_plugin{
+	function delete_content($info,$data){
+		global $config;
+		$user_id=get_user_id($data['author']);
+		$permlink=mongo_prepare($data['permlink']);
+		$find_content=mongo_find_id('content',array('author'=>(int)$user_id,'permlink'=>$permlink));
+		if($find_content){
+			$data=array('status'=>1,'delete_time'=>(int)$info['unixtime']);
+			$bulk=new MongoDB\Driver\BulkWrite;
+			$bulk->update(['_id'=>(int)$find_subcontent],['$set'=>$data]);
+			$this->mongo->executeBulkWrite($config['db_prefix'].'.content',$bulk);
+		}
+		else{
+			$find_subcontent=mongo_find_id('subcontent',array('author'=>(int)$user_id,'permlink'=>$permlink));
+			if($find_subcontent){
+				$data=array('status'=>1,'delete_time'=>(int)$info['unixtime']);
+				$bulk=new MongoDB\Driver\BulkWrite;
+				$bulk->update(['_id'=>(int)$find_subcontent],['$set'=>$data]);
+				$this->mongo->executeBulkWrite($config['db_prefix'].'.subcontent',$bulk);
+			}
+		}
+	}
+	function content($info,$data){
+		global $config;
+		if(''==$data['parent_author']){//content
+			$parent_permlink=mongo_prepare($data['parent_permlink']);
+
+			$user_id=get_user_id($data['author']);
+			$permlink=mongo_prepare($data['permlink']);
+			$user_status=mongo_find_attr('users','status',array('_id'=>(int)$user_id));
+
+			$data_arr=array(
+				'title'=>mongo_prepare($data['title']),
+				'body'=>mongo_prepare($data['body']),
+				'curation_percent'=>(int)$data['curation_percent'],
+				'curation_percent'=>(int)$data['curation_percent'],
+				'status'=>$user_status,
+				'parse_time'=>(int)time()
+			);
+
+			$json_metadata_encoded=json_decode($data['json_metadata'],true);
+			if(isset($json_metadata_encoded['cover'])){
+				$data_arr['cover']=mongo_prepare($json_metadata_encoded['cover']);
+			}
+			if(isset($json_metadata_encoded['foreword'])){
+				$data_arr['foreword']=mongo_prepare($json_metadata_encoded['foreword']);
+			}
+
+			$find_content=mongo_find_id('content',array('author'=>(int)$user_id,'permlink'=>$permlink));
+			$bulk=new MongoDB\Driver\BulkWrite;
+			if($find_content){
+				$data_arr['update_time']=(int)$info['unixtime'];
+				$bulk->update(['_id'=>(int)$find_content],['$set'=>$data_arr]);
+			}
+			else{
+				$data_arr['_id']=(int)mongo_counter('content',true);
+				$data_arr['author']=(int)$user_id;
+				$data_arr['permlink']=$permlink;
+				$data_arr['parent_permlink']=$parent_permlink;
+				$data_arr['time']=(int)$info['unixtime'];
+				$bulk->insert($data_arr);
+			}
+			$this->mongo->executeBulkWrite($config['db_prefix'].'.content',$bulk);
+		}
+		else{//subcontent
+			$parent_user_id=get_user_id($data['parent_author']);
+			$parent_permlink=mongo_prepare($data['parent_permlink']);
+			$parent_content=mongo_find_id('content',array('author'=>(int)$parent_user_id,'permlink'=>$parent_permlink));
+			$parent_subcontent=0;
+			$level=0;
+			$sort=0;
+			if(!$parent_content){
+				$parent_subcontent=mongo_find_id('subcontent',array('author'=>(int)$parent_user_id,'permlink'=>$parent_permlink));
+				if(!$parent_subcontent){
+					$parent_subcontent=0;
+				}
+			}
+
+			if($parent_subcontent){
+				$parent_subcontent_arr=mongo_find('subcontent',array('_id'=>(int)$parent_subcontent));
+				$parent_content=$parent_subcontent_arr['content'];
+
+				$level=1+$parent_subcontent_arr['level'];
+
+				$parent_subcontent_next_sort=mongo_find_attr('subcontent','sort',
+					array(
+						'content'=>(int)$parent_content,
+						'sort'=>array('$gt'=>(int)$parent_subcontent_arr['sort']),
+						'level'=>array('$lte'=>(int)$parent_subcontent_arr['level']),
+					),
+					array(
+						'sort'=>array('sort'=>1),
+						'limit'=>1
+					)
+				);
+				if($parent_subcontent_next_sort){
+					$sort=$parent_subcontent_next_sort;
+				}
+				else{
+					$sort=(int)mongo_find_attr('subcontent','sort',
+						array(
+							'content'=>(int)$parent_content
+							),
+						array(
+							'sort'=>array('sort'=>-1),
+							'limit'=>1
+						)
+					);
+					$sort++;
+				}
+				$bulk=new MongoDB\Driver\BulkWrite;
+				$bulk->update(['content'=>(int)$parent_content,'sort'=>array('$gte'=>(int)$sort)],['$inc'=>['sort'=>1]]);
+				$this->mongo->executeBulkWrite($config['db_prefix'].'.subcontent',$bulk);
+			}
+			else{
+				$sort=(int)mongo_find_attr('subcontent','sort',
+					array(
+						'content'=>(int)$parent_content
+						),
+					array(
+						'sort'=>array('sort'=>-1),
+						'limit'=>1
+					)
+				);
+				$sort++;
+			}
+
+			$user_id=get_user_id($data['author']);
+			$permlink=mongo_prepare($data['permlink']);
+			$user_status=mongo_find_attr('users','status',array('_id'=>(int)$user_id));
+
+			$data_arr=array(
+				'title'=>mongo_prepare($data['title']),
+				'body'=>mongo_prepare($data['body']),
+				'curation_percent'=>(int)$data['curation_percent'],
+				'status'=>$user_status,
+				'level'=>$level,
+				'sort'=>$sort,
+				'parse_time'=>(int)time()
+			);
+
+			$json_metadata_encoded=json_decode($data['json_metadata'],true);
+			if(isset($json_metadata_encoded['cover'])){
+				$data_arr['cover']=mongo_prepare($json_metadata_encoded['cover']);
+			}
+			if(isset($json_metadata_encoded['foreword'])){
+				$data_arr['foreword']=mongo_prepare($json_metadata_encoded['foreword']);
+			}
+
+			$find_subcontent=mongo_find_id('subcontent',array('author'=>(int)$user_id,'permlink'=>$permlink));
+			$bulk=new MongoDB\Driver\BulkWrite;
+			if($find_subcontent){
+				$bulk->update(['_id'=>(int)$find_subcontent],['$set'=>$data_arr]);
+			}
+			else{
+				$data_arr['_id']=(int)mongo_counter('subcontent',true);
+				$data_arr['author']=(int)$user_id;
+				$data_arr['content']=(int)$parent_content;
+				$data_arr['permlink']=$permlink;
+				$data_arr['parent_author']=(int)$parent_user_id;
+				$data_arr['parent_permlink']=$parent_permlink;
+				$data_arr['time']=(int)$info['unixtime'];
+				$bulk->insert($data_arr);
+			}
+			$this->mongo->executeBulkWrite($config['db_prefix'].'.subcontent',$bulk);
+		}
+	}
+}
