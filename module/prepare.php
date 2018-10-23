@@ -59,17 +59,17 @@ function mongo_find($collection,$find,$options=array('limit'=>1)){
 	}
 	return false;
 }
-function mongo_find_id($collection,$find){
+function mongo_find_id($collection,$find,$options=array('limit'=>1)){
 	global $mongo,$config;
-	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,['limit'=>1]));
+	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,$options));
 	foreach($rows as $row){
 		return $row->_id;
 	}
 	return false;
 }
-function mongo_find_attr($collection,$attr,$find){
+function mongo_find_attr($collection,$attr,$find,$options=array('limit'=>1)){
 	global $mongo,$config;
-	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,['limit'=>1]));
+	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,$options));
 	foreach($rows as $row){
 		return $row->$attr;
 	}
