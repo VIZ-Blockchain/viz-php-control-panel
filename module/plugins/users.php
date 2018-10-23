@@ -58,6 +58,7 @@ class viz_plugin_users extends viz_plugin{
 				'about'=>'',
 				'gender'=>0,
 
+				'status'=>0,
 				'parse_time'=>(int)time(),
 			);
 			if($user_arr['json_metadata']){
@@ -70,11 +71,11 @@ class viz_plugin_users extends viz_plugin{
 							$user_data['gender']=2;
 					}
 					if(isset($json_metadata['profile']['avatar']))
-						$user_data['avatar']=$json_metadata['profile']['avatar'];
+						$user_data['avatar']=mongo_prepare($json_metadata['profile']['avatar']);
 					if(isset($json_metadata['profile']['nickname']))
-						$user_data['nickname']=$json_metadata['profile']['nickname'];
+						$user_data['nickname']=mongo_prepare($json_metadata['profile']['nickname']);
 					if(isset($json_metadata['profile']['about']))
-						$user_data['about']=$json_metadata['profile']['about'];
+						$user_data['about']=mongo_prepare($json_metadata['profile']['about']);
 				}
 			}
 			$bulk=new MongoDB\Driver\BulkWrite;
