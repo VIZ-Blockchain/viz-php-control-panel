@@ -51,9 +51,9 @@ function get_user_id($login){
 	}
 	return $users_arr[$login];
 }
-function mongo_find($collection,$find){
+function mongo_find($collection,$find,$options=array('limit'=>1)){
 	global $mongo,$config;
-	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,['limit'=>1]));
+	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,$options));
 	foreach($rows as $row){
 		return $row->toArray();
 	}
