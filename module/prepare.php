@@ -59,6 +59,14 @@ function mongo_find($collection,$find){
 	}
 	return false;
 }
+function mongo_find_id($collection,$find){
+	global $mongo,$config;
+	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,['limit'=>1]));
+	foreach($rows as $row){
+		return $row->_id;
+	}
+	return false;
+}
 function mongo_exist($collection,$find){
 	global $mongo,$config;
 	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,['limit'=>1]));
