@@ -140,8 +140,6 @@ while($work){
 					'curator_payout_value'=>$content_info['curator_payout_value'],
 					'beneficiary_payout_value'=>$content_info['beneficiary_payout_value'],
 					'total_pending_payout_value'=>$content_info['total_pending_payout_value'],
-					'body'=>$content_info['body'],
-					'title'=>$content_info['title'],
 					'cashout_time'=>(int)$cashout_time,
 					'last_payout'=>(int)$last_payout,
 					'parse_time'=>(int)time()
@@ -169,8 +167,6 @@ while($work){
 					'curator_payout_value'=>$content_info['curator_payout_value'],
 					'beneficiary_payout_value'=>$content_info['beneficiary_payout_value'],
 					'total_pending_payout_value'=>$content_info['total_pending_payout_value'],
-					'body'=>$content_info['body'],
-					'title'=>$content_info['title'],
 					'cashout_time'=>(int)$cashout_time,
 					'last_payout'=>(int)$last_payout,
 					'parse_time'=>(int)time()
