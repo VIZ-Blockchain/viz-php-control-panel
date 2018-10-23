@@ -9,14 +9,17 @@ class viz_plugin{
 		$this->mongo=&$mongo;
 	}
 	function execute($id,$data){
+		$block_tx_count=count($data);
 		foreach($data as $transaction){
 			$operation_name=$transaction['op'][0];
 			$operation_data=$transaction['op'][1];
 			if(method_exists($this,$operation_name)){
 				$date=date_parse_from_format('Y-m-d\TH:i:s',$transaction['timestamp']);
 				$unixtime=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
-
-				$this->$operation_name(array('block_id'=>$transaction['block'],'tx_id'=>$transaction['trx_in_block'],'op_id'=>$transaction['op_in_trx'],'tx_hash'=>$transaction['trx_id'],'timestamp'=>$transaction['timestamp'],'unixtime'=>$unixtime),$operation_data);
+				if(65535==$transaction['trx_in_block']){//type 2^16 uint16, -1 num for virtual op
+					$transaction['trx_in_block']=-1;
+				}
+				$this->$operation_name(array('block_id'=>$transaction['block'],'tx_id'=>$transaction['trx_in_block'],'op_id'=>$transaction['op_in_trx'],'tx_hash'=>$transaction['trx_id'],'block_tx_count'=>$block_tx_count,'timestamp'=>$transaction['timestamp'],'unixtime'=>$unixtime),$operation_data);
 			}
 		}
 	}

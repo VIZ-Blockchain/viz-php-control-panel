@@ -6,6 +6,7 @@ class viz_plugin_blocks extends viz_plugin{
 		$block_arr=array(
 			'_id'=>(int)$info['block_id'],
 			'time'=>(int)$info['unixtime'],
+			'tx_count'=>(int)$info['block_tx_count'],
 			'witness'=>$data['witness'],
 			'shares'=>(float)$data['shares']
 		);
