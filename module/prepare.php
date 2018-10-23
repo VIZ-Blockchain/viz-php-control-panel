@@ -36,13 +36,19 @@ function get_user_id($login){
 			$users_arr[$login]=$key;
 		}
 		else{
-			$check_user=$api->execute_method('get_accounts',array(array($login)))[0];
-			if($check_user['id']){
-				$bulk=new MongoDB\Driver\BulkWrite;
-				$bulk->insert(['_id'=>$check_user['id'],'login'=>$check_user['name']]);
-				$mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
-				redis_add_ulist('update_user',$check_user['name']);
-				$users_arr[$check_user['name']]=$check_user['id'];
+			$api_result=$api->execute_method('get_accounts',array(array($login)));
+			if(isset($api_result[0])){
+				$check_user=$api_result[0];
+				if($check_user['id']){
+					$bulk=new MongoDB\Driver\BulkWrite;
+					$bulk->insert(['_id'=>$check_user['id'],'login'=>$check_user['name']]);
+					$mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
+					redis_add_ulist('update_user',$check_user['name']);
+					$users_arr[$check_user['name']]=$check_user['id'];
+				}
+				else{
+					return false;
+				}
 			}
 			else{
 				return false;
@@ -54,24 +60,27 @@ function get_user_id($login){
 function mongo_find($collection,$find,$options=array('limit'=>1)){
 	global $mongo,$config;
 	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,$options));
+	$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 	foreach($rows as $row){
-		return $row->toArray();
+		return $row;
 	}
 	return false;
 }
 function mongo_find_id($collection,$find,$options=array('limit'=>1)){
 	global $mongo,$config;
 	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,$options));
+	$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 	foreach($rows as $row){
-		return $row->_id;
+		return $row['_id'];
 	}
 	return false;
 }
-function mongo_find_attr($collection,$attr,$find,$options=array('limit'=>1)){
+function mongo_find_attr($collection,$attr,$find,$options=['limit'=>1]){
 	global $mongo,$config;
 	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,$options));
+	$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 	foreach($rows as $row){
-		return $row->$attr;
+		return $row[$attr];
 	}
 	return false;
 }
