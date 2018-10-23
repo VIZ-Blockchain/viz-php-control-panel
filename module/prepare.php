@@ -80,7 +80,12 @@ function mongo_find_attr($collection,$attr,$find,$options=['limit'=>1]){
 	$rows=$mongo->executeQuery($config['db_prefix'].'.'.$collection,new MongoDB\Driver\Query($find,$options));
 	$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 	foreach($rows as $row){
-		return $row[$attr];
+		if(isset($row[$attr])){
+			return $row[$attr];
+		}
+		else{
+			return false;
+		}
 	}
 	return false;
 }
