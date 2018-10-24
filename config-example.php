@@ -11,6 +11,8 @@ $config['db_prefix']='viz';
 $config['redis_host']='localhost';
 $config['redis_password']='';
 
+$config['user_active_time']=300;//5 min
+
 // Timezone:
 $config['server_timezone']='Etc/GMT';
 

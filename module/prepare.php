@@ -141,6 +141,58 @@ function redis_get_ulist($name){
 	global $redis;
 	return $redis->spop($name.':ulist');
 }
+function redis_add_feed($user,$content_id){
+	global $redis;
+	$redis->zadd('feed:'.$user,(int)$content_id,(int)$content_id);
+	$user_login=get_user_login($user);
+	$user_action_time=$redis->zscore('users_action_time',$user_login);
+	//Remove the amount of feed by user activity
+	//Rules: 10000 = 30 days = 2592000 sec
+	//15 day not affected, limit 5000
+	//other 15 day linear reduction
+	if(0!=$user_action_time){
+		$offset=time()-$user_action_time;
+		$amount_limit=10000 - ceil($offset/260);
+		if($amount_limit<10){
+			$amount_limit=10;
+		}
+		if($amount_limit>5000){
+			$amount_limit=5000;
+		}
+		$offset_id=$redis->zrevrangebyscore('feed:'.$user,'+inf','-inf',array('limit'=>array($amount_limit,'1')));
+		if($offset_id){
+			$redis->zremrangebyscore('feed:'.$user,'-inf','('.$offset_id);
+		}
+	}
+	$redis->expire('feed:'.$user,2592000);//no activity feed for 30 days will be removed
+	return false;
+}
+function redis_read_feed($user,$content_id=0,$count=100){
+	global $redis;
+	if(0==$content_id){
+		return $redis->zrevrangebyscore('feed:'.$user,'+inf','-inf',array('limit'=>array('0',$count)));
+	}
+	return $redis->zrevrangebyscore('feed:'.$user,'('.$content_id,'-inf',array('limit'=>array('0',$count)));
+}
+function redis_unread_feed($user,$content_id=0){
+	global $redis;
+	if(0==$content_id){
+		return $redis->zcount('feed:'.$user,'-inf','+inf');
+	}
+	else{
+		return $redis->zcount('feed:'.$user,'('.$content_id,'+inf');
+	}
+}
+function redis_user_online($login){
+	global $redis,$config;
+	$action_time=$redis->zscore('users_action_time',$login);
+	if($action_time>(time()-$config['user_active_time'])){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
 function mongo_prepare($text){
 	return str_replace(array('\\',"\0","\n","\r","'",'"',"\x1a"),array('\\\\','\\0','\\n','\\r',"\\'",'\\"','\\Z'),$text);
 }
