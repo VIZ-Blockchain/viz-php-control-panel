@@ -99,6 +99,18 @@ class viz_plugin_content extends viz_plugin{
 					}
 				}
 			}
+
+			if(in_array('links',$config['plugins'])){
+				if(in_array('feed',$config['plugins_extensions']['content'])){
+					if(!$find_content){
+						$rows=$mongo->executeQuery($config['db_prefix'].'.users_links',new MongoDB\Driver\Query(['user_2'=>(int)$user_id,'value'=>1],$options));
+						$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+						foreach($rows as $row){
+							redis_add_feed($row['user_1'],$content_id);
+						}
+					}
+				}
+			}
 		}
 		else{//subcontent
 			$parent_user_id=get_user_id($data['parent_author']);
