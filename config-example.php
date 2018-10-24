@@ -16,5 +16,6 @@ $config['server_timezone']='Etc/GMT';
 
 // Enabled plugins:
 $config['plugins']=array('blocks','users','transfers','content');
+$config['plugins_extensions']=array('content'=>array('tags'));
 
 $site_root=$_SERVER['DOCUMENT_ROOT'];

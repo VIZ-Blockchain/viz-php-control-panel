@@ -48,13 +48,16 @@ class viz_plugin_content extends viz_plugin{
 			}
 
 			$find_content=mongo_find_id('content',array('author'=>(int)$user_id,'permlink'=>$permlink));
+			$content_id=0;
 			$bulk=new MongoDB\Driver\BulkWrite;
 			if($find_content){
+				$content_id=$find_content;
 				$data_arr['update_time']=(int)$info['unixtime'];
-				$bulk->update(['_id'=>(int)$find_content],['$set'=>$data_arr]);
+				$bulk->update(['_id'=>(int)$content_id],['$set'=>$data_arr]);
 			}
 			else{
-				$data_arr['_id']=(int)mongo_counter('content',true);
+				$content_id=mongo_counter('content',true);
+				$data_arr['_id']=(int)$content_id;
 				$data_arr['author']=(int)$user_id;
 				$data_arr['permlink']=$permlink;
 				$data_arr['parent_permlink']=$parent_permlink;
@@ -62,6 +65,40 @@ class viz_plugin_content extends viz_plugin{
 				$bulk->insert($data_arr);
 			}
 			$this->mongo->executeBulkWrite($config['db_prefix'].'.content',$bulk);
+
+			if(in_array('tags',$config['plugins_extensions']['content'])){
+				if($find_content){
+					$bulk=new MongoDB\Driver\BulkWrite;
+					$bulk->delete(['content'=>(int)$find_content]);
+					$this->mongo->executeBulkWrite($config['db_prefix'].'.content_tags',$bulk);
+				}
+				if(isset($json_metadata_encoded['tags'])){
+					foreach($json_metadata_encoded['tags'] as $tag){
+						$tag=trim($tag," \r\n\t");
+						$tag_id=mongo_find_id('tags',array('value'=>$tag));
+						if(!$tag_id){
+							$tag_id=mongo_counter('tags',true);
+							$tag_arr=array('_id'=>(int)$tag_id,'value'=>mongo_prepare($tag),'count'=>1);
+							$bulk=new MongoDB\Driver\BulkWrite;
+							$bulk->insert($tag_arr);
+							$this->mongo->executeBulkWrite($config['db_prefix'].'.tags',$bulk);
+						}
+						else{
+							$bulk=new MongoDB\Driver\BulkWrite;
+							$bulk->update(['_id'=>(int)$tag_id],['$inc'=>['count'=>1]]);
+							$this->mongo->executeBulkWrite($config['db_prefix'].'.tags',$bulk);
+						}
+						$content_tag_arr=array(
+							'_id'=>(int)mongo_counter('content_tags',true),
+							'tag'=>(int)$tag_id,
+							'content'=>(int)$content_id
+						);
+						$bulk=new MongoDB\Driver\BulkWrite;
+						$bulk->insert($content_tag_arr);
+						$this->mongo->executeBulkWrite($config['db_prefix'].'.content_tags',$bulk);
+					}
+				}
+			}
 		}
 		else{//subcontent
 			$parent_user_id=get_user_id($data['parent_author']);
