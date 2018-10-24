@@ -1,5 +1,54 @@
 <?php
 class viz_plugin_content extends viz_plugin{
+	function custom($info,$data){
+		global $config;
+		if(in_array('repost',$config['plugins_extensions']['content'])){
+			$custom_name=$data['id'];
+			$required_posting_auths=$data['required_posting_auths'];
+			$required_auths=$data['required_auths'];
+			$json=$data['json'];
+			$json=json_decode($json,true);
+
+			if('follow'==$custom_name){
+				$custom_action=$json[0];
+				$custom_data=$json[1];
+				if('reblog'==$custom_action){
+					$author=$custom_data['author'];
+					$author_id=get_user_id($author);
+					if($author_id){
+						$user_login=$custom_data['account'];
+						if(in_array($user_login,$required_posting_auths)){
+							$user_id=get_user_id($user_login);
+							if($user_id){
+								$permlink=$custom_data['permlink'];
+								$find_content=mongo_find_id('content',array('author'=>(int)$author_id,'permlink'=>mongo_prepare($permlink)));
+								if($find_content){
+									$reblog_id=mongo_counter('content',true);
+									$data_arr=array('_id'=>(int)$reblog_id,'parent'=>(int)$find_content,'author'=>(int)$user_id,'time'=>(int)$info['unixtime']);
+									if(isset($custom_data['comment'])){
+										$data_arr['comment']=mongo_prepare($custom_data['comment']);
+									}
+									$bulk=new MongoDB\Driver\BulkWrite;
+									$bulk->insert($data_arr);
+									$this->mongo->executeBulkWrite($config['db_prefix'].'.content',$bulk);
+
+									if(in_array('links',$config['plugins'])){
+										$rows=$this->mongo->executeQuery($config['db_prefix'].'.users_links',new MongoDB\Driver\Query(['user_2'=>(int)$user_id,'value'=>1]));
+										$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+										foreach($rows as $row){
+											if(!mongo_exist('users_links',['user_1'=>(int)$row['user_1'],'user_2'=>(int)$author_id,'value'=>2])){
+												redis_add_feed($row['user_1'],$reblog_id);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	function delete_content($info,$data){
 		global $config;
 		$user_id=get_user_id($data['author']);
@@ -103,7 +152,7 @@ class viz_plugin_content extends viz_plugin{
 			if(in_array('links',$config['plugins'])){
 				if(in_array('feed',$config['plugins_extensions']['content'])){
 					if(!$find_content){
-						$rows=$mongo->executeQuery($config['db_prefix'].'.users_links',new MongoDB\Driver\Query(['user_2'=>(int)$user_id,'value'=>1],$options));
+						$rows=$this->mongo->executeQuery($config['db_prefix'].'.users_links',new MongoDB\Driver\Query(['user_2'=>(int)$user_id,'value'=>1],)));
 						$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 						foreach($rows as $row){
 							redis_add_feed($row['user_1'],$content_id);
