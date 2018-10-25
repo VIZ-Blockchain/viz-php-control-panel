@@ -12,13 +12,14 @@ if('transfers_history_table'==$path_array[2]){
 	}
 	if($user_id!=0){
 		$transfers_arr1=$redis->zrevrange('transfers_to:'.$user_id,'0',''.$count);
+		$transfers_arr1=array();
 		$transfers_arr2=$redis->zrevrange('transfers_from:'.$user_id,'0',''.$count);
 		$transfers_arr=array_merge($transfers_arr1,$transfers_arr2);
 		$transfers_arr=array_unique($transfers_arr);
 		rsort($transfers_arr);
 		foreach($transfers_arr as $transfer_id){
 			$m=$redis->hgetall('transfers:'.$transfer_id);
-			print '<tr class="wallet-history-'.($m['from']==$user_id?'out':'in').'">';
+			print '<tr class="wallet-history-'.($m['from']==$user_id?'out':'in').'" data-transfer-id="'.$transfer_id.'">';
 			print '<td><span class="timestamp" data-timestamp="'.$m['time'].'">'.date('d.m.Y H:i:s',$m['time']).'</span></td>';
 			print '<td><span class="wallet-recipient-set">'.get_user_login($m['from']).'</span></td>';
 			print '<td><span class="wallet-recipient-set">'.get_user_login($m['to']).'</span></td>';
@@ -120,7 +121,7 @@ if('transfers_history'==$path_array[2]){
 		$m=$redis->hgetall('transfers:'.$transfer_id);
 		if((0==$currency)||($currency==$m['currency'])){
 			$res='';
-			$res.='<tr data-tansfer-id="'.$m['id'].'">';
+			$res.='<tr data-transfer-id="'.$m['id'].'">';
 			$res.='<td><span class="timestamp" data-timestamp="'.$m['time'].'">'.date('d.m.Y H:i:s',$m['time']).'</span></td>';
 			$res.='<td>'.get_user_login($m['from']).'</td>';
 			$res.='<td>'.get_user_login($m['to']).'</td>';
