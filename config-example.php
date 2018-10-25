@@ -18,6 +18,6 @@ $config['server_timezone']='Etc/GMT';
 
 // Enabled plugins:
 $config['plugins']=array('blocks','users','transfers','content','links');
-$config['plugins_extensions']=array('content'=>array('tags','feed','repost'));
+$config['plugins_extensions']=array('content'=>array('tags','feed','repost'),'links'=>array('votes'));
 
 $site_root=$_SERVER['DOCUMENT_ROOT'];
