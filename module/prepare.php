@@ -9,8 +9,8 @@ $replace['css_change_time']=filemtime($site_root.'/css/app.css');
 
 $api_ws_arr=array(
 	//'https://api.viz.blckchnd.com/',
-	'https://testnet.viz.world/',
-	//'https://ws.viz.ropox.tools/',
+	//'https://testnet.viz.world/',
+	'https://rpc.viz.ropox.tools/',
 );
 $api=new viz_jsonrpc_web($api_ws_arr[array_rand($api_ws_arr)]);
 
