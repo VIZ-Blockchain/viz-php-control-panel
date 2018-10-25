@@ -49,7 +49,9 @@ while($work){
 		$current_block_time=0;
 		while(!$success){
 			$current_block_time=microtime(true);
-			$success=$plugins->block($current_block,$api->execute_method('get_ops_in_block',array($current_block,0)));
+			$block_data=$api->execute_method('get_ops_in_block',array($current_block,0));
+			$success=$plugins->block($current_block,$block_data);
+			unset($block_data);
 			if(!$success){
 				print 'WARNING: Attempt '.$attempts.' on #'.$current_block.PHP_EOL;
 				$attempts++;
@@ -71,6 +73,7 @@ while($work){
 			}
 		}
 	}
+	unset($dgp);
 	$dgp=$api->execute_method('get_dynamic_global_properties');
 	$last_block=$dgp['head_block_number'];
 	if(($last_block+1)<=$current_block){
