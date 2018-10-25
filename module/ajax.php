@@ -12,7 +12,6 @@ if('transfers_history_table'==$path_array[2]){
 	}
 	if($user_id!=0){
 		$transfers_arr1=$redis->zrevrange('transfers_to:'.$user_id,'0',''.$count);
-		$transfers_arr1=array();
 		$transfers_arr2=$redis->zrevrange('transfers_from:'.$user_id,'0',''.$count);
 		$transfers_arr=array_merge($transfers_arr1,$transfers_arr2);
 		$transfers_arr=array_unique($transfers_arr);
