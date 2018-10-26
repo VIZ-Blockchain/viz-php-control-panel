@@ -981,8 +981,8 @@ function preview_content($data){
 			$cover=$data['cover'];
 		}
 
-		$result.='<div class="page preview" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'">';
 		$author_login=get_user_login($data['author']);
+		$result.='<div class="page preview" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'">';
 		$result.='<a href="/@'.$author_login.'/'.htmlspecialchars($data['permlink']).'/" class="subtitle">'.htmlspecialchars($data['title']).'</a>';
 
 		if($cover){
@@ -1048,17 +1048,25 @@ function preview_content($data){
 		$votes_count=mongo_count('content_votes',['parent'=>(int)$data['_id']]);
 		$comments_count=mongo_count('subcontent',['content'=>(int)$data['_id']]);
 		$author_avatar=mongo_find_attr('users','avatar',['_id'=>(int)$data['author']]);
+		$upvote=false;
+		$flag=false;
 		if($auth){
 			$vote_weight=mongo_find_attr('content_votes','weight',['parent'=>(int)$data['_id'],'user'=>(int)$user_arr['_id']]);
+			if($vote_weight>0){
+				$upvote=true;
+			}
+			if($vote_weight<0){
+				$flag=true;
+			}
 		}
 		$result.='<div class="info">
 			<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">@'.$author_login.'</a></div>
 			<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
 			<div class="right">
-				<a class="award'.($vote_weight>0?' active':'').' award-action"></a>
-				<!--<a class="flag'.($vote_weight<0?' active':'').'"></a>-->
-				<div class="votes_count">'.$votes_count.' голосов</div>
-				<div class="comments">'.$comments_count.'<a href="/@'.$author_login.'/'.htmlspecialchars($data['permlink']).'/#comments" class="icon"><i class="far fa-comment"></i></a></div>
+				<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы проголосовали с силой '.($vote_weight/100).'%"':'').'></a>
+				<a class="flag'.($flag?' active':'').' flag-action"'.($flag?' title="Вы поставили флаг с силой '.($vote_weight/100).'%"':'').'></a>
+				<div class="votes_count"><span>'.$votes_count.'</span> голосов</div>
+				<div class="comments"><span>'.$comments_count.'</span><a href="/@'.$author_login.'/'.htmlspecialchars($data['permlink']).'/#comments" class="icon"><i class="far fa-comment"></i></a></div>
 			</div>
 		</div>';
 

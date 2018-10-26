@@ -555,6 +555,64 @@ function witness_chain_properties_update(witness_login,url,signing_key){
 		});
 	}
 }
+function unvote_content(author,permlink,target){
+	gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,0,function(err,result){
+		if(!err){
+			target.find('.flag-action').removeClass('active').attr('title','');
+			target.find('.award-action').removeClass('active').attr('title','');
+			let votes_count=target.find('.votes_count span');
+			votes_count.html(parseInt(votes_count.html())-1);
+			add_notify('Вы успешно сняли голос');
+			view_energy();
+		}
+		else{
+			add_notify('Ошибка',true);
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+	});
+}
+function upvote_content(author,permlink,target){
+	let weight=10000/10;
+	if($('.header-menu-el.energy').hasClass('powerup')){
+		weight=10000;
+		$('.header-menu-el.energy').removeClass('powerup');
+	}
+	gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,weight,function(err,result){
+		if(!err){
+			target.find('.flag-action').removeClass('active').attr('title','');
+			target.find('.award-action').addClass('active').attr('title','Вы проголосовали с силой '+(weight/100)+'%');
+			let votes_count=target.find('.votes_count span');
+			votes_count.html(1+parseInt(votes_count.html()));
+			add_notify('Вы успешно проголосовали');
+			view_energy();
+		}
+		else{
+			add_notify('Ошибка',true);
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+	});
+}
+function flag_content(author,permlink,target){
+	let weight=10000/10;
+	if($('.header-menu-el.energy').hasClass('powerup')){
+		weight=10000;
+		$('.header-menu-el.energy').removeClass('powerup');
+	}
+	gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,-weight,function(err,result){
+		if(!err){
+			target.find('.award-action').removeClass('active').attr('title','');
+			target.find('.flag-action').addClass('active').attr('title','Вы поставили флаг с силой '+(weight/100)+'%');
+			let votes_count=target.find('.votes_count span');
+			votes_count.html(1+parseInt(votes_count.html()));
+			add_notify('Вы успешно поставили флаг');
+			view_energy();
+		}
+		else{
+			add_notify('Ошибка',true);
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+	});
+}
 function vote_witness(witness_login,value){
 	gate.broadcast.accountWitnessVote(users[current_user]['active_key'],current_user,witness_login,value,function(err, result){
 		if(!err){
@@ -1280,6 +1338,30 @@ $(window).on('hashchange',function(e){
 function app_mouse(e){
 	if(!e)e=window.event;
 	var target=e.target || e.srcElement;
+	if($(target).hasClass('award-action')){
+		e.preventDefault();
+		proper_target=$(target).closest('.page');
+		if(typeof proper_target.attr('data-content-author') !== 'undefined'){
+			if($(target).hasClass('active')){
+				unvote_content(proper_target.attr('data-content-author'),proper_target.attr('data-content-permlink'),proper_target);
+			}
+			else{
+				upvote_content(proper_target.attr('data-content-author'),proper_target.attr('data-content-permlink'),proper_target);
+			}
+		}
+	}
+	if($(target).hasClass('flag-action')){
+		e.preventDefault();
+		proper_target=$(target).closest('.page');
+		if(typeof proper_target.attr('data-content-author') !== 'undefined'){
+			if($(target).hasClass('active')){
+				unvote_content(proper_target.attr('data-content-author'),proper_target.attr('data-content-permlink'),proper_target);
+			}
+			else{
+				flag_content(proper_target.attr('data-content-author'),proper_target.attr('data-content-permlink'),proper_target);
+			}
+		}
+	}
 	if($(target).hasClass('auth-action')){
 		e.preventDefault();
 		if($(target).closest('.control').length){
