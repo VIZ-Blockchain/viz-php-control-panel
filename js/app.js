@@ -52,13 +52,14 @@ function load_session(){
 function view_session(){
 	if(''!=current_user){
 		$('.header .account').html('<a href="/@'+current_user+'/">'+current_user+'</a> <a class="auth-logout icon"><i class="fas fa-fw fa-sign-out-alt"></i></a>');
+		view_energy();
 	}
 	else{
 		$('.header .account').html('<a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
 	}
-	view_energy();
 }
 function view_energy(){
+	$('.header .energy').css('display','inline-block');
 	$('.header .energy').html('&hellip;');
 	if(''!=current_user){
 		$('.header .energy').css('display','inline-block');
