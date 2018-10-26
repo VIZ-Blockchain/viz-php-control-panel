@@ -40,7 +40,7 @@ if($block_id!=1){
 $work=true;
 $current_block=$block_id;
 $dgp=$api->execute_method('get_dynamic_global_properties');
-$last_block=$dgp['head_block_number']-1;
+$last_block=$dgp['head_block_number'];
 $sleep=0;
 while($work){
 	for(;$current_block<=$last_block;$current_block++){
@@ -75,7 +75,7 @@ while($work){
 	}
 	unset($dgp);
 	$dgp=$api->execute_method('get_dynamic_global_properties');
-	$last_block=$dgp['head_block_number']-1;
+	$last_block=$dgp['head_block_number'];
 	if(($last_block+1)<=$current_block){
 		$sleep=(int)((3-(microtime(true)-$current_block_time))*1000000);
 		if($sleep>0){
