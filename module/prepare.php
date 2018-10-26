@@ -23,6 +23,25 @@ $currencies_id_arr=array(
 	2=>'VIZ'
 );
 
+$tags_arr=array();
+function get_tag($id){
+	global $tags_arr,$mongo,$config;
+	$key=array_search($id,$tags_arr);
+	if(false===$key){
+		$rows=$mongo->executeQuery($config['db_prefix'].'.tags',new MongoDB\Driver\Query(['_id'=>(int)$id],['limit'=>1]));
+		foreach($rows as $row){
+			$key=$row->value;
+			if($key){
+				$tags_arr[$key]=(int)$id;
+			}
+			else{
+				return false;
+			}
+		}
+	}
+	return $key;
+}
+
 $users_arr=array();
 function get_user_id($login){
 	global $users_arr,$api,$mongo,$config;
@@ -121,6 +140,15 @@ function get_user_login($id){
 		}
 	}
 	return $key;
+}
+function get_content_by_id($id){
+	global $mongo,$config;
+	$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query(['_id'=>(int)$id],['limit'=>1]));
+	$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+	foreach($rows as $row){
+		return $row;
+	}
+	return false;
 }
 function get_user_by_id($id){
 	global $mongo,$config;
@@ -934,6 +962,108 @@ function text_to_view($text,$set_markdown=false){
 		$text='<p>'.implode("</p>\n<p>",$text_arr).'</p>';
 	}
 	return $text;
+}
+function preview_content($data){
+		global $mongo,$config,$auth,$user_arr;
+		$result='';
+		$repost=false;
+		if($data['parent']){
+			$repost=true;
+			$repost_user=get_user_login($data['author']);
+			$repost_time=$data['time'];
+			$data=get_content_by_id($data['parent']);
+		}
+
+		$data['body']=stripcslashes($data['body']);
+
+		$cover=false;
+		if(isset($data['cover'])){
+			$cover=$data['cover'];
+		}
+
+		$result.='<div class="page preview" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'">';
+		$author_login=get_user_login($data['author']);
+		$result.='<a href="/@'.$author_login.'/'.htmlspecialchars($data['permlink']).'/" class="subtitle">'.htmlspecialchars($data['title']).'</a>';
+
+		if($cover){
+			$result.='<div class="cover"><img src="https://i.goldvoice.club/0x0/'.htmlspecialchars($cover).'" alt=""></div>';
+		}
+
+		$result.='
+			<div class="article'.($cover?' cover-exist clearfix':'').'">';
+		if(isset($data['foreword'])){
+			$result.=text_to_view($data['foreword'],false);
+		}
+		else{
+			$preview_text=mb_substr($data['body'],0,1024);
+			$preview_text=str_replace('<br>',"\n",$preview_text);
+			$preview_text=str_replace('<hr>',"\n",$preview_text);
+			$preview_text=htmlspecialchars_decode($preview_text);
+			$preview_text=str_replace('&nbsp;',' ',$preview_text);
+			$preview_text=str_replace('<br />',"\n",$preview_text);
+			$preview_text=str_replace('<br/>',"\n",$preview_text);
+			$preview_text=str_replace('<p>',"\n",$preview_text);
+			$preview_text=str_replace('</p>',"\n",$preview_text);
+			$preview_text=mb_ereg_replace("\r",'',$preview_text);
+			$preview_text=mb_ereg_replace("\t",'',$preview_text);
+			$preview_text=str_replace('  ',' ',$preview_text);
+			$preview_text=str_replace("\n\n","\n",$preview_text);
+			$preview_text=strip_tags($preview_text);
+			$preview_text=trim($preview_text,"\r\n\t ");
+			$preview_text_arr=explode("\n",$preview_text);
+			$preview_text_final=$preview_text_arr[0];
+			if(mb_strlen($preview_text_final)<250){
+				if($preview_text_arr[1]){
+					$preview_text_final.='</p><p>'.(mb_strlen($preview_text_arr[1])>250?mb_substr($preview_text_arr[1],0,255,'utf-8').'&hellip;':$preview_text_arr[1]);
+				}
+			}
+			if(mb_strlen($preview_text_final)<250){
+				if($preview_text_arr[2]){
+					$preview_text_final.='</p><p>'.(mb_strlen($preview_text_arr[2])>250?mb_substr($preview_text_arr[2],0,255,'utf-8').'&hellip;':$preview_text_arr[2]);
+				}
+			}
+			else{
+				$preview_text_final=mb_substr($preview_text_final,0,255,'utf-8').'&hellip;';
+			}
+			if($preview_text_final){
+				$preview_text_final='<p>'.$preview_text_final.'</p>';
+			}
+			$result.=$preview_text_final;
+		}
+		$result.='</div>';
+
+		$tags_list=array();
+		$tags=$mongo->executeQuery($config['db_prefix'].'.content_tags',new MongoDB\Driver\Query(['content'=>(int)$data['_id']],['sort'=>array('_id'=>1),'limit'=>(int)100]));
+		$tags->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+		foreach($tags as $tag_id){
+			$tag=get_tag($tag_id['tag']);
+			if($tag){
+				$tags_list[]='<a href="/tags/'.htmlspecialchars($tag).'/">'.htmlspecialchars($tag).'</a>';
+			}
+		}
+		if($tags_list){
+			$result.='<div class="tags">'.implode($tags_list).'</div>';
+		}
+
+		$votes_count=mongo_count('content_votes',['parent'=>(int)$data['_id']]);
+		$comments_count=mongo_count('subcontent',['content'=>(int)$data['_id']]);
+		$author_avatar=mongo_find_attr('users','avatar',['_id'=>(int)$data['author']]);
+		if($auth){
+			$vote_weight=mongo_find_attr('content_votes','weight',['parent'=>(int)$data['_id'],'user'=>(int)$user_arr['_id']]);
+		}
+		$result.='<div class="info">
+			<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">@'.$author_login.'</a></div>
+			<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
+			<div class="right">
+				<a class="award'.($vote_weight>0?' active':'').' award-action"></a>
+				<!--<a class="flag'.($vote_weight<0?' active':'').'"></a>-->
+				<div class="votes_count">'.$votes_count.' голосов</div>
+				<div class="comments">'.$comments_count.'<a href="/@'.$author_login.'/'.htmlspecialchars($data['permlink']).'/#comments" class="icon"><i class="far fa-comment"></i></a></div>
+			</div>
+		</div>';
+
+		$result.='</div>';
+		return $result;
 }
 
 $auth=false;

@@ -1130,3 +1130,18 @@ select.bubble.right{
 select.small-size{
 	width:100px;
 }
+
+.award.active{
+	color:#fff !important;
+	background:#396ac5 !important;
+}
+.award.active:hover::before{
+	color:#fff !important;
+}
+.flag.active{
+	color:#fff !important;
+	background:#f93434 !important;
+}
+.flag.active:hover::before{
+	color:#fff !important;
+}
