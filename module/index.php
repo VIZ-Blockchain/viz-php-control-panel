@@ -3,16 +3,42 @@ ob_start();
 if('@'==mb_substr($path_array[1],0,1)){
 	if($path_array[2]){
 		$author=mb_substr($path_array[1],1);
+		$author_id=get_user_id($author);
 		$permlink=urldecode($path_array[2]);
-		$cache_name=md5($author.$permlink);
-		if($buf=$cache->get($cache_name)){
-			$content=json_decode($buf,true);
-		}
-		else{
-			$content=$api->execute_method('get_content',array($author,$permlink,-1));
-			$cache->set($cache_name,json_encode($content),5);
-		}
-		if($content['body']){
+		$data=get_content($author_id,$permlink);
+		if(isset($data['_id'])){
+			$descr='';
+			if(isset($data['foreword'])){
+				$descr=mb_substr(strip_tags($data['foreword']),0,250).'...';
+			}
+			else{
+				$descr=mb_substr(strip_tags($data['body']),0,250).'...';
+			}
+			$replace['description']=htmlspecialchars(trim($descr," \r\n\t"));
+			$replace['description']=str_replace("\n",' ',$replace['description']);
+			$replace['description']=str_replace('  ',' ',$replace['description']);
+
+			$replace['head_addon'].='
+			<meta property="og:url" content="https://viz.world/@'.$author.'/'.$data['permlink'].'/" />
+			<meta name="og:title" content="'.htmlspecialchars($data['title']).'" />
+			<meta name="twitter:title" content="'.htmlspecialchars($data['title']).'" />';
+
+			$cover=false;
+			if(isset($data['cover'])){
+				$cover=$data['cover'];
+				if(!preg_match('~^https://~iUs',$cover)){
+					$cover='https://i.goldvoice.club/0x0/'.$cover;
+				}
+				$replace['head_addon'].='
+	<link rel="image_src" href="'.$cover.'" />
+	<meta property="og:image" content="'.$cover.'" />
+	<meta name="twitter:image" content="'.$cover.'" />
+	<meta name="twitter:card" content="summary_large_image" />';
+				print '<img src="'.$cover.'" itemprop="image" class="schema">';
+			}
+			print view_content($data);
+			$buf='';
+		/*if($content['body']){
 			$buf='';
 			$date=date_parse_from_format('Y-m-d\TH:i:s',$content['created']);
 			$content_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
@@ -54,9 +80,6 @@ if('@'==mb_substr($path_array[1],0,1)){
 			$buf.=$text;
 			$buf.='</b></strong></em></i>';//fix styles
 
-			/*$buf.='<pre>';
-			$buf.=print_r($content,true);
-			$buf.='</pre>';*/
 			$buf.='
 			</div>';
 			$tags=$json['tags'];
@@ -76,7 +99,7 @@ if('@'==mb_substr($path_array[1],0,1)){
 				<!--<div class="flag right"></div>-->
 			</div>
 			</div>';
-
+		*/
 
 			$buf.='<div class="page comments" id="comments">
 <div class="actions"><div class="reply reply-action post-reply unselectable">Оставить комментарий</div></div>
@@ -84,7 +107,7 @@ if('@'==mb_substr($path_array[1],0,1)){
 <hr>';
 
 			$comment_tree=new comments_tree();
-			$replies=$api->execute_method('get_all_content_replies',array($author,$permlink,-1));
+			$replies=$api->execute_method('get_all_content_replies',array($author,$data['permlink'],-1));
 			$comment_arr=array();
 			$i=1;
 			foreach($replies as $reply){

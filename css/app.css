@@ -554,6 +554,10 @@ label input[type=checkbox]{
 	line-height:60px;
 	margin-left:calc(50% - 13.125px);
 }
+.page.content .addon .flag{
+	margin-left:15px;
+	opacity:0.3;
+}
 .page.content .addon .flag::before{
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
@@ -569,6 +573,7 @@ label input[type=checkbox]{
 	color:rgb(0, 27, 88)
 }
 .page.content .addon .flag:hover{
+	opacity:1;
 	box-shadow: 0 2px 4px -1px rgba(97, 0, 0, 0.07), 0 4px 5px 0 rgba(121, 0, 0, 0.07), 0 3px 12px 3px rgba(187, 0, 0, 0.56);
 }
 .page.content .addon .flag:hover::before{
