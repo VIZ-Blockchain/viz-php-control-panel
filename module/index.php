@@ -632,7 +632,7 @@ if('committee'==$path_array[1]){
 	}
 }
 else
-if('mongo'==$path_array[1]){
+if('mongo'==$path_array[1] && $admin){
 	$replace['title']=htmlspecialchars('Mongo admin').' - '.$replace['title'];
 	if(isset($_GET['action'])){
 		if('add_index'==$_GET['action']){
