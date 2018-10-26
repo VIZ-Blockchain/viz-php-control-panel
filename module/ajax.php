@@ -1,5 +1,31 @@
 <?php
 header("Content-type:text/html; charset=UTF-8");
+if('create_session'==$path_array[2]){
+	if(in_array('session',$config['plugins'])){
+		$key=$_POST['key'];
+		$cookie_time=time();
+		$cookie=md5($cookie_time.'VIZ'.$key).md5($key.'WORLD'.date('d.m.Y'));
+		$check_session_id=$redis->zscore('session_cookie',$cookie);
+		if($check_session_id){
+			$check_ip=$redis->hget('session:'.$check_session_id,'ip');
+			if($check_ip==$ip){
+				$redis->del('session:'.$check_session_id);
+			}
+		}
+		$new_id=$redis->incr('id:session');
+		if($new_id){
+			$redis->zadd('session_cookie',$new_id,$cookie);
+			$redis->zadd('session_key',$new_id,$key);
+			$redis->hset('session:'.$new_id,'id',$new_id);
+			$redis->hset('session:'.$new_id,'time',$cookie_time);
+			$redis->hset('session:'.$new_id,'ip',$ip);
+			$redis->hset('session:'.$new_id,'key',$key);
+			$redis->hset('session:'.$new_id,'cookie',$cookie);
+		}
+		header('HTTP/1.1 200 Ok');
+		print $cookie;
+	}
+}
 if('transfers_history_table'==$path_array[2]){
 	$user_login=mongo_prepare($_POST['user']);
 	$user_id=get_user_id($user_login);

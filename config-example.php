@@ -17,7 +17,10 @@ $config['user_active_time']=300;//5 min
 $config['server_timezone']='Etc/GMT';
 
 // Enabled plugins:
-$config['plugins']=array('blocks','users','transfers','content','links');
+$config['plugins']=array('blocks','users','transfers','content','links','session');
 $config['plugins_extensions']=array('content'=>array('tags','feed','repost'),'links'=>array('votes'));
+
+//Admin users logins from blockchain (affected only with session plugin)
+$config['admin_users']=array();
 
 $site_root=$_SERVER['DOCUMENT_ROOT'];

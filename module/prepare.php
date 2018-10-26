@@ -122,14 +122,23 @@ function get_user_login($id){
 	}
 	return $key;
 }
+function get_user_by_id($id){
+	global $mongo,$config;
+	$rows=$mongo->executeQuery($config['db_prefix'].'.users',new MongoDB\Driver\Query(['_id'=>(int)$id],['limit'=>1]));
+	$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+	foreach($rows as $row){
+		return $row;
+	}
+	return false;
+}
 function get_user_link($user_1,$user_2,$what=1){
 	global $mongo,$config;
 	$rows=$mongo->executeQuery($config['db_prefix'].'.users_links',new MongoDB\Driver\Query(['user_1'=>(int)$user_1,'user_2'=>(int)$user_2,'what'=>(int)$what],['limit'=>1]));
+	$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 	foreach($rows as $row){
-		return $row->toArray();
+		return $row;
 	}
 	return false;
-	//return $db->sql_row("SELECT `id`,`mutually`,`value` FROM `users_links` WHERE `user_1`='".(int)$user_1."' AND `user_2`='".(int)$user_2."' AND `value`='".(int)$what."' LIMIT 1");
 }
 function redis_add_ulist($name,$value){//unique list in set
 	global $redis;
@@ -925,4 +934,26 @@ function text_to_view($text,$set_markdown=false){
 		$text='<p>'.implode("</p>\n<p>",$text_arr).'</p>';
 	}
 	return $text;
+}
+
+$auth=false;
+if(isset($_COOKIE['session_id'])){
+	$session_id=$_COOKIE['session_id'];
+	$check_session_id=$redis->zscore('session_cookie',$session_id);
+	$session_arr=$redis->hgetall('session:'.$check_session_id);
+	if(!$session_arr['user']){
+		unset($session_arr);
+	}
+	if($session_arr['id']){
+		$user_arr=get_user_by_id($session_arr['user']);
+		if($user_arr['login']){
+			$auth=true;
+			$redis->zadd('users_action_time',time(),$user_arr['login']);
+			$redis->hset('session:'.$session_arr['id'],'action_time',time());
+			$redis->zadd('session_action_time',time(),$session_arr['id']);
+		}
+		if(in_array($user_arr['login'],$config['admin_users'])){
+			$admin=true;
+		}
+	}
 }
