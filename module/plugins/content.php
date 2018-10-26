@@ -227,6 +227,9 @@ class viz_plugin_content extends viz_plugin{
 			$user_id=get_user_id($data['author']);
 			$permlink=mongo_prepare($data['permlink']);
 			$user_status=mongo_find_attr('users','status',array('_id'=>(int)$user_id));
+			if(!$user_status){
+				$user_status=0;
+			}
 
 			$data_arr=array(
 				'title'=>mongo_prepare($data['title']),
