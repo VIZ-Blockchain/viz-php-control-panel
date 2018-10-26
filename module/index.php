@@ -254,8 +254,77 @@ if('tools'==$path_array[1]){
 		print '<p><a href="/tools/create-account/">Создание аккаунта</a></p>';
 		print '<p><a href="/tools/delegation/">Делегирование доли</a></p>';
 		print '<p><a href="/tools/schedule/">Расписание делегатов</a></p>';
+		print '<p><a href="/tools/blocks/">Обзор блоков</a></p>';
 		print '<p><a href="/tools/reset-account/">Сброс доступов к аккаунту</a></p>';
 		print '</div></div>';
+	}
+	elseif('blocks'==$path_array[2]){
+		$dgp=$api->execute_method('get_dynamic_global_properties');
+		if(''==$path_array[3]){
+			$replace['title']=htmlspecialchars('Обзор блоков').' - '.$replace['title'];
+			print '<div class="page content">
+		<h1>Обзор блоков</h1>
+		<div class="article">';
+			$date=date_parse_from_format('Y-m-d\TH:i:s',$dgp['genesis_time']);
+			$genesis_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+			print '<p>Время запуска сети: <span class="timestamp" data-timestamp="'.$genesis_time.'">'.date('d.m.Y H:i:s',$genesis_time).'</span></p>';
+			print '<p>Количество блоков: '.$dgp['head_block_number'].'</p>';
+			print '<p>Количество в базе данных (индекс): '.mongo_counter('blocks').'</p>';
+			print '<p>Количество в базе данных (курсор): '.mongo_count('blocks').'</p>';
+			print '<p>Количество пользователей в бд: '.mongo_count('users').'</p>';
+			print '<h3>Голосуемые параметры сети</h3>';
+			print '<pre class="view_block">';
+			$chain_properties=$api->execute_method('get_chain_properties');
+			$view_props=print_r($chain_properties,true);
+			$view_props=preg_replace('~\[(.[^\]]*)\] =\> (.*)\n~iUs','[<span style="color:red">$1</span>] => <span style="color:#1b72fa">$2</span>'.PHP_EOL,$view_props);
+			$view_props=str_replace('<span style="color:#1b72fa">Array</span>','<span style="color:#069c40">Array</span>',$view_props);
+			print $view_props;
+			print '</pre>';
+			print '<h3>Последние блоки</h3>';
+			print '<div class="blocks">';
+			$low_corner=max(0,(int)$dgp['head_block_number']-1000);
+			for($i=(int)$dgp['head_block_number'];$i>$low_corner;--$i){
+				print '<a href="/tools/blocks/'.$i.'/">'.$i.'</a>';
+			}
+			print '<hr>';
+			print '<a href="/tools/blocks/1/">1</a>';
+			print '</div>';
+			print '</div></div>';
+		}
+		else{
+			$id=(int)$path_array[3];
+			if($id==$path_array[3]){
+				$id_arr=$api->execute_method('get_ops_in_block',array($id,0));
+				if($id_arr[0]){
+					$replace['title']=htmlspecialchars('Обзор блока VIZ '.$id.'').' - '.$replace['title'];
+					print '<div class="page content">
+					<a class="right" href="/tools/blocks/">&larr; Вернуться</a>
+					<h1>VIZ блок #'.$id.'</h1>
+					<div class="article">';
+					print '<pre class="view_block">';
+					$view_block=print_r($id_arr,true);
+					$view_block=preg_replace('~\[(.[^\]]*)\] =\> (.*)\n~iUs','[<span style="color:red">$1</span>] => <span style="color:#1b72fa">$2</span>'.PHP_EOL,$view_block);
+					$view_block=str_replace('<span style="color:#1b72fa">Array</span>','<span style="color:#069c40">Array</span>',$view_block);
+					print $view_block;
+					print '</pre>';
+					print '<h3>Соседние блоки</h3>';
+					print '<div class="blocks">';
+					if($id+1 <= (int)$dgp['head_block_number']){
+						print '<a href="/tools/blocks/'.($id+1).'/">&uarr; '.($id+1).'</a>';
+					}
+					if(0 <= ($id-1)){
+						print '<a href="/tools/blocks/'.($id - 1).'/">&darr; '.($id - 1).'</a><hr>';
+					}
+					$high_corner=min((int)$dgp['head_block_number'],$id+50);
+					$low_corner=max(0,$id-50);
+					for($i=$high_corner;$i>$low_corner;--$i){
+						print '<a href="/tools/blocks/'.$i.'/"'.($i==$id?' class="current"':'').'>'.$i.'</a>';
+					}
+					print '</div>';
+					print '</div></div>';
+				}
+			}
+		}
 	}
 	elseif('invites'==$path_array[2]){
 		if('claim'==$path_array[3]){
@@ -430,7 +499,7 @@ if('witnesses'==$path_array[1]){
 			$date=date_parse_from_format('Y-m-d\TH:i:s',$witness_arr['created']);
 			$created_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
 			print '<p>Дата заявления о намерениях: <span class="timestamp" data-timestamp="'.$created_time.'">'.date('d.m.Y H:i:s',$created_time).'</span></p>';
-			print '<p>Последний блок: <a href="/blocks/'.$witness_arr['last_confirmed_block_num'].'/">'.$witness_arr['last_confirmed_block_num'].'</a></p>';
+			print '<p>Последний блок: <a href="/tools/blocks/'.$witness_arr['last_confirmed_block_num'].'/">'.$witness_arr['last_confirmed_block_num'].'</a></p>';
 			print '<p>Публичный ключ подписи: '.$witness_arr['signing_key'].'</p>';
 			print '<h2>Голосуемые параметры цепи</h2>';
 			print '<pre class="view_block">';
@@ -682,73 +751,6 @@ if('mongo'==$path_array[1]){
 	}
 }
 else
-if('blocks'==$path_array[1]){
-	$dgp=$api->execute_method('get_dynamic_global_properties');
-	if(''==$path_array[2]){
-		$replace['title']=htmlspecialchars('Обзор блоков').' - '.$replace['title'];
-		print '<div class="page content">
-	<h1>Обзор блоков</h1>
-	<div class="article">';
-		$date=date_parse_from_format('Y-m-d\TH:i:s',$dgp['genesis_time']);
-		$genesis_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
-		print '<p>Время запуска сети: <span class="timestamp" data-timestamp="'.$genesis_time.'">'.date('d.m.Y H:i:s',$genesis_time).'</span></p>';
-		print '<p>Количество блоков: '.$dgp['head_block_number'].'</p>';
-		print '<p>Количество в базе данных (индекс): '.mongo_counter('blocks').'</p>';
-		print '<p>Количество в базе данных (курсор): '.mongo_count('blocks').'</p>';
-		print '<p>Количество пользователей в бд: '.mongo_count('users').'</p>';
-		print '<h3>Голосуемые параметры сети</h3>';
-		print '<pre class="view_block">';
-		$chain_properties=$api->execute_method('get_chain_properties');
-		$view_props=print_r($chain_properties,true);
-		$view_props=preg_replace('~\[(.[^\]]*)\] =\> (.*)\n~iUs','[<span style="color:red">$1</span>] => <span style="color:#1b72fa">$2</span>'.PHP_EOL,$view_props);
-		$view_props=str_replace('<span style="color:#1b72fa">Array</span>','<span style="color:#069c40">Array</span>',$view_props);
-		print $view_props;
-		print '</pre>';
-		print '<h3>Последние блоки</h3>';
-		print '<div class="blocks">';
-		$low_corner=max(0,(int)$dgp['head_block_number']-1000);
-		for($i=(int)$dgp['head_block_number'];$i>$low_corner;--$i){
-			print '<a href="/blocks/'.$i.'/">'.$i.'</a>';
-		}
-		print '<hr>';
-		print '<a href="/blocks/1/">1</a>';
-		print '</div>';
-		print '</div></div>';
-	}
-	else{
-		$id=(int)$path_array[2];
-		if($id==$path_array[2]){
-			$id_arr=$api->execute_method('get_ops_in_block',array($id,0));
-			if($id_arr[0]){
-				$replace['title']=htmlspecialchars('Обзор блока '.$id.'').' - '.$replace['title'];
-				print '<div class="page content">
-				<h1>Блокчейн VIZ, обзор блока #'.$id.'</h1>
-				<div class="article">';
-				print '<pre class="view_block">';
-				$view_block=print_r($id_arr,true);
-				$view_block=preg_replace('~\[(.[^\]]*)\] =\> (.*)\n~iUs','[<span style="color:red">$1</span>] => <span style="color:#1b72fa">$2</span>'.PHP_EOL,$view_block);
-				$view_block=str_replace('<span style="color:#1b72fa">Array</span>','<span style="color:#069c40">Array</span>',$view_block);
-				print $view_block;
-				print '</pre>';
-				print '<h3>Соседние блоки</h3>';
-				print '<div class="blocks">';
-				if($id+1 <= (int)$dgp['head_block_number']){
-					print '<a href="/blocks/'.($id+1).'/">&uarr; '.($id+1).'</a>';
-				}
-				if(0 <= ($id-1)){
-					print '<a href="/blocks/'.($id - 1).'/">&darr; '.($id - 1).'</a><hr>';
-				}
-				$high_corner=min((int)$dgp['head_block_number'],$id+50);
-				$low_corner=max(0,$id-50);
-				for($i=$high_corner;$i>$low_corner;--$i){
-					print '<a href="/blocks/'.$i.'/"'.($i==$id?' class="current"':'').'>'.$i.'</a>';
-				}
-				print '</div>';
-				print '</div></div>';
-			}
-		}
-	}
-}
 if('tags'==$path_array[1]){
 	if(''==$path_array[2]){
 		print '<div class="page content">
