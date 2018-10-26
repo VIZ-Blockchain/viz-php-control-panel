@@ -40,7 +40,7 @@
 	<script type="text/javascript" src="/js/app.js?{script_change_time}"></script>
 </head>
 <body>
-<div class="header shadow">
+<div class="header shadow unselectable">
 	<div class="actions"><a class="menu-expand icon"><i class="fas fa-bars"></i></a></div>
 	<div class="logo"><a href="http://VIZ.World/" class="logo">VIZ<span>.World</span></a></div>
 	<div class="right">

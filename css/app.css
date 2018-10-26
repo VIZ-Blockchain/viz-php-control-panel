@@ -238,6 +238,17 @@ a.icon{
 }
 .header-menu-el.energy{
 	display:none;
+	cursor:pointer;
+}
+.header-menu-el.energy i{
+	min-width:25px;
+}
+.header-menu-el.energy.powerup{
+    color:#f33;
+}
+.header-menu-el.energy.powerup i:before {
+    content: "\f0e7" !important;
+    font-size:24px;
 }
 
 .main{

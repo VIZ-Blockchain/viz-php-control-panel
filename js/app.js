@@ -1193,6 +1193,15 @@ function app_mouse(e){
 			generate_key(true);
 		}
 	}
+
+	if($(target).hasClass('energy') || $(target).parent().hasClass('energy')){
+		if($('.header-menu-el.energy').hasClass('powerup')){
+			$('.header-menu-el.energy').removeClass('powerup');
+		}
+		else{
+			$('.header-menu-el.energy').addClass('powerup');
+		}
+	}
 	if($(target).hasClass('wallet-history-filter-all') || $(target).parent().hasClass('wallet-history-filter-all')){
 		$('.wallet-history tbody tr').css('display','table-row');
 	}
