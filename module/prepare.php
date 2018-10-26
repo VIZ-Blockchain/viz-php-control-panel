@@ -41,6 +41,20 @@ function get_tag($id){
 	}
 	return $key;
 }
+function get_tag_id($value){
+	global $tags_arr,$mongo,$config;
+	if(!isset($tags_arr[$value])){
+		$rows=$mongo->executeQuery($config['db_prefix'].'.tags',new MongoDB\Driver\Query(['value'=>mongo_prepare($value)],['limit'=>1]));
+		$key=false;
+		foreach($rows as $row){
+			$key=(int)$row->_id;
+		}
+		if($key){
+			$tags_arr[$value]=$key;
+		}
+	}
+	return $tags_arr[$value];
+}
 
 $users_arr=array();
 function get_user_id($login){
@@ -963,6 +977,9 @@ function text_to_view($text,$set_markdown=false){
 	}
 	return $text;
 }
+function preview_content_by_id($id){
+	return preview_content(get_content_by_id($id));
+}
 function preview_content($data){
 		global $mongo,$config,$auth,$user_arr;
 		$result='';
@@ -971,6 +988,10 @@ function preview_content($data){
 			$repost=true;
 			$repost_user=get_user_login($data['author']);
 			$repost_time=$data['time'];
+			$repost_comment=false;
+			if(isset($data['comment'])){
+				$repost_comment=stripcslashes($data['comment']);
+			}
 			$data=get_content_by_id($data['parent']);
 		}
 
@@ -983,6 +1004,11 @@ function preview_content($data){
 
 		$author_login=get_user_login($data['author']);
 		$result.='<div class="page preview" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'">';
+
+		if($repost){
+			$result.='<div class="repost-info"><div class="repost-date timestamp" data-timestamp="'.$repost_time.'">'.date('d.m.Y H:i',$repost_time).'</div><i class="fas fa-fw fa-retweet"></i> <span>Репост от</span> @'.$repost_user.''.($repost_comment?'<div class="repost-comment">'.htmlspecialchars($repost_comment).'</div>':'').'</div>';
+		}
+
 		$result.='<a href="/@'.$author_login.'/'.htmlspecialchars($data['permlink']).'/" class="subtitle">'.htmlspecialchars($data['title']).'</a>';
 
 		if($cover){

@@ -1145,3 +1145,19 @@ select.small-size{
 .flag.active:hover::before{
 	color:#fff !important;
 }
+
+.repost-info{
+	display: inline-block;
+	margin: 0 21px;
+	margin-bottom: 12px;
+	font-family: Arial,sans-serif !important;
+	font-weight: 700;
+	font-style: normal;
+	font-size: 14px;
+	width:100%;
+}
+.repost-date{
+	margin-right:25px;
+	opacity:0.5;
+	float:right;
+}
