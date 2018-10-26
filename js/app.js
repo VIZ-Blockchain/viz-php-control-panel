@@ -6,8 +6,11 @@ var users={};
 var notify_id=0;
 var empty_signing_key='VIZ1111111111111111111111111111111114T1Anm';
 var api_gate='wss://testnet.viz.world';
+var domain='viz.world';
 gate.config.set('websocket',api_gate);
 gate.api.stop();
+
+wait_session_timer=0;
 
 function del_notify(id){
 	$('.notify-list .notify[rel="'+id+'"]').remove();
@@ -23,10 +26,103 @@ function add_notify(html,dark=false,fade_time=10000){
 	window.setTimeout('fade_notify('+notify_id+')',fade_time);
 }
 
+function wait_session(){
+	if(typeof users[current_user].session_verify == 'undefined'){
+		session_generate();
+		return;
+	}
+	if(0==users[current_user].session_verify){
+		users[current_user].session_attempts++;
+		if(users[current_user].session_attempts>20){
+			users[current_user].session_attempts=0;
+			$('.auth-error').html('Ошибка при инициализации сессии, попробуйте авторизоваться повторно позже');
+			$('.auth-action').removeClass('disabled');
+		}
+		else{
+			$('.header .account').html('<i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;');
+			$('.auth-error').html('Вы успешно авторизованы, инициализируем сессию, подождите (попытка '+users[current_user].session_attempts+')');
+			$.ajax({
+				type:'POST',
+				url:'/ajax/check_session/',
+				data:{},
+				success:function(data_json){
+					data_obj=JSON.parse(data_json);
+					if(typeof data_obj.error !== 'undefined'){
+						console.log(''+new Date().getTime()+': '+data_obj.error+' - '+data_obj.error_str);
+						if('rebuild_session'==data_obj.error){
+							session_generate();
+						}
+						else if('wait'==data_obj.error){
+							wait_session_timer=window.setTimeout('wait_session()',1500);
+						}
+					}
+					else
+					if(typeof data_obj !== 'undefined'){
+						wait_session_timer=0;
+						users[current_user].session_verify=1;
+						save_session();
+						$('.auth-error').html('Вы успешно авторизованы, сессия инициализирована');
+						$('.auth-action').removeClass('disabled');
+						//initialize user_session_status (feed status, notifications)
+						if('/'==document.location.pathname){
+							document.location='https://'+domain+'/feed/';
+						}
+						else{
+							document.location=document.location;
+						}
+					}
+					else{
+						wait_session_timer=window.setTimeout('wait_session()',3000);
+					}
+				}
+			});
+		}
+	}
+}
+function session_generate(){
+	if(''!=current_user){
+		var key=pass_gen(20,false);
+		$.ajax({
+			type:'POST',
+			url:'/ajax/create_session/',
+			data:{'key':key},
+			success:function(session){
+				users[current_user].session_id=session;
+				users[current_user].session_verify=0;
+				users[current_user].session_attempts=0;
+				set_session_cookie();
+				gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'session','["auth",{"key":"'+key+'"}]',function(err,result){
+					if(!err){
+						console.log(result);
+						save_session();
+						wait_session_timer=window.setTimeout('wait_session()',3000);
+					}
+					else{
+						$('.auth-error').html('Не удается отправить custom операцию для инициализации сессии');
+						$('.auth-action').removeClass('disabled');
+						console.log(err);
+					}
+				});
+			}
+		});
+	}
+}
+function set_session_cookie(){
+	if(''==current_user){
+		document.cookie='session_id=; path=/; domain='+domain+';';
+	}
+	else{
+		var expire = new Date();
+		expire.setTime(expire.getTime() + 350 * 24 * 3600 * 1000);
+		document.cookie='session_id='+users[current_user].session_id+'; expires='+expire.toUTCString()+'; path=/; domain='+domain+';';
+	}
+}
 function save_session(){
 	let users_json=JSON.stringify(users);
 	localStorage.setItem('users',users_json);
 	localStorage.setItem('current_user',current_user);
+	wait_session();
+	set_session_cookie();
 	view_session();
 	session_control();
 }
@@ -44,6 +140,7 @@ function load_session(){
 		wallet_control();
 		committee_control();
 		delegation_control();
+		wait_session();
 	}
 	create_account_control();
 	reset_account_control();
@@ -1012,7 +1109,8 @@ function session_control(){
 	if(0!=$('.control .session-control').length){
 		let session_html='';
 		for(key in users){
-			session_html+='<p class="clearfix">'+(users[key]['active_key']!=''?'<span class="right" title="Сохранен Active ключ"><i class="fas fa-fw fa-key"></i></span>':'')+'<a href="/@'+key+'/">'+key+'</a>, '+(current_user==key?'<b>используется</b>':'<a href="#" class="auth-change" data-login="'+key+'">переключиться</a>')+', <a href="#" class="auth-logout" data-login="'+key+'">отключить</a></p>';
+			session_html+='<p class="clearfix">'+(1==users[key]['session_verify']?'<span class="right" title="Сессия подтверждена"><i class="fas fa-fw fa-check"></i></span>':'')+(users[key]['active_key']!=''?'<span class="right" title="Сохранен Active ключ"><i class="fas fa-fw fa-key"></i></span>':'')+'<a href="/@'+key+'/">'+key+'</a>, '+(current_user==key?'<b>используется</b>':'<a href="#" class="auth-change" data-login="'+key+'">переключиться</a>')+', <a href="#" class="auth-logout" data-login="'+key+'">отключить</a></p>';
+
 		}
 		$('.control .session-control').html(session_html);
 	}
@@ -1036,6 +1134,7 @@ function logout(login='',redirect=true){
 	}
 }
 function try_auth(login,posting_key,active_key){
+	$('.auth-action').addClass('disabled');
 	$('.auth-error').html('');
 	login=login.toLowerCase();
 	if('@'==login.substring(0,1)){
@@ -1055,12 +1154,14 @@ function try_auth(login,posting_key,active_key){
 						}
 						catch(e){
 							$('.auth-error').html('Posting ключ не валидный');
+							$('.auth-action').removeClass('disabled');
 							return;
 						}
 					}
 				}
 				if(!posting_valid){
 					$('.auth-error').html('Posting ключ не подходит');
+					$('.auth-action').removeClass('disabled');
 					return;
 				}
 				if(active_key){
@@ -1074,28 +1175,32 @@ function try_auth(login,posting_key,active_key){
 							}
 							catch(e){
 								$('.auth-error').html('Active ключ не валидный');
+								$('.auth-action').removeClass('disabled');
 								return;
 							}
 						}
 					}
 					if(!active_valid){
 						$('.auth-error').html('Active ключ не подходит');
+						$('.auth-action').removeClass('disabled');
 						return;
 					}
 				}
 				users[login]={'posting_key':posting_key,'active_key':active_key};
 				current_user=login;
-				save_session();
-				$('.auth-error').html('Вы успешно авторизованы!');
-				document.location='/';
+				session_generate();
 			}
 			else{
 				$('.auth-error').html('Пользователь не найден');
+				$('.auth-action').removeClass('disabled');
+				return;
 			}
 		});
 	}
 	else{
 		$('.auth-error').html('Пользователь не указан');
+		$('.auth-action').removeClass('disabled');
+		return;
 	}
 }
 
@@ -1178,7 +1283,9 @@ function app_mouse(e){
 	if($(target).hasClass('auth-action')){
 		e.preventDefault();
 		if($(target).closest('.control').length){
-			try_auth($('input[name=login]').val(),$('input[name=posting_key]').val(),$('input[name=active_key]').val());
+			if(!$(target).hasClass('disabled')){
+				try_auth($('input[name=login]').val(),$('input[name=posting_key]').val(),$('input[name=active_key]').val());
+			}
 		}
 	}
 	if($(target).hasClass('generate-general-action')){

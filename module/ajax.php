@@ -1,7 +1,7 @@
 <?php
 header("Content-type:text/html; charset=UTF-8");
-if('create_session'==$path_array[2]){
-	if(in_array('session',$config['plugins'])){
+if(in_array('session',$config['plugins'])){
+	if('create_session'==$path_array[2]){
 		$key=$_POST['key'];
 		$cookie_time=time();
 		$cookie=md5($cookie_time.'VIZ'.$key).md5($key.'WORLD'.date('d.m.Y'));
@@ -24,6 +24,29 @@ if('create_session'==$path_array[2]){
 		}
 		header('HTTP/1.1 200 Ok');
 		print $cookie;
+	}
+	if('check_session'==$path_array[2]){
+		if($auth){
+			print json_encode($session_arr['id']);
+		}
+		else{
+			$session_id=$_COOKIE['session_id'];
+			$check_session_id=$redis->zscore('session_cookie',$session_id);
+			if($check_session_id){
+				$check_ip=$redis->hget('session:'.$check_session_id,'ip');
+				if($check_ip==$ip){
+					$session_arr=$redis->hgetall('session:'.$check_session_id);
+				}
+			}
+			$current_time_offset=time();
+			$session_arr['time']=intval($session_arr['time'])+90;
+			if($current_time_offset>$session_arr['time']){
+				print '{"error":"rebuild_session","error_str":"'.$current_time_offset.', '.$session_arr['time'].'"}';
+			}
+			else{
+				print '{"error":"wait","error_str":"'.$current_time_offset.', '.$session_arr['time'].'"}';
+			}
+		}
 	}
 }
 if('transfers_history_table'==$path_array[2]){

@@ -944,7 +944,8 @@ if(isset($_COOKIE['session_id'])){
 	if(!$session_arr['user']){
 		unset($session_arr);
 	}
-	if($session_arr['id']){
+	else{
+		unset($session_arr['ip']);
 		$user_arr=get_user_by_id($session_arr['user']);
 		if($user_arr['login']){
 			$auth=true;
