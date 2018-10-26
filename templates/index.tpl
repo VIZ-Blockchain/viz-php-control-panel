@@ -45,7 +45,7 @@
 	<div class="logo"><a href="http://VIZ.World/" class="logo">VIZ<span>.World</span></a></div>
 	<div class="right">
 		{header_menu}
-		<div class="header-menu-el telegram"><a href="https://t.me/viz_world" target="_blank" class="icon"><i class="fas fa-fw fa-paper-plane"></i></a></div>
+		<div class="header-menu-el social-links"><a href="https://discord.gg/nEu4MqR" target="_blank" class="icon"><i class="fab fa-fw fa-discord"></i></a><a href="https://t.me/viz_world" target="_blank" class="icon"><i class="fas fa-fw fa-paper-plane"></i></a></div>
 		<div class="header-menu-el energy" title="Состояние энергии аккаунта">&hellip;</div>
 		<div class="header-menu-el account"><a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a></div>
 	</div>
