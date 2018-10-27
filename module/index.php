@@ -655,6 +655,25 @@ if('tags'==$path_array[1]){
 		}
 	}
 }
+else
+if('feed'==$path_array[1]){
+	print '<div class="page content">
+	<h1>Лента новостей</h1>';
+	if(!$auth){
+		print '<p>Личная лента новостей доступна после авторизации и подписки на других пользователей.</p>';
+		print '</div>';
+	}
+	else{
+		$rows=redis_read_feed($user_arr['id']);
+		if(0==count($rows)){
+			print '<p>У вас нет публикаций в ленте.</p>';
+		}
+		foreach($rows as $row){
+			print preview_content_by_id($row);
+		}
+		print '</div>';
+	}
+}
 if(''==$path_array[1]){
 	$find=array();
 	$perpage=100;

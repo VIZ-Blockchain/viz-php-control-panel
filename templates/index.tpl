@@ -57,9 +57,9 @@
 		<div class="menu-el inactive"><i class="fas fa-fw fa-user-circle"></i><a href="#/profile/">Профиль</a></div>
 		<div class="menu-el"><i class="fas fa-fw fa-wallet"></i><a href="/wallet/">Кошелек</a></div>
 		<hr>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-newspaper"></i><a href="#/feed/">Лента контента</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-newspaper"></i><a href="/feed/">Лента контента</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-plus-circle"></i><a href="#/publication/">Опубликовать контент</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-home"></i><a href="#/content/">Обзор сети</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-home"></i><a href="/">Обзор сети</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-bell"></i><a href="#/notifications/">Уведомления</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-users"></i><a href="#/users/">Пользователи</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-user-friends"></i><a href="#/social/">Социальные связи</a></div>
