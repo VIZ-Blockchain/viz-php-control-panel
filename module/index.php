@@ -7,6 +7,15 @@ if('@'==mb_substr($path_array[1],0,1)){
 		$permlink=urldecode($path_array[2]);
 		$data=get_content($author_id,$permlink);
 		if(isset($data['_id'])){
+			$author_arr=get_user_by_id($author_id);
+
+			if($author_arr['nickname']){
+				$replace['title']=htmlspecialchars($author_arr['nickname']).' - '.$replace['title'];
+			}
+			else{
+				$replace['title']='@'.$author_arr['login'].' - '.$replace['title'];
+			}
+
 			$descr='';
 			if(isset($data['foreword'])){
 				$descr=mb_substr(strip_tags($data['foreword']),0,250).'...';
@@ -36,6 +45,9 @@ if('@'==mb_substr($path_array[1],0,1)){
 	<meta name="twitter:card" content="summary_large_image" />';
 				print '<img src="'.$cover.'" itemprop="image" class="schema">';
 			}
+
+			$replace['title']=htmlspecialchars($data['title']).' - '.$replace['title'];
+
 			print view_content($data);
 			$buf='';
 			$buf.='<div class="page comments" id="comments">
@@ -59,35 +71,56 @@ if('@'==mb_substr($path_array[1],0,1)){
 	}
 	else{
 		$account_login=mb_substr($path_array[1],1);
-		$account=$api->execute_method('get_accounts',array(array($account_login)));
-		if($account[0]['name']==$account_login){
-			$account_name=$account_login;
-			$account_json=@json_decode($account[0]['json_metadata'],true);
+		$account_id=get_user_id($account_login);
+		if(0<$account_id){
+			$account_arr=get_user_by_id($account_id);
+			if(!isset($account_arr['shares'])){
+				redis_add_ulist('update_user',$account_arr['login']);
+			}
+			$account_name=$account_arr['login'];
 			$account_avatar='/default-avatar.png';
 			$account_about='';
 
-			if($account_json['profile']['name']){
-				$account_name=htmlspecialchars($account_json['profile']['name']);
+			if($account_arr['nickname']){
+				$account_name=htmlspecialchars($account_arr['nickname']);
+				$replace['title']=htmlspecialchars($account_name).' - '.$replace['title'];
 			}
-			if($account_json['profile']['profile_image']){
-				$account_avatar=htmlspecialchars($account_json['profile']['profile_image']);
+			else{
+				$replace['title']='@'.$account_name.' - '.$replace['title'];
 			}
-			if($account_json['profile']['about']){
-				$account_about=htmlspecialchars(strip_tags($account_json['profile']['about']));
+			if($account_arr['avatar']){
+				$account_avatar=htmlspecialchars($account_arr['avatar']);
+			}
+			if($account_arr['about']){
+				$account_about=htmlspecialchars(strip_tags($account_arr['about']));
 			}
 			$account_name=str_replace('@','',$account_name);
 			print '<div class="page user-badge clearfix">
-			<a href="/@'.$account_login.'/" class="avatar" style="background-image:url(\''.$account_avatar.'\')"></a>
-			<div class="actions">
-				<div class="follow">Подписаться</div><br>
-				<div class="unfollow">Отписаться</div>
-			</div>
+			<a href="/@'.$account_login.'/" class="avatar" style="background-image:url(\''.$account_avatar.'\')"></a>';
+			if($auth){
+				print '
+				<div class="actions" data-user-login="'.$account_login.'">';
+				$link=get_user_link($user_arr['_id'],$account_id);
+				if(false===$link){
+					print '<div class="follow follow-action">Подписаться</div><br><div class="ignore ignore-action">Игнорировать</div>';
+				}
+				if(1==$link){
+					print '<div class="unfollow unfollow-action">Отписаться</div>';
+				}
+				if(2==$link){
+					print '<div class="unfollow unfollow-action">Перестать игнорировать</div>';
+				}
+				print '</div>';
+			}
+			print '
 			<div class="info">
 				<div class="login"><a href="/@'.$account_login.'/">'.$account_name.'</a></div>
 				<div class="descr">
-					<p>'.$account_about.'</p>
-					<p>Энергии: '.($account[0]['energy']/100).'%, Контента: '.$account[0]['content_count'].', Голосов: '.$account[0]['vote_count'].'</p>
-					<p>Баланс: '.$account[0]['balance'].', '.$account[0]['vesting_shares'].'</p>
+					<p>'.$account_about.'</p>';
+					if(isset($account_arr['content_count'])){
+						print '<p>Контента: '.$account_arr['content_count'].', Голосов: '.$account_arr['vote_count'].'</p>';
+					}
+					print '<p>Баланс: '.($account_arr['balance']/1000).' VIZ, '.($account_arr['shares']/1000000).' SHARES</p>
 				</div>
 			</div>
 	</div>';

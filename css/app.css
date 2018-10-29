@@ -758,6 +758,17 @@ label input[type=checkbox]{
 .page.user-badge .actions .unfollow{
 	cursor:pointer;
 	display:inline-block;
+	color:#111;
+	padding:4px 8px 6px;
+	border:1px solid #111;
+	border-radius:4px;
+	background:#fff;
+	margin-bottom:4px;
+	margin-left:4px;
+}
+.page.user-badge .actions .ignore{
+	cursor:pointer;
+	display:inline-block;
 	color:#f11;
 	padding:4px 8px 6px;
 	border:1px solid #f11;

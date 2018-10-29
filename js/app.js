@@ -79,6 +79,51 @@ function wait_session(){
 		}
 	}
 }
+function follow_user(user,proper_target){
+	if(''!=current_user){
+		let json=JSON.stringify(['follow',{follower:current_user,following:user,what:['blog']}]);
+		gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'follow',json,function(err,result){
+			if(!err){
+				add_notify('Вы успешно подписались на '+user);
+				proper_target.html('<div class="unfollow unfollow-action">Отписаться</div>');
+			}
+			else{
+				add_notify('Не удается отправить операцию подписки на '+user,true);
+				console.log(err);
+			}
+		});
+	}
+}
+function unfollow_user(user,proper_target){
+	if(''!=current_user){
+		let json=JSON.stringify(['follow',{follower:current_user,following:user,what:[]}]);
+		gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'follow',json,function(err,result){
+			if(!err){
+				add_notify('Вы стали соблюдать нейтралитет с '+user);
+				proper_target.html('<div class="follow follow-action">Подписаться</div><br><div class="ignore ignore-action">Игнорировать</div>');
+			}
+			else{
+				add_notify('Не удается отправить операцию нейтралитета с '+user,true);
+				console.log(err);
+			}
+		});
+	}
+}
+function ignore_user(user,proper_target){
+	if(''!=current_user){
+		let json=JSON.stringify(['follow',{follower:current_user,following:user,what:['ignore']}]);
+		gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'follow',json,function(err,result){
+			if(!err){
+				add_notify('Вы успешно начали игнорировать '+user);
+				proper_target.html('<div class="unfollow unfollow-action">Перестать игнорировать</div>');
+			}
+			else{
+				add_notify('Не удается отправить операцию игнорирования '+user,true);
+				console.log(err);
+			}
+		});
+	}
+}
 function session_generate(){
 	if(''!=current_user){
 		var key=pass_gen(20,false);
@@ -1338,6 +1383,27 @@ $(window).on('hashchange',function(e){
 function app_mouse(e){
 	if(!e)e=window.event;
 	var target=e.target || e.srcElement;
+	if($(target).hasClass('follow-action')){
+		e.preventDefault();
+		proper_target=$(target).closest('.actions');
+		if(typeof proper_target.attr('data-user-login') !== 'undefined'){
+				follow_user(proper_target.attr('data-user-login'),proper_target);
+		}
+	}
+	if($(target).hasClass('unfollow-action')){
+		e.preventDefault();
+		proper_target=$(target).closest('.actions');
+		if(typeof proper_target.attr('data-user-login') !== 'undefined'){
+				unfollow_user(proper_target.attr('data-user-login'),proper_target);
+		}
+	}
+	if($(target).hasClass('ignore-action')){
+		e.preventDefault();
+		proper_target=$(target).closest('.actions');
+		if(typeof proper_target.attr('data-user-login') !== 'undefined'){
+				ignore_user(proper_target.attr('data-user-login'),proper_target);
+		}
+	}
 	if($(target).hasClass('award-action')){
 		e.preventDefault();
 		proper_target=$(target).closest('.page');

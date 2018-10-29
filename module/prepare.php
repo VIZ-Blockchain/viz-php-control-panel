@@ -182,12 +182,12 @@ function get_user_by_id($id){
 	}
 	return false;
 }
-function get_user_link($user_1,$user_2,$what=1){
+function get_user_link($user_1,$user_2){
 	global $mongo,$config;
-	$rows=$mongo->executeQuery($config['db_prefix'].'.users_links',new MongoDB\Driver\Query(['user_1'=>(int)$user_1,'user_2'=>(int)$user_2,'what'=>(int)$what],['limit'=>1]));
+	$rows=$mongo->executeQuery($config['db_prefix'].'.users_links',new MongoDB\Driver\Query(['user_1'=>(int)$user_1,'user_2'=>(int)$user_2],['limit'=>1]));
 	$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 	foreach($rows as $row){
-		return $row;
+		return $row['value'];
 	}
 	return false;
 }
