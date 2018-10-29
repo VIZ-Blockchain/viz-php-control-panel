@@ -155,7 +155,9 @@ class viz_plugin_content extends viz_plugin{
 						$rows=$this->mongo->executeQuery($config['db_prefix'].'.users_links',new MongoDB\Driver\Query(['user_2'=>(int)$user_id,'value'=>1]));
 						$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 						foreach($rows as $row){
-							redis_add_feed($row['user_1'],$content_id);
+							if(!mongo_exist('users_links',['user_1'=>(int)$row['user_1'],'user_2'=>(int)$user_id,'value'=>2])){
+								redis_add_feed($row['user_1'],$content_id);
+							}
 						}
 					}
 				}
