@@ -1083,9 +1083,9 @@ function profile_control(){
 					result+='<p>Про аккаунт (about):<br><input type="text" class="profile-input round wide" name="about" data-category="profile" value="'+(typeof metadata.profile.about !== 'undefined'?metadata.profile.about:'')+'"></p>';
 					result+='<p>Аватар (ссылка, avatar):<br><input type="text" class="profile-input round wide" name="avatar" data-category="profile" value="'+(typeof metadata.profile.avatar !== 'undefined'?metadata.profile.avatar:'')+'"></p>';
 					result+='<p>Пол/тип аккаунта (gender):<br><select class="profile-select round" name="gender" data-category="profile">'
-					+'<option value=""'+(typeof metadata.profile.gender !== 'undefined'?((''==metadata.profile.gender)?' selected':''):'')+'">Не указан</option>'
-					+'<option value="male"'+(typeof metadata.profile.gender !== 'undefined'?(('male'==metadata.profile.gender)?' selected':''):'')+'">Мужской</option>'
-					+'<option value="female"'+(typeof metadata.profile.gender !== 'undefined'?(('female'==metadata.profile.gender)?' selected':''):'')+'">Женский</option>'
+					+'<option value=""'+(typeof metadata.profile.gender !== 'undefined'?((''==metadata.profile.gender)?' selected':''):'')+'>Не указан</option>'
+					+'<option value="male"'+(typeof metadata.profile.gender !== 'undefined'?(('male'==metadata.profile.gender)?' selected':''):'')+'>Мужской</option>'
+					+'<option value="female"'+(typeof metadata.profile.gender !== 'undefined'?(('female'==metadata.profile.gender)?' selected':''):'')+'>Женский</option>'
 					+'</select></p>';
 					result+='<p><input type="button" class="profile-action button" data-value="true" value="Сохранить профиль"></p>';
 					control.html(result);
