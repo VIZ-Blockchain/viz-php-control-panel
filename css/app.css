@@ -573,6 +573,7 @@ label input[type=checkbox]{
 	color:rgb(0, 27, 88)
 }
 .page.content .addon .flag:hover{
+	border:1px solid #c52e2e;
 	opacity:1;
 	box-shadow: 0 2px 4px -1px rgba(97, 0, 0, 0.07), 0 4px 5px 0 rgba(121, 0, 0, 0.07), 0 3px 12px 3px rgba(187, 0, 0, 0.56);
 }
@@ -1035,6 +1036,11 @@ a.load_more{
 .committee-control input[name=vote_percent]{
 	display:inline-block;
 	margin:0 12px;
+}
+select.round{
+	border-radius: 4px;
+	border: 1px solid #aaa;
+	padding: 4px 8px;
 }
 input.round{
 	border-radius: 4px;

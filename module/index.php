@@ -319,6 +319,15 @@ if('login'==$path_array[1]){
 	print '</div></div>';
 }
 else
+if('profile'==$path_array[1]){
+	$replace['title']=htmlspecialchars('Профиль').' - '.$replace['title'];
+	print '<div class="page content">
+	<h1><i class="fas fa-fw fa-user-circle"></i> Профиль</h1>
+	<div class="article control">';
+	print '<div class="profile-control"></div>';
+	print '</div></div>';
+}
+else
 if('wallet'==$path_array[1]){
 	$replace['title']=htmlspecialchars('Кошелек').' - '.$replace['title'];
 	print '<div class="page content">

@@ -186,6 +186,7 @@ function load_session(){
 		committee_control();
 		delegation_control();
 		wait_session();
+		profile_control();
 	}
 	create_account_control();
 	reset_account_control();
@@ -1054,6 +1055,48 @@ function bind_filter_wallet_history(){
 		filter_wallet_history();
 	});
 }
+function profile_control(){
+	if(0!=$('.control .profile-control').length){
+		let control=$('.profile-control');
+		let result='';
+		if(''==current_user){
+			result+='<p>Вам необходимо <a href="/login/">авторизоваться</a>.</p>';
+			control.html(result);
+		}
+		else{
+			gate.api.getAccounts([current_user],function(err,response){
+				if(typeof response[0] !== 'undefined'){
+					result+='<p>Вы можете изменить публичный профиль в блокчейне заполнив форму ниже.</p><p><b>Внимание!</b> После внесенных и сохраненных изменений никто не сможет удалить эти данные из интернета.</p>';
+					result+='<p>Активный аккаунт: <a href="/@'+current_user+'/">'+current_user+'</a></p>';
+					console.log(response[0].json_metadata);
+					let metadata;
+					if(''==response[0].json_metadata){
+						metadata={};
+					}
+					else{
+						metadata=JSON.parse(response[0].json_metadata);
+					}
+					if(typeof metadata.profile == 'undefined'){
+						metadata.profile={};
+					}
+					result+='<p>Псевдоним (nickname):<br><input type="text" class="profile-input round wide" name="nickname" data-category="profile" value="'+(typeof metadata.profile.nickname !== 'undefined'?metadata.profile.nickname:'')+'"></p>';
+					result+='<p>Про аккаунт (about):<br><input type="text" class="profile-input round wide" name="about" data-category="profile" value="'+(typeof metadata.profile.about !== 'undefined'?metadata.profile.about:'')+'"></p>';
+					result+='<p>Аватар (ссылка, avatar):<br><input type="text" class="profile-input round wide" name="avatar" data-category="profile" value="'+(typeof metadata.profile.avatar !== 'undefined'?metadata.profile.avatar:'')+'"></p>';
+					result+='<p>Пол/тип аккаунта (gender):<br><select class="profile-select round" name="gender" data-category="profile">'
+					+'<option value=""'+(typeof metadata.profile.gender !== 'undefined'?((''==metadata.profile.gender)?' selected':''):'')+'">Не указан</option>'
+					+'<option value="male"'+(typeof metadata.profile.gender !== 'undefined'?(('male'==metadata.profile.gender)?' selected':''):'')+'">Мужской</option>'
+					+'<option value="female"'+(typeof metadata.profile.gender !== 'undefined'?(('female'==metadata.profile.gender)?' selected':''):'')+'">Женский</option>'
+					+'</select></p>';
+					result+='<p><input type="button" class="profile-action button" data-value="true" value="Сохранить профиль"></p>';
+					control.html(result);
+				}
+				else{
+					add_notify('Ошибка в получении пользователя '+current_user,true);
+				}
+			});
+		}
+	}
+}
 function wallet_control(update=false){
 	if(0!=$('.control .wallet-control').length){
 		let wallet_control=$('.wallet-control');
@@ -1380,9 +1423,68 @@ $(window).on('hashchange',function(e){
 	}
 });
 
+function save_profile(target){
+	if(''!=current_user){
+		target.addClass('disabled');
+		gate.api.getAccounts([current_user],function(err,response){
+			if(typeof response[0] !== 'undefined'){
+				let metadata;
+				if(''==response[0].json_metadata){
+					metadata={};
+				}
+				else{
+					metadata=JSON.parse(response[0].json_metadata);
+				}
+				if(typeof metadata.profile == 'undefined'){
+					metadata.profile={};
+				}
+				var control=$('.profile-control');
+				control.find('.profile-input').each(function(i){
+					if($(this).val()){
+						if(typeof $(this).attr('data-category') !== 'undefined'){
+							metadata[$(this).attr('data-category')][$(this).attr('name')]=$(this).val();
+						}
+						else{
+							metadata[$(this).attr('name')]=$(this).val();
+						}
+					}
+				});
+				control.find('.profile-select').each(function(i){
+					if(typeof $(this).attr('data-category') !== 'undefined'){
+						metadata[$(this).attr('data-category')][$(this).attr('name')]=$(this).val();
+					}
+					else{
+						metadata[$(this).attr('name')]=$(this).val();
+					}
+				});
+				gate.broadcast.accountMetadata(users[current_user].posting_key,current_user,JSON.stringify(metadata),function(err, result){
+					if(!err){
+						add_notify('Профиль аккаунта '+current_user+' изменен');
+						target.removeClass('disabled');
+					}
+					else{
+						console.log(err);
+						add_notify('Ошибка в сохранение метаданных '+current_user+'');
+						target.removeClass('disabled');
+					}
+				});
+			}
+			else{
+				add_notify('Ошибка в получении пользователя '+current_user,true);
+				target.removeClass('disabled');
+			}
+		});
+	}
+}
 function app_mouse(e){
 	if(!e)e=window.event;
 	var target=e.target || e.srcElement;
+	if($(target).hasClass('profile-action')){
+		e.preventDefault();
+		if(!$(target).hasClass('disabled')){
+			save_profile($(target));
+		}
+	}
 	if($(target).hasClass('follow-action')){
 		e.preventDefault();
 		proper_target=$(target).closest('.actions');
