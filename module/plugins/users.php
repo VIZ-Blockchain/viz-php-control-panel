@@ -25,6 +25,9 @@ class viz_plugin_users extends viz_plugin{
 	function account_update($info,$data){
 		redis_add_ulist('update_user',$data['account']);
 	}
+	function account_metadata($info,$data){
+		redis_add_ulist('update_user',$data['account']);
+	}
 	function account_create($info,$data){
 		global $config;
 		redis_add_ulist('update_user',$data['creator']);
