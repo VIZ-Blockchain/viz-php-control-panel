@@ -1518,6 +1518,45 @@ function wait_content(author,permlink){
 		},
 	});
 }
+function post_subcontent(target){
+	if(''!=current_user){
+		target.addClass('disabled');
+		let content_id=parseInt(target.parent().attr('data-reply-content'));
+		let subcontent_id=parseInt(target.parent().attr('data-reply-subcontent'));
+		let subcontent=target.parent().find('textarea[name=reply-text]').val();
+		let parent_author='';
+		let parent_permlink='';
+		let permlink='';
+		let title='';
+		let json='';
+		let curation_percent=0;
+		if(0<content_id){
+			parent_author=$('.page.content[data-content-id='+content_id+']').attr('data-content-author');
+			parent_permlink=$('.page.content[data-content-id='+content_id+']').attr('data-content-permlink');
+			permlink='re-'+parent_author+'-'+parseInt(new Date().getTime()/1000);
+		}
+		if(0<subcontent_id){
+			parent_author=$('.page.comments .comment[data-id='+subcontent_id+']').attr('data-author');
+			parent_permlink=$('.page.comments .comment[data-id='+subcontent_id+']').attr('data-permlink');
+			permlink='re-'+parent_author+'-'+parseInt(new Date().getTime()/1000);
+		}
+		if(''!=parent_author){
+			gate.broadcast.content(users[current_user].posting_key,parent_author,parent_permlink,current_user,permlink,title,subcontent,curation_percent,json,[],function(err,result){
+				if(!err){
+					$(target).parent().remove();
+					set_update_comments_list();
+					add_notify('Комментарий отправлен',5000);
+				}
+				else{
+					console.log(err);
+					window.setTimeout(function(){set_update_comments_list(false)},100);
+					add_notify('Ошибка при отправке комментария',true);
+					target.removeClass('disabled');
+				}
+			});
+		}
+	}
+}
 function post_content(target){
 	if(''!=current_user){
 		target.addClass('disabled');
@@ -1800,6 +1839,16 @@ function bind_range(){
 		}
 	});
 }
+function app_keyboard(e){
+	if(!e)e=window.event;
+	var key=(e.charCode)?e.charCode:((e.keyCode)?e.keyCode:((e.which)?e.which:0));
+	if(key==27){
+		if(false!==modal){
+			e.preventDefault();
+			close_modal();
+		}
+	}
+}
 function app_mouse(e){
 	if(!e)e=window.event;
 	var target=e.target || e.srcElement;
@@ -1824,7 +1873,7 @@ function app_mouse(e){
 	if($(target).hasClass('wysiwyg-action') || $(target).parent().hasClass('wysiwyg-action')){
 		e.preventDefault();
 		var proper_target=$(target);
-		if($(target).parent().hasClass('reply-action')){
+		if($(target).parent().hasClass('wysiwyg-action')){
 			proper_target=$(target).parent();
 		}
 		proper_target.remove();
@@ -2090,11 +2139,17 @@ function app_mouse(e){
 	if($(target).hasClass('auth-logout') || $(target).parent().hasClass('auth-logout')){
 		e.preventDefault();
 		var proper_target=$(target);
-		if($(target).parent().hasClass('reply-action')){
+		if($(target).parent().hasClass('auth-logout')){
 			proper_target=$(target).parent();
 		}
 		let login=proper_target.attr('data-login');
 		logout(login,login?false:true);
+	}
+	if($(target).hasClass('reply-execute')){
+		e.preventDefault();
+		if(!$(target).hasClass('disabled')){
+			post_subcontent($(target));
+		}
 	}
 	if($(target).hasClass('reply-action') || $(target).parent().hasClass('reply-action')){
 			e.preventDefault();
@@ -2102,36 +2157,36 @@ function app_mouse(e){
 			if($(target).parent().hasClass('reply-action')){
 				proper_target=$(target).parent();
 			}
-			//if(1==user.verify){
+			if(1==users[current_user].session_verify){
 				window.clearTimeout(update_comments_list_timer);
 				var content_id=0;
-				var comment_id=0;
-				if(proper_target.hasClass('post-reply')){
-					content_id=1;//parseInt(proper_target.attr('data-post-id'));
+				var subcontent_id=0;
+				if(proper_target.hasClass('content-reply')){
+					content_id=parseInt($('.page.content').attr('data-content-id'));
 				}
-				if(proper_target.hasClass('comment-reply')){
-					comment_id=1;//parseInt(proper_target.attr('data-comment-id'));
+				if(proper_target.hasClass('subcontent-reply')){
+					subcontent_id=parseInt(proper_target.closest('.comment').attr('data-id'));
 				}
-				var comment_form='<div class="reply-form" data-reply-post="'+content_id+'" data-reply-comment="'+comment_id+'"><textarea name="reply-text" placeholder="Введите ваш ответ..."></textarea><input type="button" class="reply-execute" value="Ответить"></div>'
-				if(comment_id){
-					if(0==$('.reply-form[data-reply-comment='+comment_id+']').length){
+				var comment_form='<div class="reply-form" data-reply-content="'+content_id+'" data-reply-subcontent="'+subcontent_id+'"><textarea name="reply-text" class="round" placeholder="Введите ваш ответ..."></textarea><input type="button" class="button reply-execute" value="Ответить"></div>'
+				if(subcontent_id){
+					if(0==$('.reply-form[data-reply-subcontent='+subcontent_id+']').length){
 						proper_target.closest('.addon').after(comment_form);
 						proper_target.closest('.addon').parent().find('.reply-form textarea[name=reply-text]').focus();
 					}
 					else{
-						$('.reply-form[data-reply-comment='+comment_id+']').remove();
+						$('.reply-form[data-reply-subcontent='+subcontent_id+']').remove();
 					}
 				}
 				if(content_id){
-					if(0==$('.reply-form[data-reply-post='+content_id+']').length){
+					if(0==$('.reply-form[data-reply-content='+content_id+']').length){
 						proper_target.closest('.comments').find('.subtitle').after(comment_form);
 						proper_target.closest('.comments').find('.reply-form textarea[name=reply-text]').focus();
 					}
 					else{
-						$('.reply-form[data-reply-post='+content_id+']').remove();
+						$('.reply-form[data-reply-content='+content_id+']').remove();
 					}
 				}
-			//}
+			}
 		}
 }
 $(document).ready(function(){
@@ -2143,10 +2198,14 @@ $(document).ready(function(){
 	}
 	document.addEventListener('click', app_mouse, false);
 	document.addEventListener('tap', app_mouse, false);
+	document.addEventListener('keyup', app_keyboard, false);
 	update_dgp();
 	update_datetime();
 	if(0<$('input[type=range]').length){
 		bind_range();
+	}
+	if(0<$('.page.comments').length){
+		update_comments_list_timer=window.setTimeout(function(){update_comments_list()},update_comments_list_timeout);
 	}
 	$('a.menu-expand').bind('click',function(){
 		if($('a.menu-expand').hasClass('active')){

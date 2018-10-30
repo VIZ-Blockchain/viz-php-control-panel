@@ -51,13 +51,13 @@ if('@'==mb_substr($path_array[1],0,1)){
 			print view_content($data);
 
 			print '<div class="page comments" id="comments">
-<div class="actions"><div class="reply reply-action post-reply unselectable">Оставить комментарий</div></div>
+<div class="actions"><div class="reply reply-action content-reply unselectable">Оставить комментарий</div></div>
 <div class="subtitle">Комментарии</div>
 <hr>';
 
 			$find=array('content'=>(int)$data['_id']);
-			$sort=array('sort'=>1);
-			$rows=$mongo->executeQuery($config['db_prefix'].'.subcontent',new MongoDB\Driver\Query($find));
+			$sort=array('sort'=>['sort'=>1]);
+			$rows=$mongo->executeQuery($config['db_prefix'].'.subcontent',new MongoDB\Driver\Query($find,$sort));
 			$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 			foreach($rows as $row){
 				print view_subcontent($row);

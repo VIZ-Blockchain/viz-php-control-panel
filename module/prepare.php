@@ -1183,13 +1183,14 @@ function view_subcontent($data){
 		$data['parent']=0;
 	}
 	$data['body']=stripcslashes($data['body']);
+	$data['permlink']=stripcslashes($data['permlink']);
 	$author_login=get_user_login($data['author']);
 	$author_nickname=mongo_find_attr('users','nickname',['_id'=>(int)$data['author']]);
 	if(!$author_nickname){
 		$author_nickname='@'.$author_login;
 	}
 	$author_avatar=mongo_find_attr('users','avatar',['_id'=>(int)$data['author']]);
-	$ret.='<div class="comment" id="'.$author_login.'/'.htmlspecialchars($data['permlink']).'" data-level="'.$level.'" data-id="'.$data['_id'].'" data-parent="'.$data['parent'].'">
+	$ret.='<div class="comment" id="'.$author_login.'/'.htmlspecialchars($data['permlink']).'" data-author="'.$author_login.'" data-permlink="'.htmlspecialchars($data['permlink']).'" data-level="'.$level.'" data-id="'.$data['_id'].'" data-parent="'.$data['parent'].'" data-sort="'.$data['sort'].'">
 		<div class="info">
 			<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a></div>
 			<div class="anchor"><a href="#'.$author_login.'/'.htmlspecialchars($data['permlink']).'">#</a></div>
@@ -1199,7 +1200,7 @@ function view_subcontent($data){
 			'.text_to_view($data['body']).'
 		</div>
 		<div class="addon">
-			<a class="reply reply-action comment-reply">Ответ <i class="far fa-fw fa-comment-dots"></i></a>
+			<a class="reply reply-action subcontent-reply unselectable">Ответ <i class="far fa-fw fa-comment-dots"></i></a>
 			<!--<a class="award">Наградить <i class="fas fa-fw fa-angle-up"></i></a>-->
 		</div>
 	</div>';
