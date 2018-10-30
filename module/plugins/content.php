@@ -213,7 +213,7 @@ class viz_plugin_content extends viz_plugin{
 					$sort++;
 				}
 				$bulk=new MongoDB\Driver\BulkWrite;
-				$bulk->update(['content'=>(int)$parent_content,'sort'=>array('$gte'=>(int)$sort)],['$inc'=>['sort'=>1]]);
+				$bulk->update(['content'=>(int)$parent_content,'sort'=>array('$gte'=>(int)$sort)],['$inc'=>['sort'=>1]],['multi'=>true]);
 				$this->mongo->executeBulkWrite($config['db_prefix'].'.subcontent',$bulk);
 			}
 			else{
@@ -242,8 +242,8 @@ class viz_plugin_content extends viz_plugin{
 				'curation_percent'=>(int)$data['curation_percent'],
 				'status'=>$user_status,
 				'parent'=>$parent_subcontent,
-				'level'=>$level,
-				'sort'=>$sort,
+				'level'=>(int)$level,
+				'sort'=>(int)$sort,
 				'parse_time'=>(int)time()
 			);
 
