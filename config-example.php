@@ -23,4 +23,13 @@ $config['plugins_extensions']=array('content'=>array('tags','feed','repost'),'li
 //Admin users logins from blockchain (affected only with session plugin)
 $config['admin_users']=array();
 
+//WYSIWYG js-script code
+$config['wysiwyg']='
+<script src="https://cloud.tinymce.com/stable/tinymce.min.js?apiKey=???"></script>
+<script>
+$(document).ready(function(){
+	bind_drag_and_drop_image();
+});
+</script>';
+
 $site_root=$_SERVER['DOCUMENT_ROOT'];

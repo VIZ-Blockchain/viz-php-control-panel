@@ -1042,10 +1042,19 @@ select.round{
 	border: 1px solid #aaa;
 	padding: 4px 8px;
 }
+textarea.round{
+	border-radius: 4px;
+	border: 1px solid #aaa;
+	padding: 4px 8px;
+}
 input.round{
 	border-radius: 4px;
 	border: 1px solid #aaa;
 	padding: 4px 8px;
+}
+textarea.wide{
+	width: 100%;
+	font-size: 14px;
 }
 input.wide{
 	width: 100%;
@@ -1182,4 +1191,50 @@ select.small-size{
 	margin-right:25px;
 	opacity:0.5;
 	float:right;
+}
+
+.spoiler{
+	background:#000 !important;
+	color:#000 !important;
+}
+.spoiler img{
+	opacity:0;
+}
+.spoiler:hover{
+	background:none !important;
+	color:initial !important;
+}
+.spoiler:hover img{
+	opacity:1;
+}
+#upload-file{
+	display:none;
+}
+.drop-file{
+	font-size:30px;
+}
+html.modal-open{
+	overflow:hidden;
+}
+.modal-overlay {
+	position:fixed;
+	left:0;
+	top:0;
+	right:0;
+	bottom:0;
+	background:rgba(255, 255, 255, 0.5);
+	z-index:5000;
+	display:none;
+	zoom:1;
+}
+.modal{
+	padding: 2rem;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	z-index: 6000;
+	display:none;
+}
+.modal-overlay.active, .modal.active{
+	display:block;
 }

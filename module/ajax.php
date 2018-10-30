@@ -1,5 +1,24 @@
 <?php
 header("Content-type:text/html; charset=UTF-8");
+if(in_array('content',$config['plugins'])){
+	if('check_content'==$path_array[2]){
+		$author_login=$_POST['author'];
+		$author_id=get_user_id($author_login);
+		$permlink=$_POST['permlink'];
+		$content_arr=mongo_find('content',['author'=>(int)$author_id,'permlink'=>mongo_prepare($permlink)]);
+		if($content_arr['_id']){
+			if($content_arr['body']){
+				print '{"status":"ok"}';
+			}
+			else{
+				print '{"status":"none"}';
+			}
+		}
+		else{
+			print '{"status":"none"}';
+		}
+	}
+}
 if(in_array('session',$config['plugins'])){
 	if('create_session'==$path_array[2]){
 		$key=$_POST['key'];

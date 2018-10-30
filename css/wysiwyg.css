@@ -1,0 +1,205 @@
+@charset "UTF-8";
+/* reset */
+html, body, body div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, menu, nav, section, time, mark, audio, video, details, summary {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font-weight: normal;
+	vertical-align: baseline;
+	background: transparent;
+}
+main, article, aside, figure, footer, header, nav, section, details, summary {display: block;}
+html {
+	box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+	box-sizing: inherit;
+}
+img,
+object,
+embed {max-width: 100%;}
+html {overflow-y: scroll;}
+ul {list-style: none;}
+blockquote, q {quotes: none;}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {content: ''; content: none;}
+a {margin: 0; padding: 0; font-size: 100%; vertical-align: baseline; background: transparent;}
+del {text-decoration: line-through;}
+table {border-collapse: separate; border-spacing: 0;}
+th {font-weight: bold; vertical-align: bottom;}
+td {font-weight: normal; vertical-align: top;}
+hr {display: block; height: 1px; border: 0; border-top: 1px solid rgba(175,175,175,0.5); margin: 1em 0; padding: 0;clear: both;}
+input, select {vertical-align: middle;}
+input[type="radio"] {vertical-align: text-bottom;}
+input[type="checkbox"] {vertical-align: bottom;}
+.ie7 input[type="checkbox"] {vertical-align: baseline;}
+.ie6 input {vertical-align: text-bottom;}
+select, input, textarea {font: 99% sans-serif;}
+table {font-size: inherit; font: 100%;}
+small {font-size: 85%;}
+strong {font-weight: bold;}
+td, td img {vertical-align: top;}
+sub, sup {font-size: 75%; line-height: 0; position: relative;}
+sup {top: -0.5em;}
+sub {bottom: -0.25em;}
+.clickable,
+label,
+input[type=button],
+input[type=submit],
+input[type=file],
+button {cursor: pointer;}
+pre, code, kbd, samp {font-family: monospace, sans-serif;}
+button, input, select, textarea {margin: 0;}
+button,
+input[type=button] {width: auto; overflow: visible;}
+.ie7 img {-ms-interpolation-mode: bicubic;}
+.clearfix:after { content: " "; display: block; clear: both; }
+.clear{clear:both;}
+/* wysiwyg css */
+ul {
+   list-style-type: disc;
+   list-style-position: inside;
+}
+ol {
+   list-style-type: decimal;
+   list-style-position: inside;
+}
+ul ul, ol ul {
+   list-style-type: circle;
+   list-style-position: inside;
+   margin-left: 15px;
+}
+ol ol, ul ol {
+   list-style-type: lower-latin;
+   list-style-position: inside;
+   margin-left: 15px;
+}
+ul{
+	margin-bottom:8px;
+}
+body{
+	box-sizing: border-box;
+	border-collapse: collapse;
+	font-family:Roboto,'Open Sans','Fira Sans Condensed',Arial;
+	background:#fff;
+	padding:16px;
+	font-size:14px;
+	margin-bottom:24px;
+}
+blockquote{
+	color: #666;
+	margin:4px;
+	margin-left:8px;
+	padding:4px;
+	padding-left:8px;
+	border-left:2px solid #eee;
+}
+pre{
+	color: #000;
+	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+	font-size: 0.94em;
+	border-radius: 3px;
+	background-color: #F8F8F8;
+	border: 1px solid #CCC;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	padding: 5px;
+}
+a{
+	cursor:pointer;
+	color:#02c;
+	-webkit-transition: all 0.2s linear;
+	-moz-transition: all 0.2s linear;
+	-o-transition: all 0.2s linear;
+	transition: all 0.2s linear;
+}
+a:visited{
+	color:#04e;
+}
+a:hover{
+	color:#bb0000;
+}
+
+h1{
+	margin:8px 0;
+	margin-top: 12px;
+	font-size:135%;
+}
+h2{
+	margin:8px 0;
+	margin-top: 12px;
+	font-size:125%;
+}
+h3{
+	margin:8px 0;
+	font-size:115%;
+}
+h4{
+	margin:8px 0;
+	font-size:105%;
+}
+h5{
+	margin:6px 0;
+	font-size:95%;
+}
+h6{
+	margin:4px 0;
+	font-size:85%;
+}
+p{
+	margin-bottom:12px;
+}
+blockquote p{
+	margin:6px 0;
+}
+table{
+	border: 1px solid #dde;
+	border-right: 0;
+	border-top: 0;
+	padding: 0px;
+	margin: 0 auto 10px;
+	width: 100%;
+}
+table th{
+	background-color: #eef;
+	border: 0;
+	margin: 0;
+	border-top: 1px solid #dde;
+	border-right: 1px solid #dde;
+	padding: 5px;
+	text-align: center;
+}
+table td{
+	border-top: 1px solid #dde;
+	border-right: 1px solid #dde;
+	vertical-align: top;
+	padding: 5px;
+	margin: 0;
+}
+p img{
+	display: inline-block;
+	vertical-align: middle;
+	max-width:100%;
+}
+p img{
+	margin:8px 0;
+}
+.spoiler{
+	background:#555 !important;
+	color:#000 !important;
+}
+.spoiler img{
+	opacity:0;
+}
+.spoiler:hover{
+	background:none !important;
+	color:initial !important;
+}
+.spoiler:hover img{
+	opacity:1;
+}

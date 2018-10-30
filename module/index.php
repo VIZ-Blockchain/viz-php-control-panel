@@ -319,6 +319,24 @@ if('login'==$path_array[1]){
 	print '</div></div>';
 }
 else
+if('publication'==$path_array[1]){
+	$replace['title']=htmlspecialchars('Опубликовать контент').' - '.$replace['title'];
+	print $config['wysiwyg'];
+	print '<div class="page content">
+	<h1><i class="fas fa-fw fa-plus-circle"></i> Опубликовать контент</h1>
+	<div class="article post-content control">';
+	print '<p><input type="text" name="permlink" class="round wide" placeholder="URL"></p>';
+	print '<p><input type="text" name="title" class="round wide" placeholder="Заголовок"></p>';
+	print '<p><input type="text" name="foreword" class="round wide" placeholder="Предисловие (превью для текста)"></p>';
+	print '<p><input type="text" name="cover" class="round wide" placeholder="Ссылка на обложку (миниатюра для превью)"></p>';
+	print '<p><textarea name="content" rows="20" class="round wide" placeholder="Содержимое контента"></textarea></p>';
+	print '<p><input id="upload-file" type="file"><a class="upload-image-action action-button"><i class="fas fa-fw fa-file-image"></i> Загрузить изображение</a> <a class="wysiwyg-action action-button"><i class="fas fa-fw fa-pen-square"></i> WYSIWYG</a></p>';
+	print '<p><input type="text" name="tags" class="round wide" placeholder="Тэги через запятую (ключевые термины для поиска контента)"></p>';
+	print '<p>Процент кураторам: <input type="text" name="curation_percent" value="0" size="4" class="round" data-fixed="curation_percent_range"> <input type="range" name="curation_percent_range" data-fixed="curation_percent" min="0" max="+100" value="0"></p>';
+	print '<p><a class="post-content-action button">Опубликовать</a></p>';
+	print '</div></div>';
+}
+else
 if('profile'==$path_array[1]){
 	$replace['title']=htmlspecialchars('Профиль').' - '.$replace['title'];
 	print '<div class="page content">

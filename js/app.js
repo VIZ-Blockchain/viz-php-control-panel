@@ -7,6 +7,8 @@ var notify_id=0;
 var empty_signing_key='VIZ1111111111111111111111111111111114T1Anm';
 var api_gate='wss://testnet.viz.world';
 var domain='viz.world';
+var modal=false;
+var wysiwyg_active=false;
 gate.config.set('websocket',api_gate);
 gate.api.stop();
 
@@ -1206,8 +1208,7 @@ function committee_control(){
 			let committee_control=$(this);
 			let result='';
 			result+='<h3>Голосование за заявку #'+request_id+'</h3>';
-			result+='<p><input type="range" name="vote_percent_range" min="-100" max="+100" value="0">';
-			result+=' <input type="text" name="vote_percent" value="0" size="4" class="round"> процентов от максимальной суммы заявки<br>';
+			result+='<p>Процент от максимальной суммы заявки: <input type="text" name="vote_percent" value="0" size="4" class="round" data-fixed="vote_percent_range"> <input type="range" name="vote_percent_range" min="-100" max="+100" value="0" data-fixed="vote_percent"><br>';
 			result+='<input type="button" class="committee-vote-request-action button" value="Проголосовать"></p>';
 			if(current_user==creator){
 				if(status==0){
@@ -1216,20 +1217,7 @@ function committee_control(){
 				}
 			}
 			committee_control.html(result);
-			committee_control.find('input[name=vote_percent_range]').bind('change',function(){
-				committee_control.find('input[name=vote_percent]').val($(this).val());
-			});
-			committee_control.find('input[name=vote_percent]').bind('change',function(){
-				let percent=parseInt($(this).val());
-				if(percent>100){
-					percent=100;
-				}
-				if(percent<-100){
-					percent=-100;
-				}
-				$(this).val(percent);
-				committee_control.find('input[name=vote_percent_range]').val(percent);
-			});
+			bind_range();
 		});
 	}
 	if(0!=$('.control .committee-create-request').length){
@@ -1422,7 +1410,111 @@ $(window).on('hashchange',function(e){
 		$(window).scrollTop(0);
 	}
 });
-
+function wait_content(author,permlink){
+	$.ajax({
+		type:'POST',
+		url:'/ajax/check_content/',
+		data:{'author':author,'permlink':permlink},
+		success:function(data_json){
+			data_obj=JSON.parse(data_json);
+			if('ok'==data_obj.status){
+				document.location='/@'+author+'/'+permlink+'/';
+			}
+			else{
+				setTimeout(function(){wait_content(author,permlink)},1000);
+			}
+		},
+	});
+}
+function post_content(target){
+	if(''!=current_user){
+		target.addClass('disabled');
+		var title=$('input[name=title]').val();
+		var permlink=$('input[name=permlink]').val();
+		if(''==$('input[name=permlink]').val()){
+			$('input[name=permlink]').val(title);
+			permlink=$('input[name=permlink]').val();
+		}
+		var content=$('textarea[name=content]').val();
+		var tags=$('input[name=tags]').val();
+		if(wysiwyg_active){
+			content=tinyMCE.activeEditor.getContent();
+		}
+		content=content.replace(' rel="noopener"','');
+		var foreword=$('input[name=foreword]').val().trim();
+		var curation_percent=parseInt($('input[name=curation_percent]').val())*100;
+		var cover=$('input[name=cover]').val().trim();
+		if(''==cover){
+			let links_arr=content.match(/((https?:|)\/\/[^\s]+)/g);
+			for(i in links_arr){
+				let regExp = /^.*((youtube.com|youtu.be)\/(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?\"]*).*/;
+				let match = links_arr[i].match(regExp);
+				if(match && match[6].length == 11){
+					cover='https://img.youtube.com/vi/'+match[6]+'/0.jpg';
+					$('input[name=cover]').val(cover);
+					break;
+				}
+			}
+		}
+		var tags_arr=tags.split(',');
+		if(tags_arr.length>1){
+			for(var i=0;i<tags_arr.length;i++){
+				tags_arr[i]=tags_arr[i].trim();
+			}
+		}
+		else{
+			tags_arr=tags.split(' ');
+		}
+		var json_object={'tags':tags_arr,'cover':cover,'foreword':foreword};
+		var json=JSON.stringify(json_object);
+		var parent_permlink='';
+		if(0<$('input[name=parent_permlink]').length){
+			parent_permlink=$('input[name=parent_permlink]').val();
+		}
+		$('input[name=permlink]').attr('disabled','disabled');
+		$(target).val('Отправка&hellip;');
+		$.ajax({
+			type:'POST',
+			url:'/ajax/check_content/',
+			data:{'author':current_user,'permlink':permlink},
+			success:function(data_json){
+				data_obj=JSON.parse(data_json);
+				if('ok'==data_obj.status){//content already exist
+					if(confirm('Контент с таким URL уже существует, вы хотите заменить его?')){
+						gate.broadcast.content(users[current_user].posting_key,'',parent_permlink,current_user,permlink,title,content,curation_percent,json,[],function(err,result){
+							if(!err){
+								add_notify('Публикация прошла успешно, переадресация&hellip;');
+								setTimeout(function(){wait_content(current_user,permlink)},3500);
+							}
+							else{
+								console.log(err);
+								add_notify('Ошибка при публикации',true);
+								$('input[name=permlink]').removeAttr('disabled');
+								target.removeClass('disabled');
+								target.removeClass('Опубликовать');
+							}
+						});
+					}
+				}
+				else{
+					gate.broadcast.content(users[current_user].posting_key,'',parent_permlink,current_user,permlink,title,content,curation_percent,json,[],function(err,result){
+						if(!err){
+							add_notify('Публикация прошла успешно, переадресация&hellip;');
+							setTimeout(function(){wait_content(current_user,permlink)},3500);
+						}
+						else{
+							console.log(err);
+							add_notify('Ошибка при публикации',true);
+							$('input[name=permlink]').removeAttr('disabled');
+							target.removeClass('disabled');
+							target.removeClass('Опубликовать');
+						}
+					});
+				}
+			}
+		});
+	}
+}
 function save_profile(target){
 	if(''!=current_user){
 		target.addClass('disabled');
@@ -1476,9 +1568,176 @@ function save_profile(target){
 		});
 	}
 }
+function wysiwyg_activation(){
+	tinymce.init({
+		selector: "textarea",
+		plugins: [
+			"advlist autolink link image lists anchor codesample",
+			"wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
+			"table contextmenu directionality textcolor paste textcolor colorpicker textpattern hr"
+		],
+
+		toolbar1: "undo redo | removeformat | subscript superscript | bold italic strikethrough | alignleft aligncenter alignright alignjustify | styleselect",
+		toolbar2: "bullist numlist | outdent indent blockquote codesample | link unlink anchor image media hr | forecolor | fullscreen code",
+
+		menubar: false,
+		toolbar_items_size: "small",
+		relative_urls : false,
+		remove_script_host : false,
+		browser_spellcheck:true,
+		language : "ru",
+		language_url : "/js/tinymce_ru.js",
+		style_formats: [
+			{title: "Центрирование", block: "center"},
+			{title: 'Спойлер', inline : 'span', classes : 'spoiler'},
+			{title: "Заголовок 1", block: "h1"},
+			{title: "Заголовок 2", block: "h2"},
+			{title: "Заголовок 3", block: "h3"},
+			{title: "Заголовок 4", block: "h4"},
+		],
+		content_css : "/css/wysiwyg.css?" + new Date().getTime(),
+	});
+	wysiwyg_active=true;
+}
+function show_modal(selector,fixed=false){
+	$('html').addClass('modal-open');
+	$('.modal-overlay').addClass('active');
+	outer_width=$(selector).outerWidth();
+	outer_height=$(selector).outerHeight();
+	if(fixed){
+		$(selector).css('position','fixed');
+	}
+	$(selector).css('margin-left','-'+(outer_width/2)+'px');
+	$(selector).css('margin-top','-'+(outer_height/2)+'px');
+	$(selector).addClass('active');
+	modal=selector;
+}
+function close_modal(){
+	$('html').removeClass('modal-open');
+	$('.modal').removeClass('active');
+	$('.modal-overlay').removeClass('active');
+	if(false!==modal){
+		$(modal).css('position','absolute');
+		modal=false;
+	}
+}
+function bind_drag_and_drop_image(){
+	window.ondragover=function(e){
+		e.preventDefault();
+		show_modal('.drop-file',true);
+	}
+	window.ondrop = function(e){
+		e.preventDefault();
+		try_upload_image(e.dataTransfer.files[0]);
+	}
+}
+function try_upload_percent(e){
+	var percent = parseInt(e.loaded / e.total * 100);
+	$('.drop-file').html('<i class="fa fa-fw fa-spinner fa-spin" aria-hidden="true"></i> Uploading ('+percent+'%)&hellip;');
+}
+function try_upload_image(file,input_name=''){
+	if(file.type.match(/image.*/)){
+		$('.drop-file').html('<i class="fa fa-fw fa-spinner fa-spin" aria-hidden="true"></i> Uploading&hellip;');
+		var post_form = new FormData();
+		post_form.append('image',file);
+		var xhr=new XMLHttpRequest();
+		xhr.upload.addEventListener('progress',try_upload_percent,false);
+		xhr.open('POST','https://api.imgur.com/3/image.json');
+		xhr.onload=function(){
+			if(200==xhr.status){
+				var img_url = JSON.parse(xhr.responseText).data.link;
+				img_url=img_url.replace('http://','https://');
+				console.log(xhr.img_url);
+				if(''==input_name){
+					if(''==$('input[name=cover]').val()){
+						$('input[name=cover]').val(img_url);
+					}
+					if(wysiwyg_active){
+						tinyMCE.execCommand('mceInsertContent',false,'\n<img src="'+img_url+'" alt="">\n');
+					}
+					else{
+						$('textarea[name=content]').val($('textarea[name=content]').val()+'\n'+img_url+'\n');
+						$('textarea[name=content]').focus();
+					}
+				}
+				else{
+					$('input[name='+input_name+']').val(img_url);
+				}
+				close_modal();
+				$('.drop-file').html('<i class="fas fa-fw fa-file-upload"></i> Drop file here&hellip;');
+			}
+			else{
+				add_notify('<strong>'+l10n.global.error_caption+'</strong> '+l10n.errors.xhr_upload+' '+xhr.status+'',true);
+				close_modal();
+				$('.drop-file').html('<i class="fas fa-fw fa-file-upload"></i> Drop file here&hellip;');
+			}
+		}
+		xhr.onerror=function(){
+			close_modal();
+			$('.drop-file').html('<i class="fas fa-fw fa-file-upload"></i> Drop file here&hellip;');
+		}
+		xhr.setRequestHeader('Authorization','Client-ID f1adac24a4d5691');//viz-world public gate
+		xhr.send(post_form);
+	}
+}
+function bind_range(){
+	$('input[type=range]').each(function(i){
+		if(typeof $(this).attr('data-fixed') !== 'undefined'){
+			let fixed_name=$(this).attr('data-fixed');
+			let fixed_min=parseInt($(this).attr('min'));
+			let fixed_max=parseInt($(this).attr('max'));
+			$(this).unbind('change');
+			$(this).bind('change',function(){
+				if($(this).is(':focus')){
+					$('input[name='+fixed_name+']').val($(this).val());
+				}
+			});
+			$('input[name='+fixed_name+']').unbind('change');
+			$('input[name='+fixed_name+']').bind('change',function(){
+				let fixed_name=$(this).attr('data-fixed');
+				let val=parseInt($(this).val());
+				if(val>fixed_max){
+					val=fixed_max;
+				}
+				if(val<fixed_min){
+					val=fixed_min;
+				}
+				$(this).val(val);
+				$('input[name='+fixed_name+']').val($(this).val());
+			});
+		}
+	});
+}
 function app_mouse(e){
 	if(!e)e=window.event;
 	var target=e.target || e.srcElement;
+	if($(target).hasClass('post-content-action')){
+		e.preventDefault();
+		if(!$(target).hasClass('disabled')){
+			post_content($(target));
+		}
+	}
+	if($(target).hasClass('upload-image-action')){
+		e.preventDefault();
+		$('#upload-file').unbind('change');
+		$('#upload-file').bind('change',function(e){
+			e.preventDefault();
+			var files = this.files;
+			var file = files[0];
+			show_modal('.drop-file',true);
+			try_upload_image(file);
+		});
+		$('#upload-file').click();
+	}
+	if($(target).hasClass('wysiwyg-action') || $(target).parent().hasClass('wysiwyg-action')){
+		e.preventDefault();
+		var proper_target=$(target);
+		if($(target).parent().hasClass('reply-action')){
+			proper_target=$(target).parent();
+		}
+		proper_target.remove();
+		wysiwyg_activation();
+	}
 	if($(target).hasClass('profile-action')){
 		e.preventDefault();
 		if(!$(target).hasClass('disabled')){
@@ -1794,6 +2053,9 @@ $(document).ready(function(){
 	document.addEventListener('tap', app_mouse, false);
 	update_dgp();
 	update_datetime();
+	if(0<$('input[type=range]').length){
+		bind_range();
+	}
 	$('a.menu-expand').bind('click',function(){
 		if($('a.menu-expand').hasClass('active')){
 			$('a.menu-expand').removeClass('active');
