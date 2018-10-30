@@ -1013,6 +1013,10 @@ function preview_content($data){
 	}
 
 	$author_login=get_user_login($data['author']);
+	$author_nickname=mongo_find_attr('users','nickname',['_id'=>(int)$data['author']]);
+	if(!$author_nickname){
+		$author_nickname='@'.$author_login;
+	}
 	$result.='<div class="page preview" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'">';
 
 	if($repost){
@@ -1096,7 +1100,7 @@ function preview_content($data){
 		}
 	}
 	$result.='<div class="info">
-		<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">@'.$author_login.'</a></div>
+		<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a></div>
 		<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
 		<div class="right">
 			<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы проголосовали с силой '.($vote_weight/100).'%"':'').'></a>
@@ -1115,13 +1119,17 @@ function view_content($data){
 	$data['title']=stripcslashes($data['title']);
 	$data['body']=stripcslashes($data['body']);
 	$author_login=get_user_login($data['author']);
+	$author_nickname=mongo_find_attr('users','nickname',['_id'=>(int)$data['author']]);
+	if(!$author_nickname){
+		$author_nickname='@'.$author_login;
+	}
 	$author_avatar=mongo_find_attr('users','avatar',['_id'=>(int)$data['author']]);
 
 	$result.='<div class="page content" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'">';
 	$result.='<h1>'.htmlspecialchars($data['title']).'</h1>';
 	$result.='
 	<div class="info">
-		<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">@'.$author_login.'</a></div>
+		<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a></div>
 		<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
 	</div>';
 	$result.='<div class="article">';
@@ -1165,6 +1173,37 @@ function view_content($data){
 
 	$result.='</div>';
 	return $result;
+}
+function view_subcontent($data){
+	$level=$data['level'];
+	if($level>5){
+		$level=5;
+	}
+	if(!isset($data['parent'])){
+		$data['parent']=0;
+	}
+	$data['body']=stripcslashes($data['body']);
+	$author_login=get_user_login($data['author']);
+	$author_nickname=mongo_find_attr('users','nickname',['_id'=>(int)$data['author']]);
+	if(!$author_nickname){
+		$author_nickname='@'.$author_login;
+	}
+	$author_avatar=mongo_find_attr('users','avatar',['_id'=>(int)$data['author']]);
+	$ret.='<div class="comment" id="'.$author_login.'/'.htmlspecialchars($data['permlink']).'" data-level="'.$level.'" data-id="'.$data['_id'].'" data-parent="'.$data['parent'].'">
+		<div class="info">
+			<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a></div>
+			<div class="anchor"><a href="#'.$author_login.'/'.htmlspecialchars($data['permlink']).'">#</a></div>
+			<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
+		</div>
+		<div class="text">
+			'.text_to_view($data['body']).'
+		</div>
+		<div class="addon">
+			<a class="reply reply-action comment-reply">Ответ <i class="far fa-fw fa-comment-dots"></i></a>
+			<a class="award">Наградить <i class="fas fa-fw fa-angle-up"></i></a>
+		</div>
+	</div>';
+	return $ret;
 }
 
 $auth=false;

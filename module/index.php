@@ -54,19 +54,15 @@ if('@'==mb_substr($path_array[1],0,1)){
 <div class="actions"><div class="reply reply-action post-reply unselectable">Оставить комментарий</div></div>
 <div class="subtitle">Комментарии</div>
 <hr>';
-
-			$comment_tree=new comments_tree();
-			$replies=$api->execute_method('get_all_content_replies',array($author,$data['permlink'],-1));
-			$comment_arr=array();
-			$i=1;
-			foreach($replies as $reply){
-				$comment_arr[$i]=new comments_tree($reply);
-				$comment_tree->add($comment_arr[$i],true);
-				$i++;
-			}
-			$buf.=$comment_tree->tree();
-			$buf.='</div>';
 			print $buf;
+
+			$find=array('content'=>(int)$data['_id']);
+			$sort=array('sort'=>1);
+			$rows=$mongo->executeQuery($config['db_prefix'].'.subcontent',new MongoDB\Driver\Query($find));
+			$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+			foreach($rows as $row){
+				print view_subcontent($row);
+			}
 		}
 	}
 	else{

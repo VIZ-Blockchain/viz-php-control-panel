@@ -238,6 +238,7 @@ class viz_plugin_content extends viz_plugin{
 				'body'=>mongo_prepare($data['body']),
 				'curation_percent'=>(int)$data['curation_percent'],
 				'status'=>$user_status,
+				'parent'=>$parent_subcontent,
 				'level'=>$level,
 				'sort'=>$sort,
 				'parse_time'=>(int)time()
