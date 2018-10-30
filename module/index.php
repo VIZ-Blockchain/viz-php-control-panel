@@ -676,6 +676,7 @@ if('mongo'==$path_array[1] && $admin){
 }
 else
 if('tags'==$path_array[1]){
+	$replace['title']='Тэги - '.$replace['title'];
 	if(''==$path_array[2]){
 		print '<div class="page content">
 	<h1>Популярные тэги</h1>
@@ -699,6 +700,7 @@ if('tags'==$path_array[1]){
 		$tag=urldecode($path_array[2]);
 		$tag_id=get_tag_id($tag);
 		if($tag_id){
+			$replace['title']=htmlspecialchars($tag).' - '.$replace['title'];
 			print '<div class="page content">
 			<a class="right" href="/tags/">&larr; Вернуться</a>
 			<h1>Тэг: #'.$tag.'</h1>
