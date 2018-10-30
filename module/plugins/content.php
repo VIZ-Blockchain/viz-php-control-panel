@@ -57,7 +57,7 @@ class viz_plugin_content extends viz_plugin{
 		if($find_content){
 			$data=array('status'=>1,'delete_time'=>(int)$info['unixtime']);
 			$bulk=new MongoDB\Driver\BulkWrite;
-			$bulk->update(['_id'=>(int)$find_subcontent],['$set'=>$data]);
+			$bulk->update(['_id'=>(int)$find_content],['$set'=>$data]);
 			$this->mongo->executeBulkWrite($config['db_prefix'].'.content',$bulk);
 		}
 		else{
