@@ -58,7 +58,7 @@ class comments_tree{
 			</div>
 			<div class="addon">
 				<a class="reply reply-action comment-reply">Ответ <i class="far fa-fw fa-comment-dots"></i></a>
-				<a class="award">Наградить <i class="fas fa-fw fa-angle-up"></i></a>
+				<!--<a class="award">Наградить <i class="fas fa-fw fa-angle-up"></i></a>-->
 			</div>
 		</div>';
 		return $ret;
