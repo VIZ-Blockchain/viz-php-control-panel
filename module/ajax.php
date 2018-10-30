@@ -18,6 +18,21 @@ if(in_array('content',$config['plugins'])){
 			print '{"status":"none"}';
 		}
 	}
+	if('load_new_comments'==$path_array[2]){
+		header('HTTP/1.1 200 Ok');
+		if($auth){
+			$content_id=(int)$_POST['content_id'];
+			$last_id=(int)$_POST['last_id'];
+
+			$find=array('content'=>(int)$content_id,'_id'=>['$gt'=>(int)$last_id]);
+			$sort=array('sort'=>1);
+			$rows=$mongo->executeQuery($config['db_prefix'].'.subcontent',new MongoDB\Driver\Query($find));
+			$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+			foreach($rows as $row){
+				print view_subcontent($row).PHP_EOL;
+			}
+		}
+	}
 }
 if(in_array('session',$config['plugins'])){
 	if('create_session'==$path_array[2]){

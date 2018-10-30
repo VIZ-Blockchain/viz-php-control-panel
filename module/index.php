@@ -49,12 +49,11 @@ if('@'==mb_substr($path_array[1],0,1)){
 			$replace['title']=htmlspecialchars($data['title']).' - '.$replace['title'];
 
 			print view_content($data);
-			$buf='';
-			$buf.='<div class="page comments" id="comments">
+
+			print '<div class="page comments" id="comments">
 <div class="actions"><div class="reply reply-action post-reply unselectable">Оставить комментарий</div></div>
 <div class="subtitle">Комментарии</div>
 <hr>';
-			print $buf;
 
 			$find=array('content'=>(int)$data['_id']);
 			$sort=array('sort'=>1);
@@ -63,6 +62,8 @@ if('@'==mb_substr($path_array[1],0,1)){
 			foreach($rows as $row){
 				print view_subcontent($row);
 			}
+			print '</div>';
+			print '<div class="new-comments"></div>';
 		}
 	}
 	else{

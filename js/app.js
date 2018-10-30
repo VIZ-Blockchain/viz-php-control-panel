@@ -12,7 +12,9 @@ var wysiwyg_active=false;
 gate.config.set('websocket',api_gate);
 gate.api.stop();
 
-wait_session_timer=0;
+var wait_session_timer=0;
+var update_comments_list_timer=0;
+var update_comments_list_timeout=3500;
 
 function del_notify(id){
 	$('.notify-list .notify[rel="'+id+'"]').remove();
@@ -27,7 +29,97 @@ function add_notify(html,dark=false,fade_time=10000){
 	$('.notify-list').append(element_html);
 	window.setTimeout('fade_notify('+notify_id+')',fade_time);
 }
-
+function set_update_comments_list(update=true){
+	if(update){
+		update_comments_list_timeout=3500;
+		window.clearTimeout(update_comments_list_timer);
+		update_comments_list_timer=window.setTimeout(function(){update_comments_list();},update_comments_list_timeout);
+	}
+	else{
+		window.clearTimeout(update_comments_list_timer);
+	}
+}
+function update_comments_list(){
+	var content_id=$('.page.content').attr('data-content-id');
+	var newest_comment_id=0;
+	$('.comments .comment').each(function(){
+		var comment_id=parseInt($(this).attr('data-id'))
+		if(newest_comment_id<comment_id){
+			newest_comment_id=comment_id;
+		}
+	});
+	$.ajax({
+		type:'POST',
+		url:'/ajax/load_new_comments/',
+		data:{'content_id':content_id,'last_id':newest_comment_id},
+		success:function(data_html){
+			if(''!=data_html){
+				$('.new-comments').css('display','none');
+				$('.new-comments').html(data_html);
+				window.setTimeout(function(){set_update_comments_list(false);},100);
+				sort_new_comments_list();
+			}
+		},
+	});
+	window.clearTimeout(update_comments_list_timer);
+	update_comments_list_timer=window.setTimeout(function(){update_comments_list();},update_comments_list_timeout);
+	update_comments_list_timeout+=500;
+	if(update_comments_list_timeout>20000){
+		update_comments_list_timeout=20000;
+	}
+}
+function sort_comment_find_next(id){
+	var comment_level=$('.page.comments .comment[data-id='+id+']').attr('data-level');
+	var current_id=0;
+	var current_level=0;
+	var find=0;
+	$('.page.comments .comment[data-id='+id+']').nextAll('.comment').each(function(){
+		if(0==find){
+			current_id=$(this).attr('data-id');
+			current_level=$(this).attr('data-level');
+			if(current_level<=comment_level){
+				find=parseInt(current_id);
+			}
+		}
+	});
+	return find;
+}
+function sort_new_comments_list(){
+	$('.new-comments .comment').each(function(){
+		var comment_id=parseInt($(this).attr('data-id'));
+		$(this).addClass('new');
+		if(0==$('.page.comments .comment[data-id='+comment_id+']').length){
+			var parent_id=parseInt($(this).attr('data-parent'));
+			if(0!=parent_id){
+				var parent_comment_next=sort_comment_find_next(parent_id);
+				if(0!=parent_comment_next){
+					$('.comment[data-id='+parent_comment_next+']')[0].outerHTML=$(this)[0].outerHTML+$('.comment[data-id='+parent_comment_next+']')[0].outerHTML;
+				}
+				else{
+					var last_comment_id=parseInt($('.comments .comment').last().attr('data-id'));
+					if(last_comment_id){
+						$('.comment[data-id='+last_comment_id+']')[0].outerHTML=$('.comment[data-id='+last_comment_id+']')[0].outerHTML+$(this)[0].outerHTML;
+					}
+					else{
+						$('.page.comments').append($(this)[0].outerHTML);
+					}
+				}
+			}
+			else{
+				var last_comment_id=parseInt($('.comments .comment').last().attr('data-id'));
+				if(last_comment_id){
+					$('.comment[data-id='+last_comment_id+']')[0].outerHTML=$('.comment[data-id='+last_comment_id+']')[0].outerHTML+$(this)[0].outerHTML;
+				}
+				else{
+					$('.page.comments').append($(this)[0].outerHTML);
+				}
+			}
+		}
+	});
+	$('.new-comments').html('');
+	$('.page .content .addon .comments span').html($('.comments .comment').length);
+	update_datetime();
+}
 function wait_session(){
 	if(typeof users[current_user].session_verify == 'undefined'){
 		session_generate();
@@ -2011,16 +2103,16 @@ function app_mouse(e){
 				proper_target=$(target).parent();
 			}
 			//if(1==user.verify){
-				//window.clearTimeout(update_comments_list_timer);
-				var post_id=0;
+				window.clearTimeout(update_comments_list_timer);
+				var content_id=0;
 				var comment_id=0;
 				if(proper_target.hasClass('post-reply')){
-					post_id=1;//parseInt(proper_target.attr('data-post-id'));
+					content_id=1;//parseInt(proper_target.attr('data-post-id'));
 				}
 				if(proper_target.hasClass('comment-reply')){
 					comment_id=1;//parseInt(proper_target.attr('data-comment-id'));
 				}
-				var comment_form='<div class="reply-form" data-reply-post="'+post_id+'" data-reply-comment="'+comment_id+'"><textarea name="reply-text" placeholder="Введите ваш ответ..."></textarea><input type="button" class="reply-execute" value="Ответить"></div>'
+				var comment_form='<div class="reply-form" data-reply-post="'+content_id+'" data-reply-comment="'+comment_id+'"><textarea name="reply-text" placeholder="Введите ваш ответ..."></textarea><input type="button" class="reply-execute" value="Ответить"></div>'
 				if(comment_id){
 					if(0==$('.reply-form[data-reply-comment='+comment_id+']').length){
 						proper_target.closest('.addon').after(comment_form);
@@ -2030,13 +2122,13 @@ function app_mouse(e){
 						$('.reply-form[data-reply-comment='+comment_id+']').remove();
 					}
 				}
-				if(post_id){
-					if(0==$('.reply-form[data-reply-post='+post_id+']').length){
+				if(content_id){
+					if(0==$('.reply-form[data-reply-post='+content_id+']').length){
 						proper_target.closest('.comments').find('.subtitle').after(comment_form);
 						proper_target.closest('.comments').find('.reply-form textarea[name=reply-text]').focus();
 					}
 					else{
-						$('.reply-form[data-reply-post='+post_id+']').remove();
+						$('.reply-form[data-reply-post='+content_id+']').remove();
 					}
 				}
 			//}
