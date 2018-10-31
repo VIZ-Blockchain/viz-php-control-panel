@@ -128,7 +128,8 @@ while($work){
 	if($content_id){
 		$content_arr=mongo_find('content',array('_id'=>(int)$content_id));
 		if($content_arr){
-			$content_info=$api->execute_method('get_content',array($content_arr['login'],$content_arr['permlink']));
+			$author_login=get_user_login($content_arr['author']);
+			$content_info=$api->execute_method('get_content',array($author_login,$content_arr['permlink']));
 			if($content_info['permlink']==$content_arr['permlink']){
 				$date=date_parse_from_format('Y-m-d\TH:i:s',$content_info['cashout_time']);
 				$cashout_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
@@ -155,7 +156,8 @@ while($work){
 	if($subcontent_id){
 		$content_arr=mongo_find('content',array('_id'=>(int)$subcontent_id));
 		if($content_arr){
-			$content_info=$api->execute_method('get_content',array($content_arr['login'],$content_arr['permlink']));
+			$author_login=get_user_login($content_arr['author']);
+			$content_info=$api->execute_method('get_content',array($author_login,$content_arr['permlink']));
 			if($content_info['permlink']==$content_arr['permlink']){
 				$date=date_parse_from_format('Y-m-d\TH:i:s',$content_info['cashout_time']);
 				$cashout_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
