@@ -212,7 +212,7 @@ a.icon{
 	opacity:1;
 }
 .menu .menu-list{
-	padding:32px 16px;
+	padding:16px;
 	max-height:100%;
 	overflow-y:auto;
 }
@@ -1249,4 +1249,23 @@ html.modal-open{
 }
 .modal-overlay.active, .modal.active{
 	display:block;
+}
+
+.menu a.avatar{
+	display:inline-block;
+	margin: 0 auto;
+	position: relative;
+	display: block;
+
+	width: 120px;
+	height: 120px;
+	border-radius: 60px;
+	border: 0px solid #fff;
+	overflow: hidden;
+	box-sizing: unset;
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,0.3);
+	background-image:url('/default-avatar.png');
+	background-color: #fff;
+	background-position: 50% 50%;
+	background-size: cover;
 }

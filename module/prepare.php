@@ -1245,6 +1245,9 @@ if(isset($_COOKIE['session_id'])){
 		$user_arr=get_user_by_id($session_arr['user']);
 		if($user_arr['login']){
 			$auth=true;
+			if($user_arr['avatar']){
+				$replace['menu'].='<a href="/@'.$user_arr['login'].'/" class="avatar"'.($user_arr['avatar']?' style="background-image:url(https://i.goldvoice.club/0x0/'.htmlspecialchars($user_arr['avatar']).');"':'').' title="Перейти в свой аккаунт"></a><hr>';
+			}
 			$redis->zadd('users_action_time',time(),$user_arr['login']);
 			$redis->hset('session:'.$session_arr['id'],'action_time',time());
 			$redis->zadd('session_action_time',time(),$session_arr['id']);
