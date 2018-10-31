@@ -73,8 +73,8 @@
 		<div class="menu-el inactive"><i class="fas fa-fw fa-cogs"></i><a href="#/settings/">Настройки</a></div>
 	</div>
 </div>
-<div class="go-top-left-wrapper"><div class="go-top-button"><i class="fa fa-fw fa-chevron-up" aria-hidden="true"></i></div></div>
 <div class="main">
+<div class="go-top-left-wrapper"><div class="go-top-button"><i class="fa fa-fw fa-chevron-up" aria-hidden="true"></i></div></div>
 {pages}
 </div>
 <div class="notify-list"></div>

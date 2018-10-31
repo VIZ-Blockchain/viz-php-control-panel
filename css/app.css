@@ -1297,3 +1297,11 @@ html.modal-open{
 .go-top-left-wrapper:hover .go-top-button{
 	background:rgba(77, 110, 152, 0.08);
 }
+.main.menu-expand .go-top-left-wrapper{
+	left:256px;
+	width: calc((100% - 732px - 100px - 256px)/2);
+}
+.main.menu-expand .go-top-button{
+	width: calc((100% - 732px - 100px - 256px)/4);
+	left:256px;
+}
