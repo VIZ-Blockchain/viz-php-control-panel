@@ -9,9 +9,8 @@ if(in_array('content',$config['plugins'])){
 
 			$find=array('_id'=>['$lt'=>$last_id],'status'=>0,'parent'=>['$exists'=>false]);
 			$perpage=30;
-			$offset=0;
 			$sort=array('_id'=>-1);
-			$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query($find,['sort'=>$sort,'limit'=>(int)$perpage,'skip'=>(int)$offset]));
+			$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query($find,['sort'=>$sort,'limit'=>(int)$perpage]));
 			$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 			foreach($rows as $row){
 				print preview_content($row);
