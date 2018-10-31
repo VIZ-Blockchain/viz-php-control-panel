@@ -63,6 +63,28 @@ if(in_array('content',$config['plugins'])){
 			}
 			sleep(1);
 		}
+		if('user-content'==$action){
+			$last_id=(int)$_POST['last_id'];
+			$user_id=$user_arr['_id'];
+			if(isset($_POST['user'])){
+				$user_id=get_user_id($_POST['user']);
+			}
+			$count=0;
+
+			$find=array('_id'=>['$lt'=>$last_id],'author'=>(int)$user_id,'status'=>0);
+			$perpage=30;
+			$sort=array('_id'=>-1);
+			$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query($find,['sort'=>$sort,'limit'=>(int)$perpage]));
+			$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+			foreach($rows as $row){
+				print preview_content($row);
+				$count++;
+			}
+			if(0==$count){
+				print 'none';
+			}
+			sleep(1);
+		}
 	}
 	if('check_content'==$path_array[2]){
 		$author_login=$_POST['author'];

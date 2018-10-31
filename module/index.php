@@ -128,7 +128,7 @@ if('@'==mb_substr($path_array[1],0,1)){
 			<h2>Контент пользователя</h2>
 			</div>';
 			$find=array('author'=>(int)get_user_id($account_login),'status'=>0);
-			$perpage=100;
+			$perpage=50;
 			$offset=0;
 			$sort=array('_id'=>-1);
 			$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query($find,['sort'=>$sort,'limit'=>(int)$perpage,'skip'=>(int)$offset]));
@@ -136,6 +136,7 @@ if('@'==mb_substr($path_array[1],0,1)){
 			foreach($rows as $row){
 				print preview_content($row);
 			}
+			print '<div class="page content load-more" data-action="user-content" data-user-login="'.$account_login.'"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> Загрузка&hellip;</div></div>';
 		}
 	}
 }
