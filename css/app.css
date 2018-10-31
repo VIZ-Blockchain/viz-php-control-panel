@@ -814,6 +814,10 @@ label input[type=checkbox]{
 	margin-bottom:4px;
 	margin-left:4px;
 }
+.page.comments .comment .addon .award.active{
+	color:#396ac5 !important;
+	background:none !important;
+}
 .page.comments .comment{
 	margin-left: 0;
 	margin-bottom: 12px;

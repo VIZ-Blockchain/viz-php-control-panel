@@ -1175,6 +1175,7 @@ function view_content($data){
 	return $result;
 }
 function view_subcontent($data){
+	global $auth,$user_arr;
 	$level=$data['level'];
 	if($level>5){
 		$level=5;
@@ -1190,6 +1191,14 @@ function view_subcontent($data){
 		$author_nickname='@'.$author_login;
 	}
 	$author_avatar=mongo_find_attr('users','avatar',['_id'=>(int)$data['author']]);
+
+	$upvote=false;
+	if($auth){
+		$vote_weight=mongo_find_attr('subcontent_votes','weight',['parent'=>(int)$data['_id'],'user'=>(int)$user_arr['_id']]);
+		if($vote_weight>0){
+			$upvote=true;
+		}
+	}
 	$ret.='<div class="comment" id="'.$author_login.'/'.htmlspecialchars($data['permlink']).'" data-author="'.$author_login.'" data-permlink="'.htmlspecialchars($data['permlink']).'" data-level="'.$level.'" data-id="'.$data['_id'].'" data-parent="'.$data['parent'].'" data-sort="'.$data['sort'].'">
 		<div class="info">
 			<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a></div>
@@ -1201,7 +1210,7 @@ function view_subcontent($data){
 		</div>
 		<div class="addon">
 			<a class="reply reply-action subcontent-reply unselectable">Ответ <i class="far fa-fw fa-comment-dots"></i></a>
-			<!--<a class="award">Наградить <i class="fas fa-fw fa-angle-up"></i></a>-->
+			<a class="award award-subcontent-action'.($upvote?' active':'').'">Наградить <i class="fas fa-fw fa-angle-up"></i></a>
 		</div>
 	</div>';
 	return $ret;

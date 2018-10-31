@@ -695,6 +695,39 @@ function witness_chain_properties_update(witness_login,url,signing_key){
 		});
 	}
 }
+function unvote_subcontent(author,permlink,target){
+	gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,0,function(err,result){
+		if(!err){
+			target.find('.flag-subcontent-action').removeClass('active').attr('title','');
+			target.find('.award-subcontent-action').removeClass('active').attr('title','');
+			add_notify('Вы успешно сняли голос');
+			view_energy();
+		}
+		else{
+			add_notify('Ошибка',true);
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+	});
+}
+function upvote_subcontent(author,permlink,target){
+	let weight=10000/10;
+	if($('.header-menu-el.energy').hasClass('powerup')){
+		weight=10000;
+		$('.header-menu-el.energy').removeClass('powerup');
+	}
+	gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,weight,function(err,result){
+		if(!err){
+			target.find('.flag-subcontent-action').removeClass('active').attr('title','');
+			target.find('.award-subcontent-action').addClass('active').attr('title','Вы проголосовали с силой '+(weight/100)+'%');
+			add_notify('Вы успешно проголосовали');
+			view_energy();
+		}
+		else{
+			add_notify('Ошибка',true);
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+	});
+}
 function unvote_content(author,permlink,target){
 	gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,0,function(err,result){
 		if(!err){
@@ -1915,6 +1948,18 @@ function app_mouse(e){
 			}
 			else{
 				upvote_content(proper_target.attr('data-content-author'),proper_target.attr('data-content-permlink'),proper_target);
+			}
+		}
+	}
+	if($(target).hasClass('award-subcontent-action')){
+		e.preventDefault();
+		proper_target=$(target).closest('.comment');
+		if(typeof proper_target.attr('data-author') !== 'undefined'){
+			if($(target).hasClass('active')){
+				unvote_subcontent(proper_target.attr('data-author'),proper_target.attr('data-permlink'),proper_target);
+			}
+			else{
+				upvote_subcontent(proper_target.attr('data-author'),proper_target.attr('data-permlink'),proper_target);
 			}
 		}
 	}
