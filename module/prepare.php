@@ -995,6 +995,7 @@ function preview_content($data){
 	$repost=false;
 	if($data['parent']){
 		$repost=true;
+		$repost_id=$data['_id'];
 		$repost_user=get_user_login($data['author']);
 		$repost_time=$data['time'];
 		$repost_comment=false;
@@ -1017,7 +1018,7 @@ function preview_content($data){
 	if(!$author_nickname){
 		$author_nickname='@'.$author_login;
 	}
-	$result.='<div class="page preview" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'">';
+	$result.='<div class="page preview" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'"'.($repost?' data-repost-id="'.$repost_id.'"':'').'>';
 
 	if($repost){
 		$result.='<div class="repost-info"><div class="repost-date timestamp" data-timestamp="'.$repost_time.'">'.date('d.m.Y H:i',$repost_time).'</div><i class="fas fa-fw fa-retweet"></i> <span>Репост от</span> @'.$repost_user.''.($repost_comment?'<div class="repost-comment">'.htmlspecialchars($repost_comment).'</div>':'').'</div>';
