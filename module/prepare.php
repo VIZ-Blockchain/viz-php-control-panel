@@ -157,7 +157,7 @@ function get_user_login($id){
 }
 function get_content_by_id($id){
 	global $mongo,$config;
-	$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query(['_id'=>(int)$id],['limit'=>1]));
+	$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query(['_id'=>(int)$id,'status'=>0],['limit'=>1]));
 	$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 	foreach($rows as $row){
 		return $row;
@@ -166,7 +166,7 @@ function get_content_by_id($id){
 }
 function get_content($author,$permlink){
 	global $mongo,$config;
-	$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query(['author'=>(int)$author,'permlink'=>mongo_prepare($permlink)],['limit'=>1]));
+	$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query(['author'=>(int)$author,'permlink'=>mongo_prepare($permlink),'status'=>0],['limit'=>1]));
 	$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 	foreach($rows as $row){
 		return $row;

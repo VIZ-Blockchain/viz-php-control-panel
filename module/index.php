@@ -95,19 +95,21 @@ if('@'==mb_substr($path_array[1],0,1)){
 			print '<div class="page user-badge clearfix">
 			<a href="/@'.$account_login.'/" class="avatar" style="background-image:url(\''.$account_avatar.'\')"></a>';
 			if($auth){
-				print '
-				<div class="actions" data-user-login="'.$account_login.'">';
-				$link=get_user_link($user_arr['_id'],$account_id);
-				if(false===$link){
-					print '<div class="follow follow-action">Подписаться</div><br><div class="ignore ignore-action">Игнорировать</div>';
+				if($user_arr['_id']!=$account_id){
+					print '
+					<div class="actions" data-user-login="'.$account_login.'">';
+					$link=get_user_link($user_arr['_id'],$account_id);
+					if(false===$link){
+						print '<div class="follow follow-action">Подписаться</div><br><div class="ignore ignore-action">Игнорировать</div>';
+					}
+					if(1==$link){
+						print '<div class="unfollow unfollow-action">Отписаться</div>';
+					}
+					if(2==$link){
+						print '<div class="unfollow unfollow-action">Перестать игнорировать</div>';
+					}
+					print '</div>';
 				}
-				if(1==$link){
-					print '<div class="unfollow unfollow-action">Отписаться</div>';
-				}
-				if(2==$link){
-					print '<div class="unfollow unfollow-action">Перестать игнорировать</div>';
-				}
-				print '</div>';
 			}
 			print '
 			<div class="info">
@@ -125,7 +127,7 @@ if('@'==mb_substr($path_array[1],0,1)){
 			print '<div class="page content">
 			<h2>Контент пользователя</h2>
 			</div>';
-			$find=array('author'=>(int)get_user_id($account_login));
+			$find=array('author'=>(int)get_user_id($account_login),'status'=>0);
 			$perpage=100;
 			$offset=0;
 			$sort=array('_id'=>-1);
@@ -734,7 +736,7 @@ if('feed'==$path_array[1]){
 	}
 }
 if(''==$path_array[1]){
-	$find=array();
+	$find=array('status'=>0,'parent'=>['$exists'=>false]);
 	$perpage=100;
 	$offset=0;
 	$sort=array('_id'=>-1);

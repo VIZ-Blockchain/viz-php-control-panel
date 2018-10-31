@@ -24,7 +24,11 @@ class viz_plugin_content extends viz_plugin{
 								$find_content=mongo_find_id('content',array('author'=>(int)$author_id,'permlink'=>mongo_prepare($permlink)));
 								if($find_content){
 									$reblog_id=mongo_counter('content',true);
-									$data_arr=array('_id'=>(int)$reblog_id,'parent'=>(int)$find_content,'author'=>(int)$user_id,'time'=>(int)$info['unixtime']);
+									$user_status=mongo_find_attr('users','status',array('_id'=>(int)$user_id));
+									if(!$user_status){
+										$user_status=0;
+									}
+									$data_arr=array('_id'=>(int)$reblog_id,'parent'=>(int)$find_content,'author'=>(int)$user_id,'time'=>(int)$info['unixtime'],'status'=>$user_status);
 									if(isset($custom_data['comment'])){
 										$data_arr['comment']=mongo_prepare($custom_data['comment']);
 									}
