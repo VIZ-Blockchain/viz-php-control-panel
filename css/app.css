@@ -1269,7 +1269,7 @@ html.modal-open{
 }
 
 .go-top-left-wrapper{
-	width: calc((100% - 968px)/2);
+	width: calc((100% - 732px - 100px)/2);
 	z-index: 5;
 	left: 0;
 	position: fixed;
@@ -1279,7 +1279,7 @@ html.modal-open{
 }
 .go-top-button{
 	display:none;
-	width: calc((100% - 968px)/4);
+	width: calc((100% - 732px - 100px)/4);
 	z-index: 5;
 	left: 0;
 	position: fixed;
@@ -1287,7 +1287,7 @@ html.modal-open{
 	bottom: 0;
 	text-align: center;
 	font-size: 40px;
-	color: rgba(79, 77, 152, 0.5);
+	color: rgba(77, 110, 152, 0.5);
 }
 .go-top-button i{
 	position:fixed;
@@ -1295,5 +1295,5 @@ html.modal-open{
 	margin-left:-25px;
 }
 .go-top-left-wrapper:hover .go-top-button{
-	background:rgba(79, 77, 152, 0.08);
+	background:rgba(77, 110, 152, 0.08);
 }
