@@ -725,12 +725,16 @@ if('feed'==$path_array[1]){
 		print '</div>';
 	}
 	else{
-		$rows=redis_read_feed($user_arr['id']);
+		$perpage=30;
+		$rows=redis_read_feed($user_arr['_id'],0,$perpage);
 		if(0==count($rows)){
 			print '<p>У вас нет публикаций в ленте.</p>';
 		}
-		foreach($rows as $row){
-			print preview_content_by_id($row);
+		else{
+			foreach($rows as $row){
+				print preview_content_by_id($row);
+			}
+			print '<div class="page content load-more" data-action="feed-content" data-user-login="'.$user_arr['login'].'"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> Загрузка&hellip;</div></div>';
 		}
 		print '</div>';
 	}

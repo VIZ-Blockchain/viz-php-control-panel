@@ -22,6 +22,26 @@ if(in_array('content',$config['plugins'])){
 			}
 			sleep(1);
 		}
+		if('feed-content'==$action){
+			$last_id=(int)$_POST['last_id'];
+			$user_id=$user_arr['_id'];
+			if(isset($_POST['user'])){
+				$user_id=get_user_id($_POST['user']);
+			}
+			$count=0;
+
+			$perpage=30;
+			$feed_arr=redis_read_feed($user_id,$last_id,$perpage);
+			$rows=redis_read_feed($user_id,$last_id,$perpage);
+			foreach($rows as $row){
+				print preview_content_by_id($row);
+				$count++;
+			}
+			if(0==$count){
+				print 'none';
+			}
+			sleep(1);
+		}
 	}
 	if('check_content'==$path_array[2]){
 		$author_login=$_POST['author'];
