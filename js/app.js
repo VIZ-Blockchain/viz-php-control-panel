@@ -2266,6 +2266,45 @@ function check_load_more(){
 			$('.go-top-button i').removeClass('fa-chevron-down');
 		}
 	}
+	$('.load-more').each(function(){
+		var indicator=$(this);
+		if('1'!=indicator.attr('data-busy')){
+			var offset=indicator.offset();
+			if((scroll_top+window_height)>(offset.top-10)){
+				if('new-content'==indicator.attr('data-action')){
+					var content_list=indicator.parent();
+					indicator.attr('data-busy','1');
+					indicator.find('.fa-spinner').addClass('fa-spin');
+					var last_content_id=-1;
+					content_list.find('.page.preview').each(function(){
+						var find_content_id=parseInt($(this).attr('data-content-id'))
+						if(find_content_id<last_content_id){
+							last_content_id=find_content_id;
+						}
+						if(-1==last_content_id){
+							last_content_id=find_content_id;
+						}
+					});
+					$.ajax({
+						type:'POST',
+						url:'/ajax/load_more/',
+						data:{action:indicator.attr('data-action'),last_id:last_content_id},
+						success:function(data_html){
+							if('none'==data_html){
+								indicator.css('display','none');
+							}
+							else{
+								indicator.before(data_html);
+								update_datetime();
+								indicator.find('.fa-spinner').removeClass('fa-spin');
+								indicator.attr('data-busy','0');
+							}
+						}
+					});
+				}
+			}
+		}
+	});
 }
 $(document).ready(function(){
 	load_session();

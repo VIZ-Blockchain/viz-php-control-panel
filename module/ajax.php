@@ -1,6 +1,28 @@
 <?php
 header("Content-type:text/html; charset=UTF-8");
 if(in_array('content',$config['plugins'])){
+	if('load_more'==$path_array[2]){
+		$action=$_POST['action'];
+		if('new-content'==$action){
+			$last_id=(int)$_POST['last_id'];
+			$count=0;
+
+			$find=array('_id'=>['$lt'=>$last_id],'status'=>0,'parent'=>['$exists'=>false]);
+			$perpage=30;
+			$offset=0;
+			$sort=array('_id'=>-1);
+			$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query($find,['sort'=>$sort,'limit'=>(int)$perpage,'skip'=>(int)$offset]));
+			$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+			foreach($rows as $row){
+				print preview_content($row);
+				$count++;
+			}
+			if(0==$count){
+				print 'none';
+			}
+			sleep(1);
+		}
+	}
 	if('check_content'==$path_array[2]){
 		$author_login=$_POST['author'];
 		$author_id=get_user_id($author_login);

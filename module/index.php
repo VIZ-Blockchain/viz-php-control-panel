@@ -737,7 +737,7 @@ if('feed'==$path_array[1]){
 }
 if(''==$path_array[1]){
 	$find=array('status'=>0,'parent'=>['$exists'=>false]);
-	$perpage=100;
+	$perpage=50;
 	$offset=0;
 	$sort=array('_id'=>-1);
 	$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query($find,['sort'=>$sort,'limit'=>(int)$perpage,'skip'=>(int)$offset]));
@@ -745,6 +745,7 @@ if(''==$path_array[1]){
 	foreach($rows as $row){
 		print preview_content($row);
 	}
+	print '<div class="page content load-more" data-action="new-content"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> Загрузка&hellip;</div></div>';
 }
 $content=ob_get_contents();
 ob_end_clean();
