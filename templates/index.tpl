@@ -54,20 +54,20 @@
 <div class="menu">
 	<div class="menu-list">
 {menu}
-		<div class="menu-el"><i class="fas fa-fw fa-user-circle"></i><a href="/profile/">Профиль</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-user-cog"></i><a href="/accounts/">Аккаунты</a></div>
 		<div class="menu-el"><i class="fas fa-fw fa-wallet"></i><a href="/wallet/">Кошелек</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-user-circle"></i><a href="/profile/">Профиль</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-toolbox"></i><a href="/tools/">Инструменты</a></div>
 		<hr>
+		<div class="menu-el"><i class="fas fa-fw fa-home"></i><a href="/">Обзор сети</a></div>
 		<div class="menu-el"><i class="fas fa-fw fa-newspaper"></i><a href="/feed/">Лента контента</a></div>
 		<div class="menu-el"><i class="fas fa-fw fa-plus-circle"></i><a href="/publication/">Опубликовать контент</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-home"></i><a href="/">Обзор сети</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-bell"></i><a href="#/notifications/">Уведомления</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-users"></i><a href="#/users/">Пользователи</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-user-friends"></i><a href="#/social/">Социальные связи</a></div>
+		<hr>
 		<div class="menu-el"><i class="fas fa-fw fa-user-shield"></i><a href="/witnesses/">Делегаты</a></div>
 		<div class="menu-el"><i class="fas fa-fw fa-university"></i><a href="/committee/">Комитет</a></div>
-		<hr>
-		<div class="menu-el"><i class="fas fa-fw fa-user-cog"></i><a href="/accounts/">Аккаунты</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-toolbox"></i><a href="/tools/">Инструменты</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-book"></i><a href="#/documentation/">Документация</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-cloud"></i><a href="#/services/">Сервисы</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-cogs"></i><a href="#/settings/">Настройки</a></div>
