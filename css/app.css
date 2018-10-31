@@ -972,9 +972,7 @@ label input[type=checkbox]{
 	text-align: center;
 }
 
-a.load_more{
-	display:inline-block;
-	width:100%;
+.load-more{
 	text-align:center;
 	padding:12px;
 }
@@ -1268,4 +1266,34 @@ html.modal-open{
 	background-color: #fff;
 	background-position: 50% 50%;
 	background-size: cover;
+}
+
+.go-top-left-wrapper{
+	width: calc((100% - 968px)/2);
+	z-index: 5;
+	left: 0;
+	position: fixed;
+	top: 48px;
+	bottom: 0;
+	cursor:pointer;
+}
+.go-top-button{
+	display:none;
+	width: calc((100% - 968px)/4);
+	z-index: 5;
+	left: 0;
+	position: fixed;
+	top: 48px;
+	bottom: 0;
+	text-align: center;
+	font-size: 40px;
+	color: rgba(79, 77, 152, 0.5);
+}
+.go-top-button i{
+	position:fixed;
+	top: calc(50% - 20px);
+	margin-left:-25px;
+}
+.go-top-left-wrapper:hover .go-top-button{
+	background:rgba(79, 77, 152, 0.08);
 }
