@@ -705,7 +705,7 @@ if('tags'==$path_array[1]){
 			<h1>Тэг: #'.$tag.'</h1>
 			</div>';
 			$find=array('tag'=>(int)$tag_id);
-			$perpage=100;
+			$perpage=50;
 			$offset=0;
 			$sort=array('_id'=>-1);
 			$rows=$mongo->executeQuery($config['db_prefix'].'.content_tags',new MongoDB\Driver\Query($find,['sort'=>$sort,'limit'=>(int)$perpage,'skip'=>(int)$offset]));
@@ -713,6 +713,7 @@ if('tags'==$path_array[1]){
 			foreach($rows as $row){
 				print preview_content_by_id($row['content']);
 			}
+			print '<div class="page content load-more" data-action="tag-content" data-tag="'.htmlspecialchars($tag).'"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> Загрузка&hellip;</div></div>';
 		}
 	}
 }

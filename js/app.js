@@ -2333,6 +2333,34 @@ function check_load_more(){
 						}
 					});
 				}
+				if('tag-content'==indicator.attr('data-action')){
+					var content_list=indicator.parent();
+					indicator.attr('data-busy','1');
+					indicator.find('.fa-spinner').addClass('fa-spin');
+					var last_content_id=99999999999;
+					content_list.find('.page.preview').each(function(){
+						var find_content_id=parseInt($(this).attr('data-content-id'));
+						if(find_content_id<last_content_id){
+							last_content_id=find_content_id;
+						}
+					});
+					$.ajax({
+						type:'POST',
+						url:'/ajax/load_more/',
+						data:{action:indicator.attr('data-action'),tag:indicator.attr('data-tag'),last_id:last_content_id},
+						success:function(data_html){
+							if('none'==data_html){
+								indicator.css('display','none');
+							}
+							else{
+								indicator.before(data_html);
+								update_datetime();
+								indicator.find('.fa-spinner').removeClass('fa-spin');
+								indicator.attr('data-busy','0');
+							}
+						}
+					});
+				}
 			}
 		}
 	});

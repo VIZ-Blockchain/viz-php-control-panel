@@ -42,6 +42,28 @@ if(in_array('content',$config['plugins'])){
 			}
 			sleep(1);
 		}
+		if('tag-content'==$action){
+			$last_id=(int)$_POST['last_id'];
+			$tag=mongo_prepare($_POST['tag']);
+			$tag_id=get_tag_id($tag);
+			$count=0;
+
+			if($tag_id){
+				$find=array('content'=>['$lt'=>$last_id],'tag'=>(int)$tag_id);
+				$perpage=30;
+				$sort=array('_id'=>-1);
+				$rows=$mongo->executeQuery($config['db_prefix'].'.content_tags',new MongoDB\Driver\Query($find,['sort'=>$sort,'limit'=>(int)$perpage]));
+				$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+				foreach($rows as $row){
+					print preview_content_by_id($row['content']);
+					$count++;
+				}
+			}
+			if(0==$count){
+				print 'none';
+			}
+			sleep(1);
+		}
 	}
 	if('check_content'==$path_array[2]){
 		$author_login=$_POST['author'];
