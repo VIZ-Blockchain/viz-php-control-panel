@@ -1163,11 +1163,27 @@ function view_content($data){
 			$flag=true;
 		}
 	}
+	$reward_amount='';
+	if($votes_count){
+		if(0==$data['last_payout']){
+			if($data['total_pending_payout_value']){
+				$reward_amount='~'.$data['total_pending_payout_value'];
+			}
+		}
+		else{
+			$reward_amount=$data['payout_value'].' + '.$data['shares_payout_value'];
+		}
+	}
 	$result.='<hr>
 	<div class="addon">
 		<div class="right"><div class="comments"><span>'.$comments_count.'</span><a href="#comments" class="icon"><i class="far fa-comment"></i></a></div></div>
 		<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы проголосовали с силой '.($vote_weight/100).'%"':'').'></a>
-		<div class="votes_count"><span>'.$votes_count.'</span> голосов</div>
+		<div class="votes_count" title="'.($data['curation_percent']/100).'% кураторские"><span>'.$votes_count.'</span> голосов</div>';
+	if($reward_amount){
+		$result.='
+		<div class="reward_amount"><i class="far fa-fw fa-gem"></i> <span'.(-1!=$data['cashout_time']?' title="Выплата ожидается '.date('d.m.Y H:i:s',$data['cashout_time']).'"':'').'>'.$reward_amount.'</span></div>';
+	}
+	$result.='
 		<a class="flag'.($flag?' active':'').' flag-action"'.($flag?' title="Вы поставили флаг с силой '.($vote_weight/100).'%"':'').'></a>
 	</div>';
 

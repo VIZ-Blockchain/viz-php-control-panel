@@ -530,6 +530,14 @@ label input[type=checkbox]{
 	margin-left: 12px;
 	color: rgba(36, 36, 165, 0.8);
 }
+.page.content .addon .reward_amount{
+	display: inline-block;
+	line-height: 64px;
+	font-size: 14px;
+	vertical-align: top;
+	margin-left: 14px;
+	color: rgba(36, 36, 165, 0.6);
+}
 .page.content .addon .award, .page.content .addon .flag{
 	cursor:pointer;
 	color:#000;
