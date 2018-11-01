@@ -127,6 +127,7 @@ a:hover{
 }
 .header{
 	position:fixed;
+	top:0;
 	z-index:10;
 	width:100%;
 	height:64px;
@@ -203,9 +204,9 @@ a.icon{
 	display:none;
 	opacity:0;
 	-webkit-animation: fadeInFromNone 0.5s ease-out;
-    -moz-animation: fadeInFromNone 0.5s ease-out;
-    -o-animation: fadeInFromNone 0.5s ease-out;
-    animation: fadeInFromNone 0.5s ease-out;
+	-moz-animation: fadeInFromNone 0.5s ease-out;
+	-o-animation: fadeInFromNone 0.5s ease-out;
+	animation: fadeInFromNone 0.5s ease-out;
 }
 .menu.active{
 	display:block;
@@ -244,11 +245,11 @@ a.icon{
 	min-width:25px;
 }
 .header-menu-el.energy.powerup{
-    color:#f33;
+	color:#f33;
 }
 .header-menu-el.energy.powerup i:before {
-    content: "\f0e7" !important;
-    font-size:24px;
+	content: "\f0e7" !important;
+	font-size:24px;
 }
 
 .main{
@@ -406,6 +407,15 @@ label input[type=checkbox]{
 	font-style: normal;
 	font-size: 22px;
 	line-height: 28px;
+}
+.page h5{
+	margin:21px;
+	margin-bottom:6px;
+	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-weight: 700;
+	font-style: normal;
+	font-size: 20px;
+	line-height: 26px;
 }
 .page p{
 	word-wrap: break-word;
@@ -1304,4 +1314,174 @@ html.modal-open{
 .main.menu-expand .go-top-button{
 	width: calc((100% - 732px - 100px - 256px)/4);
 	left:256px;
+}
+
+
+/* tablet */
+@media only screen and (min-width:0) and (max-width:968px){
+	.main{
+		padding:32px;
+		padding-top:96px;
+	}
+	.header .header-menu-el{
+		padding:0 8px;
+		margin:0 8px;
+	}
+	.main.menu-expand{
+		padding-left:32px;
+	}
+	.menu{
+		-webkit-animation:none;
+		-moz-animation:none;
+		-o-animation:none;
+		animation:none;
+	}
+	.go-top-left-wrapper {
+		width: 120px;
+		z-index: 5;
+		left: 0;
+		position: fixed;
+		top: auto;
+		bottom: 0;
+		height: 8vh;
+	}
+	.go-top-button{
+		display: block;
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		bottom: 0;
+		top: 0;
+		background:rgba(77, 110, 152, 0.20);
+	}
+	.go-top-left-wrapper:hover .go-top-button{
+		background:rgba(77, 110, 152, 0.15);
+	}
+	.go-top-button i{
+		position: relative;
+		bottom: 4vh;
+		margin-left: 0;
+		margin-bottom: 0;
+		margin-top: 0;
+	}
+	.main.menu-expand .go-top-left-wrapper{
+		left:256px;
+		width:120px;
+	}
+	.main.menu-expand .go-top-button{
+		left:0;
+		width:100%;
+	}
+}
+
+/* mobile */
+@media only screen and (min-width:0) and (max-width:600px){
+	a.icon {
+	    padding:4px;
+	}
+	.main{
+		padding:16px;
+		padding-top:80px;
+	}
+	.main.menu-expand{
+		padding-left:16px;
+	}
+	.page h1{
+		font-size:22px;
+	}
+	.page h2{
+		font-size:20px;
+	}
+	.page h3{
+		font-size:18px;
+	}
+	.page h4{
+		font-size:16px;
+	}
+	.page h5{
+		font-size:14px;
+	}
+	.header-menu-el.energy.powerup i:before{
+		font-size:20px;
+	}
+	.page.content .addon{
+		line-height:48px;
+	}
+	.page.content .addon .award, .page.content .addon .flag{
+		height:48px;
+		width:48px;
+		border-radius:24px;
+	}
+	.page.content .addon .award::before{
+		line-height:44px;
+	}
+	.page.content .addon .flag{
+		margin-left:6px;
+	}
+	.page.content .addon .flag::before{
+		line-height:50px;
+	}
+	.page.content .addon .votes_count{
+		line-height:48px;
+		margin-left:6px;
+		font-size:12px;
+	}
+	.page.content .addon .reward_amount{
+		line-height:48px;
+		margin-left:6px;
+		font-size:12px;
+	}
+	.page.content .addon .comments{
+		font-size:12px;
+	}
+	.page.comments .subtitle{
+		font-size:20px;
+		line-height:24px;
+	}
+	.page.content .addon .comments .icon{
+		font-size:16px;
+		top:0;
+	}
+	.header{
+		width:100%;
+		height:48px;
+		line-height:48px;
+	}
+	.header .actions{
+		font-size:22px;
+		text-align:center;
+		width:48px;
+		display: inline-block;
+	}
+	.header .logo{
+		font-size:22px;
+		display: inline-block;
+	}
+	.header .header-menu-el{
+		height:48px;
+		line-height:48px;
+		padding:0;
+		padding-right:8px;
+		margin:0;
+		font-size:14px;
+	}
+	.header .header-menu-el.social-links{
+		display:none;
+	}
+	.menu{
+		height:calc(100% - 48px);
+		width:100%;
+		font-size:20px;
+	}
+	.main.menu-expand .go-top-left-wrapper{
+		left:0;
+	}
+}
+/* old mobile */
+@media only screen and (min-width:0) and (max-width:550px){
+
+}
+/* so old mobile */
+@media only screen and (min-width:0) and (max-width:375px){
+
 }
