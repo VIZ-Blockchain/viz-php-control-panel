@@ -1033,6 +1033,7 @@ function preview_content($data){
 	$result.='
 		<div class="article'.($cover?' cover-exist clearfix':'').'">';
 	if(isset($data['foreword'])){
+		$data['foreword']=stripcslashes($data['foreword']);
 		$result.=text_to_view($data['foreword'],false);
 	}
 	else{
