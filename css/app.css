@@ -1377,7 +1377,7 @@ html.modal-open{
 /* mobile */
 @media only screen and (min-width:0) and (max-width:600px){
 	a.icon {
-	    padding:4px;
+		padding:4px;
 	}
 	.main{
 		padding:16px;
@@ -1434,6 +1434,14 @@ html.modal-open{
 	.page.content .addon .comments{
 		font-size:12px;
 	}
+	.page.preview .subtitle{
+		font-size:20px;
+		line-height:24px;
+		width:auto;
+		white-space:normal;
+		overflow:auto;
+		text-overflow:inherit;
+	}
 	.page.comments .subtitle{
 		font-size:20px;
 		line-height:24px;
@@ -1476,6 +1484,35 @@ html.modal-open{
 	.main.menu-expand .go-top-left-wrapper{
 		left:0;
 	}
+	.page.preview .cover{
+		float:none;
+		max-width:100%;
+		width:auto;
+		max-height:200px;
+	}
+	.page.preview .cover-exist{
+		margin-left:0;
+	}
+	.page.preview .info .right{
+		float:none;
+		display:block;
+		margin-top:2px;
+	}
+	.page.preview .info .right .comments{
+		float:right;
+	}
+	.page.preview .info .right .comments::before{
+		content:"";
+		padding:0;
+	}
+	.page.preview .info .timestamp{
+		float:right;
+	}
+	.page.preview .info .timestamp::before{
+		content:"";
+		padding:0;
+	}
+
 }
 /* old mobile */
 @media only screen and (min-width:0) and (max-width:550px){
@@ -1483,5 +1520,7 @@ html.modal-open{
 }
 /* so old mobile */
 @media only screen and (min-width:0) and (max-width:375px){
-
+	.page.comments .actions{
+		margin-left:0;
+	}
 }
