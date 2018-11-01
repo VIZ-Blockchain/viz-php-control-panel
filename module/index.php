@@ -86,14 +86,14 @@ if('@'==mb_substr($path_array[1],0,1)){
 				$replace['title']='@'.$account_name.' - '.$replace['title'];
 			}
 			if($account_arr['avatar']){
-				$account_avatar=htmlspecialchars($account_arr['avatar']);
+				$account_avatar='https://i.goldvoice.club/64x64/'.htmlspecialchars($account_arr['avatar']);
 			}
 			if($account_arr['about']){
 				$account_about=htmlspecialchars(strip_tags(stripcslashes($account_arr['about'])));
 			}
 			$account_name=str_replace('@','',$account_name);
 			print '<div class="page user-badge clearfix">
-			<a href="/@'.$account_login.'/" class="avatar" style="background-image:url(\'https://i.goldvoice.club/64x64/'.$account_avatar.'\')"></a>';
+			<a href="/@'.$account_login.'/" class="avatar" style="background-image:url(\''.$account_avatar.'\')"></a>';
 			if($auth){
 				if($user_arr['_id']!=$account_id){
 					print '
