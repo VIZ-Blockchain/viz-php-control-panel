@@ -18,10 +18,10 @@ if('@'==mb_substr($path_array[1],0,1)){
 
 			$descr='';
 			if(isset($data['foreword'])){
-				$descr=mb_substr(strip_tags($data['foreword']),0,250).'...';
+				$descr=mb_substr(strip_tags(stripcslashes($data['foreword'])),0,250).'...';
 			}
 			else{
-				$descr=mb_substr(strip_tags($data['body']),0,250).'...';
+				$descr=mb_substr(strip_tags(stripcslashes($data['body'])),0,250).'...';
 			}
 			$replace['description']=htmlspecialchars(trim($descr," \r\n\t"));
 			$replace['description']=str_replace("\n",' ',$replace['description']);
@@ -89,11 +89,11 @@ if('@'==mb_substr($path_array[1],0,1)){
 				$account_avatar=htmlspecialchars($account_arr['avatar']);
 			}
 			if($account_arr['about']){
-				$account_about=htmlspecialchars(strip_tags($account_arr['about']));
+				$account_about=htmlspecialchars(strip_tags(stripcslashes($account_arr['about'])));
 			}
 			$account_name=str_replace('@','',$account_name);
 			print '<div class="page user-badge clearfix">
-			<a href="/@'.$account_login.'/" class="avatar" style="background-image:url(\''.$account_avatar.'\')"></a>';
+			<a href="/@'.$account_login.'/" class="avatar" style="background-image:url(\'https://i.goldvoice.club/64x64/'.$account_avatar.'\')"></a>';
 			if($auth){
 				if($user_arr['_id']!=$account_id){
 					print '
