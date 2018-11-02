@@ -1637,7 +1637,7 @@ function post_content(target){
 			parent_permlink=$('input[name=parent_permlink]').val();
 		}
 		$('input[name=permlink]').attr('disabled','disabled');
-		$(target).val('Отправка&hellip;');
+		$(target).html('Отправка&hellip;');
 		$.ajax({
 			type:'POST',
 			url:'/ajax/check_content/',
@@ -1646,17 +1646,37 @@ function post_content(target){
 				data_obj=JSON.parse(data_json);
 				if('ok'==data_obj.status){//content already exist
 					if(confirm('Контент с таким URL уже существует, вы хотите заменить его?')){
-						gate.broadcast.content(users[current_user].posting_key,'',parent_permlink,current_user,permlink,title,content,curation_percent,json,[],function(err,result){
+						gate.api.getContent(current_user,permlink,0,function(err, result){
 							if(!err){
-								add_notify('Публикация прошла успешно, переадресация&hellip;');
-								setTimeout(function(){wait_content(current_user,permlink)},3500);
+								let old_beneficiaries=result.beneficiaries;
+								let old_extensions=[];
+								if(0<old_beneficiaries.length){
+									let old_extensions=[[0,{'beneficiaries':old_beneficiaries}]];
+								}
+								let old_json=JSON.parse(result.json_metadata);
+								for(key in json_object){
+									old_json[key]=json_object[key];
+								}
+								let new_json=JSON.stringify(old_json);
+								gate.broadcast.content(users[current_user].posting_key,result.parent_author,result.parent_permlink,current_user,permlink,title,content,result.curation_percent,new_json,old_extensions,function(err,result){
+									if(!err){
+										add_notify('Публикация успешно изменена, переадресация через 6 секунд&hellip;');
+										setTimeout(function(){wait_content(current_user,permlink)},6000);
+									}
+									else{
+										console.log(err);
+										add_notify('Ошибка при  получении публикации',true);
+										$('input[name=permlink]').removeAttr('disabled');
+										target.removeClass('disabled');
+										target.html('Опубликовать');
+									}
+								});
 							}
 							else{
 								console.log(err);
-								add_notify('Ошибка при публикации',true);
-								$('input[name=permlink]').removeAttr('disabled');
+								add_notify('Не получается запросить публикацию с публичной ноды',true);
 								target.removeClass('disabled');
-								target.removeClass('Опубликовать');
+								target.html('Сохранить изменения');
 							}
 						});
 					}
@@ -1672,7 +1692,7 @@ function post_content(target){
 							add_notify('Ошибка при публикации',true);
 							$('input[name=permlink]').removeAttr('disabled');
 							target.removeClass('disabled');
-							target.removeClass('Опубликовать');
+							target.html('Опубликовать');
 						}
 					});
 				}

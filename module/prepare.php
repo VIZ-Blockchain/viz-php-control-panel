@@ -32,7 +32,7 @@ function get_tag($id){
 		foreach($rows as $row){
 			$key=$row->value;
 			if($key){
-				$tags_arr[$key]=(int)$id;
+				$tags_arr[stripcslashes($key)]=(int)$id;
 			}
 			else{
 				return false;
@@ -1120,6 +1120,7 @@ function view_content($data){
 	$result='';
 	$data['title']=stripcslashes($data['title']);
 	$data['body']=stripcslashes($data['body']);
+	$data['permlink']=stripcslashes($data['permlink']);
 	$author_login=get_user_login($data['author']);
 	$author_nickname=mongo_find_attr('users','nickname',['_id'=>(int)$data['author']]);
 	if(!$author_nickname){
@@ -1175,6 +1176,11 @@ function view_content($data){
 		else{
 			$reward_amount=$data['payout_value'].' + '.$data['shares_payout_value'];
 		}
+	}
+	if($auth && $data['author']==$user_arr['_id']){
+		$result.='<hr><div class="content-actions">';
+		$result.='<a href="/@'.$author_login.'/'.htmlspecialchars($data['permlink']).'/edit/">Редактировать</a>';
+		$result.='</div>';
 	}
 	$result.='<hr>
 	<div class="addon">

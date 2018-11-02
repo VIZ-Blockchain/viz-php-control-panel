@@ -15,55 +15,89 @@ if('@'==mb_substr($path_array[1],0,1)){
 			else{
 				$replace['title']='@'.$author_arr['login'].' - '.$replace['title'];
 			}
-
-			$descr='';
-			if(isset($data['foreword'])){
-				$descr=mb_substr(strip_tags(stripcslashes($data['foreword'])),0,250).'...';
-			}
-			else{
-				$descr=mb_substr(strip_tags(stripcslashes($data['body'])),0,250).'...';
-			}
-			$replace['description']=htmlspecialchars(trim($descr," \r\n\t"));
-			$replace['description']=str_replace("\n",' ',$replace['description']);
-			$replace['description']=str_replace('  ',' ',$replace['description']);
-
-			$replace['head_addon'].='
-			<meta property="og:url" content="https://viz.world/@'.$author.'/'.$data['permlink'].'/" />
-			<meta name="og:title" content="'.htmlspecialchars($content_title).'" />
-			<meta name="twitter:title" content="'.htmlspecialchars($content_title).'" />';
-
-			$cover=false;
-			if(isset($data['cover'])){
-				$cover=$data['cover'];
-				if(!preg_match('~^https://~iUs',$cover)){
-					$cover='https://i.goldvoice.club/0x0/'.$cover;
-				}
-				$replace['head_addon'].='
-	<link rel="image_src" href="'.$cover.'" />
-	<meta property="og:image" content="'.$cover.'" />
-	<meta name="twitter:image" content="'.$cover.'" />
-	<meta name="twitter:card" content="summary_large_image" />';
-				print '<img src="'.$cover.'" itemprop="image" class="schema">';
-			}
-
 			$replace['title']=htmlspecialchars($content_title).' - '.$replace['title'];
 
-			print view_content($data);
+			if(('edit'==$path_array[3])&&($auth)&&($data['author']==$user_arr['_id'])){
+				$replace['title']=htmlspecialchars('Редактирование').' - '.$replace['title'];
+				print $config['wysiwyg'];
+				print '<div class="page content">
+				<a class="right" href="/@'.$author.'/'.stripcslashes($data['permlink']).'/">&larr; Вернуться</a>
+				<h1>Редактирование</h1>
+				<div class="article post-content control">';
+				print '<p><input type="text" name="permlink" class="round wide" placeholder="URL" value="'.htmlspecialchars(stripcslashes($data['permlink'])).'" disabled="disabled"></p>';
+				print '<p><input type="text" name="title" class="round wide" placeholder="Заголовок" value="'.htmlspecialchars(stripcslashes($data['title'])).'"></p>';
+				print '<p><input type="text" name="foreword" class="round wide" placeholder="Предисловие (превью для текста)" value="'.htmlspecialchars(stripcslashes($data['foreword'])).'"></p>';
+				print '<p><input type="text" name="cover" class="round wide" placeholder="Ссылка на обложку (миниатюра для превью)" value="'.htmlspecialchars(stripcslashes($data['cover'])).'"></p>';
+				print '<p><textarea name="content" rows="20" class="round wide" placeholder="Содержимое контента">'.htmlspecialchars(stripcslashes($data['body'])).'</textarea></p>';
+				print '<p><input id="upload-file" type="file"><a class="upload-image-action action-button"><i class="fas fa-fw fa-file-image"></i> Загрузить изображение</a> <a class="wysiwyg-action action-button"><i class="fas fa-fw fa-pen-square"></i> WYSIWYG</a></p>';
+				$tags_list=array();
+				$tags=$mongo->executeQuery($config['db_prefix'].'.content_tags',new MongoDB\Driver\Query(['content'=>(int)$data['_id']],['sort'=>array('_id'=>1),'limit'=>(int)100]));
+				$tags->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+				foreach($tags as $tag_id){
+					$tag=get_tag($tag_id['tag']);
+					if($tag){
+						$tags_list[]=htmlspecialchars(stripcslashes($tag));
+					}
+				}
 
-			print '<div class="page comments" id="comments">
-<div class="actions"><div class="reply reply-action content-reply unselectable">Оставить комментарий</div></div>
-<div class="subtitle">Комментарии</div>
-<hr>';
-
-			$find=array('content'=>(int)$data['_id']);
-			$sort=array('sort'=>['sort'=>1]);
-			$rows=$mongo->executeQuery($config['db_prefix'].'.subcontent',new MongoDB\Driver\Query($find,$sort));
-			$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
-			foreach($rows as $row){
-				print view_subcontent($row);
+				print '<p><input type="text" name="tags" class="round wide" placeholder="Тэги через запятую (ключевые термины для поиска контента)" value="'.implode(',',$tags_list).'"></p>';
+				print '<p>Процент кураторам: <input type="text" name="curation_percent" value="'.($data['curation_percent']/100).'" size="4" class="round" data-fixed="curation_percent_range" disabled="disabled"> <input type="range" name="curation_percent_range" data-fixed="curation_percent" min="0" max="+100" value="'.($data['curation_percent']/100).'" disabled="disabled"></p>';
+				print '<p><a class="post-content-action button">Сохранить изменения</a></p>';
+				print '</div></div>';
 			}
-			print '</div>';
-			print '<div class="new-comments"></div>';
+			else{
+				if(''!=$path_array[3]){
+					header('location:/@'.$author.'/'.stripcslashes($data['permlink']).'/');
+					exit;
+				}
+				$descr='';
+				if(isset($data['foreword'])){
+					$descr=mb_substr(strip_tags(stripcslashes($data['foreword'])),0,250).'...';
+				}
+				else{
+					$descr=mb_substr(strip_tags(stripcslashes($data['body'])),0,250).'...';
+				}
+				$replace['description']=htmlspecialchars(trim($descr," \r\n\t"));
+				$replace['description']=str_replace("\n",' ',$replace['description']);
+				$replace['description']=str_replace('  ',' ',$replace['description']);
+
+				$replace['head_addon'].='
+				<meta property="og:url" content="https://viz.world/@'.$author.'/'.$data['permlink'].'/" />
+				<meta name="og:title" content="'.htmlspecialchars($content_title).'" />
+				<meta name="twitter:title" content="'.htmlspecialchars($content_title).'" />';
+
+				$cover=false;
+				if(isset($data['cover'])){
+					$cover=$data['cover'];
+					if(!preg_match('~^https://~iUs',$cover)){
+						$cover='https://i.goldvoice.club/0x0/'.$cover;
+					}
+					$replace['head_addon'].='
+		<link rel="image_src" href="'.$cover.'" />
+		<meta property="og:image" content="'.$cover.'" />
+		<meta name="twitter:image" content="'.$cover.'" />
+		<meta name="twitter:card" content="summary_large_image" />';
+					print '<img src="'.$cover.'" itemprop="image" class="schema">';
+				}
+
+
+				print view_content($data);
+
+				print '<div class="page comments" id="comments">
+	<div class="actions"><div class="reply reply-action content-reply unselectable">Оставить комментарий</div></div>
+	<div class="subtitle">Комментарии</div>
+	<hr>';
+
+				$find=array('content'=>(int)$data['_id']);
+				$sort=array('sort'=>['sort'=>1]);
+				$rows=$mongo->executeQuery($config['db_prefix'].'.subcontent',new MongoDB\Driver\Query($find,$sort));
+				$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+				foreach($rows as $row){
+					print view_subcontent($row);
+				}
+				print '</div>';
+				print '<div class="new-comments"></div>';
+			}
 		}
 	}
 	else{

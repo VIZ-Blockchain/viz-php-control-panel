@@ -1315,7 +1315,22 @@ html.modal-open{
 	width: calc((100% - 732px - 100px - 256px)/4);
 	left:256px;
 }
-
+.content-actions{
+	opacity:0.6;
+	text-align:right;
+	font-family:Arial,sans-serif !important;
+	font-size:12px;
+	-webkit-transition: all 0.2s linear;
+	-moz-transition: all 0.2s linear;
+	-o-transition: all 0.2s linear;
+	transition: all 0.2s linear;
+}
+.content-actions:hover{
+	opacity:1.0;
+}
+.content-actions a{
+	margin:0 4px;
+}
 
 /* tablet */
 @media only screen and (min-width:0) and (max-width:968px){
