@@ -1650,9 +1650,12 @@ function post_content(target){
 							if(!err){
 								let old_beneficiaries=result.beneficiaries;
 								let old_extensions=[];
+								/*
+								//not necessary
 								if(0<old_beneficiaries.length){
 									let old_extensions=[[0,{'beneficiaries':old_beneficiaries}]];
 								}
+								*/
 								let old_json=JSON.parse(result.json_metadata);
 								for(key in json_object){
 									old_json[key]=json_object[key];
