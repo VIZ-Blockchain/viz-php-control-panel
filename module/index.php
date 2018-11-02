@@ -8,7 +8,7 @@ if('@'==mb_substr($path_array[1],0,1)){
 		$data=get_content($author_id,$permlink);
 		if(isset($data['_id'])){
 			$author_arr=get_user_by_id($author_id);
-
+			$content_title=stripcslashes($data['title']);
 			if($author_arr['nickname']){
 				$replace['title']=htmlspecialchars($author_arr['nickname']).' - '.$replace['title'];
 			}
@@ -29,8 +29,8 @@ if('@'==mb_substr($path_array[1],0,1)){
 
 			$replace['head_addon'].='
 			<meta property="og:url" content="https://viz.world/@'.$author.'/'.$data['permlink'].'/" />
-			<meta name="og:title" content="'.htmlspecialchars($data['title']).'" />
-			<meta name="twitter:title" content="'.htmlspecialchars($data['title']).'" />';
+			<meta name="og:title" content="'.htmlspecialchars($content_title).'" />
+			<meta name="twitter:title" content="'.htmlspecialchars($content_title).'" />';
 
 			$cover=false;
 			if(isset($data['cover'])){
@@ -46,7 +46,7 @@ if('@'==mb_substr($path_array[1],0,1)){
 				print '<img src="'.$cover.'" itemprop="image" class="schema">';
 			}
 
-			$replace['title']=htmlspecialchars($data['title']).' - '.$replace['title'];
+			$replace['title']=htmlspecialchars($content_title).' - '.$replace['title'];
 
 			print view_content($data);
 
