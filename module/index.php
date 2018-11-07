@@ -17,7 +17,7 @@ if('@'==mb_substr($path_array[1],0,1)){
 			}
 			$replace['title']=htmlspecialchars($content_title).' - '.$replace['title'];
 
-			if(('edit'==$path_array[3])&&($auth)&&($data['author']==$user_arr['_id'])){
+			if(('edit'==$path_array[3])&&($auth)&&(($data['author']==$user_arr['_id'])||$admin)){
 				$replace['title']=htmlspecialchars('Редактирование').' - '.$replace['title'];
 				print $config['wysiwyg'];
 				print '<div class="page content">

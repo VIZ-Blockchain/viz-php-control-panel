@@ -6,6 +6,7 @@ var users={};
 var notify_id=0;
 var empty_signing_key='VIZ1111111111111111111111111111111114T1Anm';
 var api_gate='wss://api.viz.blckchnd.com/ws';
+var api_gate='wss://ws.viz.ropox.tools/';
 var domain='viz.world';
 var modal=false;
 var wysiwyg_active=false;
@@ -323,7 +324,9 @@ function view_energy(){
 				if(new_energy>=9000){
 					energy_icon='<i class="fas fa-battery-full"></i>';
 				}
-				$('.header .energy').html((new_energy/100)+'% '+energy_icon);
+				let awarded_rshares=parseInt(response[0].awarded_rshares);
+				let awarded_votes=parseInt(awarded_rshares/parseInt(parseFloat(response[0].vesting_shares)*1000000/10/5));
+				$('.header .energy').html((new_energy/100)+'%'+(0<awarded_votes?'<span title="Доступно апов из сокровищницы: '+awarded_votes+'">+</span>':'')+' '+energy_icon);
 			}
 		});
 	}
