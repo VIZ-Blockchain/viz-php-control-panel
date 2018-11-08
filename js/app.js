@@ -375,6 +375,11 @@ function view_energy(){
 					$('.header .energy').html((new_energy/100)+'%'+(0<awarded_votes?'<span title="Доступно апов из сокровищницы: '+awarded_votes+'">+</span>':'')+' '+energy_icon);
 				}
 			}
+			else{
+				if(typeof gate.api.ws == 'undefined'){
+					select_best_gate();
+				}
+			}
 		});
 	}
 	else{
