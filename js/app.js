@@ -1,9 +1,52 @@
 var gate=viz;
 var api_gates=['wss://lexai.host/ws','wss://api.viz.blckchnd.com/ws','wss://ws.viz.ropox.tools/']
-var api_gate=api_gates[Math.floor(Math.random()*api_gates.length)];
-console.log('Selected random API gate: '+api_gate);
-gate.config.set('websocket',api_gate);
-gate.api.stop();
+var best_gate=-1;
+var best_gate_latency=-1;
+var api_gate;
+api_gate=api_gates[Math.floor(Math.random()*api_gates.length)];
+if(null!=localStorage.getItem('api_gate_default')){
+	api_gate=localStorage.getItem('api_gate_default');
+	gate.config.set('websocket',api_gate);
+	gate.api.stop();
+}
+else{
+	select_best_gate();
+}
+
+function update_api_gate(value=false){
+	if(false==value){
+		api_gate=api_gates[best_gate];
+	}
+	else{
+		api_gate=value;
+	}
+	localStorage.setItem('api_gate_default',api_gate);
+	gate.config.set('websocket',api_gate);
+	gate.api.stop();
+}
+
+function select_best_gate(){
+	for(i in api_gates){
+		let current_gate=i;
+		let latency_start=new Date().getTime();
+		let latency=-1;
+		let socket = new WebSocket(api_gates[i]);
+		socket.onmessage=function(event){
+			latency=new Date().getTime() - latency_start;
+			if(best_gate!=current_gate){
+				if((best_gate_latency>latency)||(best_gate==-1)){
+					best_gate=current_gate;
+					best_gate_latency=latency;
+					update_api_gate();
+				}
+			}
+			socket.close();
+		}
+		socket.onopen=function(){
+			socket.send('{"id":1,"method":"call","jsonrpc":"2.0","params":["database_api","get_dynamic_global_properties",[]]}');
+		};
+	}
+}
 
 var dgp={};
 var current_block=0;
@@ -305,30 +348,32 @@ function view_energy(){
 	if(''!=current_user){
 		$('.header .energy').css('display','inline-block');
 		gate.api.getAccounts([current_user],function(err,response){
-			if(typeof response[0] !== 'undefined'){
-				let last_vote_time=Date.parse(response[0].last_vote_time);
-				let delta_time=parseInt((new Date().getTime() - last_vote_time+(new Date().getTimezoneOffset()*60000))/1000);
-				let energy=response[0].energy;
-				let new_energy=parseInt(energy+(delta_time*10000/432000));//CHAIN_ENERGY_REGENERATION_SECONDS 5 days
-				if(new_energy>10000){
-					new_energy=10000;
+			if(!err){
+				if(typeof response[0] !== 'undefined'){
+					let last_vote_time=Date.parse(response[0].last_vote_time);
+					let delta_time=parseInt((new Date().getTime() - last_vote_time+(new Date().getTimezoneOffset()*60000))/1000);
+					let energy=response[0].energy;
+					let new_energy=parseInt(energy+(delta_time*10000/432000));//CHAIN_ENERGY_REGENERATION_SECONDS 5 days
+					if(new_energy>10000){
+						new_energy=10000;
+					}
+					let energy_icon='<i class="fas fa-battery-empty"></i>';
+					if(new_energy>=2000){
+						energy_icon='<i class="fas fa-battery-quarter"></i>';
+					}
+					if(new_energy>=4000){
+						energy_icon='<i class="fas fa-battery-half"></i>';
+					}
+					if(new_energy>=6000){
+						energy_icon='<i class="fas fa-battery-three-quarters"></i>';
+					}
+					if(new_energy>=9000){
+						energy_icon='<i class="fas fa-battery-full"></i>';
+					}
+					let awarded_rshares=parseInt(response[0].awarded_rshares);
+					let awarded_votes=parseInt(awarded_rshares/parseInt(parseFloat(response[0].vesting_shares)*1000000/10/5));
+					$('.header .energy').html((new_energy/100)+'%'+(0<awarded_votes?'<span title="Доступно апов из сокровищницы: '+awarded_votes+'">+</span>':'')+' '+energy_icon);
 				}
-				let energy_icon='<i class="fas fa-battery-empty"></i>';
-				if(new_energy>=2000){
-					energy_icon='<i class="fas fa-battery-quarter"></i>';
-				}
-				if(new_energy>=4000){
-					energy_icon='<i class="fas fa-battery-half"></i>';
-				}
-				if(new_energy>=6000){
-					energy_icon='<i class="fas fa-battery-three-quarters"></i>';
-				}
-				if(new_energy>=9000){
-					energy_icon='<i class="fas fa-battery-full"></i>';
-				}
-				let awarded_rshares=parseInt(response[0].awarded_rshares);
-				let awarded_votes=parseInt(awarded_rshares/parseInt(parseFloat(response[0].vesting_shares)*1000000/10/5));
-				$('.header .energy').html((new_energy/100)+'%'+(0<awarded_votes?'<span title="Доступно апов из сокровищницы: '+awarded_votes+'">+</span>':'')+' '+energy_icon);
 			}
 		});
 	}
