@@ -1,17 +1,19 @@
 var gate=viz;
+var api_gates=['wss://lexai.host/ws','wss://api.viz.blckchnd.com/ws','wss://ws.viz.ropox.tools/']
+var api_gate=api_gates[Math.floor(Math.random()*api_gates.length)];
+console.log('Selected random API gate: '+api_gate);
+gate.config.set('websocket',api_gate);
+gate.api.stop();
+
 var dgp={};
 var current_block=0;
 var current_user='';
 var users={};
 var notify_id=0;
 var empty_signing_key='VIZ1111111111111111111111111111111114T1Anm';
-var api_gate='wss://api.viz.blckchnd.com/ws';
-var api_gate='wss://ws.viz.ropox.tools/';
 var domain='viz.world';
 var modal=false;
 var wysiwyg_active=false;
-gate.config.set('websocket',api_gate);
-gate.api.stop();
 
 var global_scroll_top=0;
 var wait_session_timer=0;
