@@ -32,8 +32,19 @@ if($pid){
 file_put_contents($site_root.'/module/updater.pid',$new_pid);
 print 'STARTUP: pid file: '.$pid_file.', pid: '.$new_pid.PHP_EOL;
 $work=true;
+$check_cashout_time=0;
 while($work){
-
+	if($check_cashout_time<time()){
+		$check_cashout_time=time()+300;//5 min
+		$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query(array('cashout_time'=>array('$ne'=>-1,'$lt'=>time()))));
+		$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+		$cashout_update_count=0;
+		foreach($rows as $row){
+			redis_add_ulist('update_content',(int)$row['_id']);
+			$cashout_update_count++;
+		}
+		print 'ADDED content in update queue by cashout time: '.$cashout_update_count.PHP_EOL;
+	}
 	$witness_login=redis_get_ulist('update_witness');
 	if($witness_login){
 		$user_id=get_user_id($witness_login);
