@@ -1007,6 +1007,10 @@ function preview_content($data){
 
 	$data['title']=stripcslashes($data['title']);
 	$data['body']=stripcslashes($data['body']);
+	$data['permlink']=stripcslashes($data['permlink']);
+	$data['permlink_href']=htmlspecialchars($data['permlink']);
+	$data['permlink_href']=str_replace('?','%3F',$data['permlink_href']);
+	$data['permlink_href']=str_replace('/','%2F',$data['permlink_href']);
 
 	$cover=false;
 	if(isset($data['cover'])){
@@ -1024,7 +1028,7 @@ function preview_content($data){
 		$result.='<div class="repost-info"><div class="repost-date timestamp" data-timestamp="'.$repost_time.'">'.date('d.m.Y H:i',$repost_time).'</div><i class="fas fa-fw fa-retweet"></i> <span>Репост от</span> @'.$repost_user.''.($repost_comment?'<div class="repost-comment">'.htmlspecialchars($repost_comment).'</div>':'').'</div>';
 	}
 
-	$result.='<a href="/@'.$author_login.'/'.htmlspecialchars($data['permlink']).'/" class="subtitle">'.htmlspecialchars($data['title']).'</a>';
+	$result.='<a href="/@'.$author_login.'/'.$data['permlink_href'].'/" class="subtitle">'.htmlspecialchars($data['title']).'</a>';
 
 	if($cover){
 		$result.='<div class="cover"><img src="https://i.goldvoice.club/0x0/'.htmlspecialchars($cover).'" alt=""></div>';
@@ -1108,7 +1112,7 @@ function preview_content($data){
 			<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы проголосовали с силой '.($vote_weight/100).'%"':'').'></a>
 			<a class="flag'.($flag?' active':'').' flag-action"'.($flag?' title="Вы поставили флаг с силой '.($vote_weight/100).'%"':'').'></a>
 			<div class="votes_count"><span>'.$votes_count.'</span> голосов</div>
-			<div class="comments"><span>'.$comments_count.'</span><a href="/@'.$author_login.'/'.htmlspecialchars($data['permlink']).'/#comments" class="icon"><i class="far fa-comment"></i></a></div>
+			<div class="comments"><span>'.$comments_count.'</span><a href="/@'.$author_login.'/'.$data['permlink_href'].'/#comments" class="icon"><i class="far fa-comment"></i></a></div>
 		</div>
 	</div>';
 
@@ -1121,6 +1125,10 @@ function view_content($data){
 	$data['title']=stripcslashes($data['title']);
 	$data['body']=stripcslashes($data['body']);
 	$data['permlink']=stripcslashes($data['permlink']);
+	$data['permlink_href']=htmlspecialchars($data['permlink']);
+	$data['permlink_href']=str_replace('?','%3F',$data['permlink_href']);
+	$data['permlink_href']=str_replace('/','%2F',$data['permlink_href']);
+
 	$author_login=get_user_login($data['author']);
 	$author_nickname=mongo_find_attr('users','nickname',['_id'=>(int)$data['author']]);
 	if(!$author_nickname){
@@ -1179,7 +1187,7 @@ function view_content($data){
 	}
 	if($auth && $data['author']==$user_arr['_id']){
 		$result.='<hr><div class="content-actions">';
-		$result.='<a href="/@'.$author_login.'/'.htmlspecialchars($data['permlink']).'/edit/">Редактировать</a>';
+		$result.='<a href="/@'.$author_login.'/'.$data['permlink_href'].'/edit/">Редактировать</a>';
 		$result.='</div>';
 	}
 	$result.='<hr>
