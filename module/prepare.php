@@ -1028,7 +1028,9 @@ function preview_content($data){
 		$result.='<div class="repost-info"><div class="repost-date timestamp" data-timestamp="'.$repost_time.'">'.date('d.m.Y H:i',$repost_time).'</div><i class="fas fa-fw fa-retweet"></i> <span>Репост от</span> @'.$repost_user.''.($repost_comment?'<div class="repost-comment">'.htmlspecialchars($repost_comment).'</div>':'').'</div>';
 	}
 
-	$result.='<a href="/@'.$author_login.'/'.$data['permlink_href'].'/" class="subtitle">'.htmlspecialchars($data['title']).'</a>';
+	if($data['title']){
+		$result.='<a href="/@'.$author_login.'/'.$data['permlink_href'].'/" class="subtitle">'.htmlspecialchars($data['title']).'</a>';
+	}
 
 	if($cover){
 		$result.='<div class="cover"><a href="/@'.$author_login.'/'.$data['permlink_href'].'/"><img src="https://i.goldvoice.club/0x0/'.htmlspecialchars($cover).'" alt=""></a></div>';

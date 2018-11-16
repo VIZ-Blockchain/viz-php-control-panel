@@ -728,12 +728,12 @@ function witness_chain_properties_update(witness_login,url,signing_key){
 				props.account_creation_fee=$('.witness-control[data-witness='+witness_login+'] input[name=account_creation_fee]').val();
 				props.create_account_delegation_ratio=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=create_account_delegation_ratio]').val());
 				props.create_account_delegation_time=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=create_account_delegation_time]').val());
-				props.bandwidth_reserve_percent=100*parseInt($('.witness-control[data-witness='+witness_login+'] input[name=bandwidth_reserve_percent]').val());
+				props.bandwidth_reserve_percent=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=bandwidth_reserve_percent]').val());
 				props.bandwidth_reserve_below=$('.witness-control[data-witness='+witness_login+'] input[name=bandwidth_reserve_below]').val();
-				props.committee_request_approve_min_percent=100*parseInt($('.witness-control[data-witness='+witness_login+'] input[name=committee_request_approve_min_percent]').val());
-				props.flag_energy_additional_cost=100*parseInt($('.witness-control[data-witness='+witness_login+'] input[name=flag_energy_additional_cost]').val());
-				props.min_curation_percent=100*parseInt($('.witness-control[data-witness='+witness_login+'] input[name=min_curation_percent]').val());
-				props.max_curation_percent=100*parseInt($('.witness-control[data-witness='+witness_login+'] input[name=max_curation_percent]').val());
+				props.committee_request_approve_min_percent=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=committee_request_approve_min_percent]').val());
+				props.flag_energy_additional_cost=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=flag_energy_additional_cost]').val());
+				props.min_curation_percent=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=min_curation_percent]').val());
+				props.max_curation_percent=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=max_curation_percent]').val());
 				props.min_delegation=$('.witness-control[data-witness='+witness_login+'] input[name=min_delegation]').val();
 				props.vote_accounting_min_rshares=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=vote_accounting_min_rshares]').val());
 				props.maximum_block_size=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=maximum_block_size]').val());
