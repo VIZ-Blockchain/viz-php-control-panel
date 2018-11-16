@@ -89,7 +89,7 @@ if('@'==mb_substr($path_array[1],0,1)){
 	<hr>';
 
 				$find=array('content'=>(int)$data['_id']);
-				$sort=array('sort'=>['sort'=>1]);
+				$sort=array('sort'=>['sort'=>1],'limit'=>5000);
 				$rows=$mongo->executeQuery($config['db_prefix'].'.subcontent',new MongoDB\Driver\Query($find,$sort));
 				$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 				foreach($rows as $row){

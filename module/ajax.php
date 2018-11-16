@@ -110,8 +110,8 @@ if(in_array('content',$config['plugins'])){
 			$last_id=(int)$_POST['last_id'];
 
 			$find=array('content'=>(int)$content_id,'_id'=>['$gt'=>(int)$last_id]);
-			$sort=array('sort'=>1);
-			$rows=$mongo->executeQuery($config['db_prefix'].'.subcontent',new MongoDB\Driver\Query($find));
+			$sort=array('sort'=>['sort'=>1],'limit'=>100);
+			$rows=$mongo->executeQuery($config['db_prefix'].'.subcontent',new MongoDB\Driver\Query($find,$sort));
 			$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 			foreach($rows as $row){
 				print view_subcontent($row).PHP_EOL;
