@@ -1031,7 +1031,7 @@ function preview_content($data){
 	$result.='<a href="/@'.$author_login.'/'.$data['permlink_href'].'/" class="subtitle">'.htmlspecialchars($data['title']).'</a>';
 
 	if($cover){
-		$result.='<div class="cover"><img src="https://i.goldvoice.club/0x0/'.htmlspecialchars($cover).'" alt=""></div>';
+		$result.='<div class="cover"><a href="/@'.$author_login.'/'.$data['permlink_href'].'/"><img src="https://i.goldvoice.club/0x0/'.htmlspecialchars($cover).'" alt=""></a></div>';
 	}
 
 	$result.='

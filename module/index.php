@@ -1,7 +1,7 @@
 <?php
 ob_start();
 if('@'==mb_substr($path_array[1],0,1)){
-	if($path_array[2]){
+	if($path_array[2] || isset($path_array[3])){
 		$author=mb_substr($path_array[1],1);
 		$author_id=get_user_id($author);
 		$permlink=urldecode($path_array[2]);
