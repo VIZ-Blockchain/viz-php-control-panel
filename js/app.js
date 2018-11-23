@@ -1424,7 +1424,7 @@ function session_control(){
 	if(0!=$('.control .session-control').length){
 		let session_html='';
 		for(key in users){
-			session_html+='<p class="clearfix">'+(1==users[key]['session_verify']?'<span class="right" title="Сессия подтверждена"><i class="fas fa-fw fa-check"></i></span>':'')+(users[key]['active_key']!=''?'<span class="right" title="Сохранен Active ключ"><i class="fas fa-fw fa-key"></i></span>':'')+'<a href="/@'+key+'/">'+key+'</a>, '+(current_user==key?'<b>используется</b>':'<a href="#" class="auth-change" data-login="'+key+'">переключиться</a>')+', <a href="#" class="auth-logout" data-login="'+key+'">отключить</a></p>';
+			session_html+='<p class="clearfix">'+(1==users[key]['session_verify']?'<span class="right" title="Сессия подтверждена"><i class="fas fa-fw fa-check"></i></span>':'')+(users[key]['active_key']!=''?'<span class="right" title="Сохранен Active ключ"><i class="fas fa-fw fa-key"></i></span>':'')+(users[key]['shield']===true?'<span class="right" title="Используется VIZ-Shield"><img src="/shield-icon.svg"></span>':'')+'<a href="/@'+key+'/">'+key+'</a>, '+(current_user==key?'<b>используется</b>':'<a href="#" class="auth-change" data-login="'+key+'">переключиться</a>')+', <a href="#" class="auth-logout" data-login="'+key+'">отключить</a></p>';
 
 		}
 		$('.control .session-control').html(session_html);
@@ -1501,7 +1501,7 @@ function try_auth(login,posting_key,active_key){
 						return;
 					}
 				}
-				users[login]={'posting_key':posting_key,'active_key':active_key};
+				users[login]={'posting_key':posting_key,'active_key':active_key,'shield':false};
 				current_user=login;
 				session_generate();
 			}
