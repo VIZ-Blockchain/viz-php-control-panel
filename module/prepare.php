@@ -1019,7 +1019,9 @@ function preview_content($data){
 
 	$author_login=get_user_login($data['author']);
 	$author_nickname=mongo_find_attr('users','nickname',['_id'=>(int)$data['author']]);
+	$custom_nickname=true;
 	if(!$author_nickname){
+		$custom_nickname=false;
 		$author_nickname='@'.$author_login;
 	}
 	$result.='<div class="page preview" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'"'.($repost?' data-repost-id="'.$repost_id.'"':'').'>';
@@ -1108,7 +1110,11 @@ function preview_content($data){
 		}
 	}
 	$result.='<div class="info">
-		<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a></div>
+		<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a>';
+	if($custom_nickname){
+		$result.='<span class="account-login"><a href="/@'.$author_login.'/">@'.$author_login.'</a></span>';
+	}
+	$result.='</div>
 		<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
 		<div class="right">
 			<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы проголосовали с силой '.($vote_weight/100).'%"':'').'></a>
@@ -1133,7 +1139,9 @@ function view_content($data){
 
 	$author_login=get_user_login($data['author']);
 	$author_nickname=mongo_find_attr('users','nickname',['_id'=>(int)$data['author']]);
+	$custom_nickname=true;
 	if(!$author_nickname){
+		$custom_nickname=false;
 		$author_nickname='@'.$author_login;
 	}
 	$author_avatar=mongo_find_attr('users','avatar',['_id'=>(int)$data['author']]);
@@ -1142,7 +1150,11 @@ function view_content($data){
 	$result.='<h1>'.htmlspecialchars($data['title']).'</h1>';
 	$result.='
 	<div class="info">
-		<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a></div>
+		<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a>';
+	if($custom_nickname){
+		$result.='<span class="account-login"><a href="/@'.$author_login.'/">@'.$author_login.'</a></span>';
+	}
+	$result.='</div>
 		<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
 	</div>';
 	$result.='<div class="article">';
