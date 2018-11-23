@@ -1221,7 +1221,9 @@ function view_subcontent($data){
 	$data['permlink']=stripcslashes($data['permlink']);
 	$author_login=get_user_login($data['author']);
 	$author_nickname=mongo_find_attr('users','nickname',['_id'=>(int)$data['author']]);
+	$custom_nickname=true;
 	if(!$author_nickname){
+		$custom_nickname=false;
 		$author_nickname='@'.$author_login;
 	}
 	$author_avatar=mongo_find_attr('users','avatar',['_id'=>(int)$data['author']]);
@@ -1235,7 +1237,11 @@ function view_subcontent($data){
 	}
 	$ret.='<div class="comment" id="'.$author_login.'/'.htmlspecialchars($data['permlink']).'" data-author="'.$author_login.'" data-permlink="'.htmlspecialchars($data['permlink']).'" data-level="'.$level.'" data-id="'.$data['_id'].'" data-parent="'.$data['parent'].'" data-sort="'.$data['sort'].'">
 		<div class="info">
-			<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a></div>
+			<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a>';
+			if($custom_nickname){
+				$ret.='<span class="account-login"><a href="/@'.$author_login.'/">@'.$author_login.'</a></span>';
+			}
+			$ret.='</div>
 			<div class="anchor"><a href="#'.$author_login.'/'.htmlspecialchars($data['permlink']).'">#</a></div>
 			<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
 		</div>

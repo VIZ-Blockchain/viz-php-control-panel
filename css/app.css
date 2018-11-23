@@ -1331,6 +1331,13 @@ html.modal-open{
 .content-actions a{
 	margin:0 4px;
 }
+.account-login a{
+	color:rgba(0,0,0,0.6);
+}
+.account-login::before {
+    content: '\2022';
+    padding: 0 7px;
+}
 
 /* tablet */
 @media only screen and (min-width:0) and (max-width:968px){
