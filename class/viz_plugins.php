@@ -56,6 +56,8 @@ class viz_plugins{
 			}
 			$listener->execute($id,$data);
 		}
+		unset($id);
+		unset($data);
 		return true;
 	}
 }

@@ -64,6 +64,7 @@ class viz_plugin_transfers extends viz_plugin{
 				'time'=>$info['unixtime']
 			)
 		);
+		$this->redis->expire('transfers:'.$transfer_id,7776000);//90 days expire for transfers
 
 		$this->redis->zadd('transfers_from:'.$from_id,$info['unixtime'],$transfer_id);
 		$this->redis->zadd('transfers_to:'.$to_id,$info['unixtime'],$transfer_id);
