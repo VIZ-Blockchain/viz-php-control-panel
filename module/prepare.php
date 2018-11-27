@@ -443,8 +443,14 @@ function clear_html_tags($text){
 	}
 	return $text;
 }
+function sort_by_value_length($a,$b){
+    return strlen($b)-strlen($a);
+}
 function text_to_view($text,$set_markdown=false){
 	global $parsedownextra;
+	if(!$text){
+		return '';
+	}
 
 	$replace_arr=array();
 	$replace_num=1;
@@ -993,7 +999,7 @@ function preview_content($data){
 	global $mongo,$config,$auth,$user_arr;
 	$result='';
 	$repost=false;
-	if($data['parent']){
+	if(isset($data['parent'])){
 		$repost=true;
 		$repost_id=$data['_id'];
 		$repost_user=get_user_login($data['author']);
