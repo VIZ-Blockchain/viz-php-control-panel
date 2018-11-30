@@ -372,9 +372,25 @@ function clear_html_tags($text){
 			$full_match='';
 		}
 		else{
-			preg_match_all('~(.[^= ]*)="(.*)"~iUs',$match,$attr_arr);
+			preg_match_all('~(.[^= ]*)="(.[^">]*)"~iUs',$match,$attr_arr);
+			$attr_values=array();
+			$attr_values_num=0;
+			foreach($attr_arr[2] as $k=>$attr_value){
+				$replace=$attr_arr[0][$k];
+				$attr_values[$attr_values_num]=$attr_value;
+				$replace2=str_replace($attr_value,'%ATTRVALUE'.$attr_values_num.'%',$replace);
+				$match=str_replace_first($replace,$replace2,$match);
+				$attr_values_num++;
+			}
+			preg_match_all('~(.[^= ]*)=(.[^ >]*) ~iUs',$match.' ',$attr_arr);
 			foreach($attr_arr[1] as $attr_k=>$attr){
-				$attr=trim($attr);
+				$attr_arr[2][$attr_k]=trim($attr_arr[2][$attr_k],'" \'');
+				foreach($attr_values as $k=>$attr_value){
+					$attr_arr[2][$attr_k]=str_replace('%ATTRVALUE'.$k.'%',$attr_value,$attr_arr[2][$attr_k]);
+					$attr_arr[0][$attr_k]=str_replace('%ATTRVALUE'.$k.'%',$attr_value,$attr_arr[0][$attr_k]);
+				}
+				$attr_arr[0][$attr_k]=trim($attr_arr[0][$attr_k]);
+				$attr=trim($attr,'" \'');
 				if(!in_array($attr,$allowed_attr_arr)){
 					$change=true;
 					if('iframe'==$tag_name){
@@ -394,6 +410,9 @@ function clear_html_tags($text){
 				}
 				if('style'==$attr){
 					$full_styles=$attr_arr[2][$attr_k];
+					if(strpos($full_styles,';')===false){
+						$full_styles.=';';
+					}
 					$styles_arr=explode(';',$full_styles);
 					foreach($styles_arr as $style_k=>$style){
 						if($style){
@@ -403,6 +422,9 @@ function clear_html_tags($text){
 							if(!in_array($style_arr[0],$allowed_style_arr)){
 								unset($styles_arr[$style_k]);
 							}
+						}
+						else{
+							unset($styles_arr[$style_k]);
 						}
 					}
 					$full_styles=implode(';',$styles_arr);
