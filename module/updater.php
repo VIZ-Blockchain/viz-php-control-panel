@@ -116,11 +116,11 @@ while($work){
 							$user_data['gender']=2;
 					}
 					if(isset($json_metadata['profile']['avatar']))
-						$user_data['avatar']=mongo_prepare($json_metadata['profile']['avatar']);
+						$user_data['avatar']=mongo_prepare(htmlspecialchars($json_metadata['profile']['avatar']));
 					if(isset($json_metadata['profile']['nickname']))
-						$user_data['nickname']=mongo_prepare($json_metadata['profile']['nickname']);
+						$user_data['nickname']=mongo_prepare(htmlspecialchars($json_metadata['profile']['nickname']));
 					if(isset($json_metadata['profile']['about']))
-						$user_data['about']=mongo_prepare($json_metadata['profile']['about']);
+						$user_data['about']=mongo_prepare(htmlspecialchars($json_metadata['profile']['about']));
 				}
 			}
 			$bulk=new MongoDB\Driver\BulkWrite;
