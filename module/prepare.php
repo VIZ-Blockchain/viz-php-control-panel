@@ -1017,6 +1017,7 @@ function preview_content($data){
 	$data['permlink_href']=htmlspecialchars($data['permlink']);
 	$data['permlink_href']=str_replace('?','%3F',$data['permlink_href']);
 	$data['permlink_href']=str_replace('/','%2F',$data['permlink_href']);
+	$data['permlink_href']=str_replace('%','%25',$data['permlink_href']);
 
 	$cover=false;
 	if(isset($data['cover'])){
@@ -1030,6 +1031,7 @@ function preview_content($data){
 		$custom_nickname=false;
 		$author_nickname='@'.$author_login;
 	}
+
 	$result.='<div class="page preview" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'"'.($repost?' data-repost-id="'.$repost_id.'"':'').'>';
 
 	if($repost){
@@ -1142,6 +1144,7 @@ function view_content($data){
 	$data['permlink_href']=htmlspecialchars($data['permlink']);
 	$data['permlink_href']=str_replace('?','%3F',$data['permlink_href']);
 	$data['permlink_href']=str_replace('/','%2F',$data['permlink_href']);
+	$data['permlink_href']=str_replace('%','%25',$data['permlink_href']);
 
 	$author_login=get_user_login($data['author']);
 	$author_nickname=mongo_find_attr('users','nickname',['_id'=>(int)$data['author']]);
