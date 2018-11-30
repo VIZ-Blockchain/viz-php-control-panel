@@ -349,6 +349,13 @@ function clear_html_tag($html,$tag){
 	}
 	return $html;
 }
+function str_replace_first($search,$replace,$subject){
+	$pos=strpos($subject, $search);
+	if($pos!==false){
+		return substr_replace($subject, $replace, $pos, strlen($search));
+	}
+	return $subject;
+}
 // looking html and clear all tags, styles, classes by rules
 function clear_html_tags($text){
 	$allowed_attr_arr=array('href','target','src','alt','width','style','id','class','colspan','rowspan');
@@ -1118,7 +1125,10 @@ function preview_content($data){
 	foreach($tags as $tag_id){
 		$tag=get_tag($tag_id['tag']);
 		if($tag){
-			$tags_list[]='<a href="/tags/'.htmlspecialchars($tag).'/">'.htmlspecialchars($tag).'</a>';
+			$tag_url=str_replace('?','%3F',$tag);
+			$tag_url=str_replace('/','%2F',$tag_url);
+			$tag_url=str_replace('%','%25',$tag_url);
+			$tags_list[]='<a href="/tags/'.htmlspecialchars($tag_url).'/">'.htmlspecialchars($tag).'</a>';
 		}
 	}
 	if($tags_list){
@@ -1199,7 +1209,10 @@ function view_content($data){
 	foreach($tags as $tag_id){
 		$tag=get_tag($tag_id['tag']);
 		if($tag){
-			$tags_list[]='<a href="/tags/'.htmlspecialchars($tag).'/">'.htmlspecialchars($tag).'</a>';
+			$tag_url=str_replace('?','%3F',$tag);
+			$tag_url=str_replace('/','%2F',$tag_url);
+			$tag_url=str_replace('%','%25',$tag_url);
+			$tags_list[]='<a href="/tags/'.htmlspecialchars($tag_url).'/">'.htmlspecialchars($tag).'</a>';
 		}
 	}
 	if($tags_list){
