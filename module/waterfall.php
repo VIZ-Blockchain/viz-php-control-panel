@@ -33,7 +33,7 @@ file_put_contents($site_root.'/module/waterfall.pid',$new_pid);
 print 'STARTUP: pid file: '.$pid_file.', pid: '.$new_pid.PHP_EOL;
 $plugins=new viz_plugins();
 $block_id=mongo_counter('blocks');
-print 'STARTUP: Find last block #'.$block_id.', working...'.PHP_EOL;
+print 'STARTUP: Find last block #'.$block_id.', working with endpoint: '.$api->endpoint.'...'.PHP_EOL;
 if($block_id!=1){
 	$block_id++;
 }
@@ -56,7 +56,7 @@ while($work){
 				print 'WARNING: Attempt '.$attempts.' on #'.$current_block.PHP_EOL;
 				$attempts++;
 				if($attempts>100){
-					print 'ERROR: Failed get #'.$current_block.' block more that 1000 times, self-terminating...'.PHP_EOL;
+					print 'ERROR: Failed get #'.$current_block.' block more that 1000 times with endpoint: '.$api->endpoint.', self-terminating...'.PHP_EOL;
 					exit;
 				}
 				usleep(100000);
