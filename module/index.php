@@ -1,4 +1,5 @@
 <?php
+set_time_limit(3);
 ob_start();
 if('@'==mb_substr($path_array[1],0,1)){
 	if($path_array[2] || isset($path_array[3])){

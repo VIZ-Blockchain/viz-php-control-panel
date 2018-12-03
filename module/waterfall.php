@@ -40,6 +40,7 @@ if($block_id!=1){
 $work=true;
 $current_block=$block_id;
 $dgp=$api->execute_method('get_dynamic_global_properties');
+print_r($dgp);
 $last_block=$dgp['head_block_number'];
 $sleep=0;
 while($work){

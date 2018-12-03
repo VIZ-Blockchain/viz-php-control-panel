@@ -162,12 +162,15 @@ class viz_jsonrpc_web{
 		if(false!==$use_port){
 			$port=$use_port;
 		}
-		if($sock=fsockopen($host, $port, $errno, $errstr, 4)){
+		if($sock=fsockopen($host, $port, $errno, $errstr, 1)){
 			fwrite($sock,$request,strlen($request));
 			while(!feof($sock)){
 				$result.=fread($sock,1024);
 			}
 			fclose($sock);
+		}
+		else{
+			return false;
 		}
 		if($this->debug){
 			$this->result_arr[]=$result;
@@ -224,16 +227,22 @@ class viz_jsonrpc_web{
 	}
 	function execute_method($method,$params=array(),$debug=false){
 		$jsonrpc_query=$this->build_method($method,$params);
-		list($header,$result)=$this->parse_web_result($this->get_url($this->endpoint,$jsonrpc_query));
-		if($debug||$this->debug){
-			print PHP_EOL.'<!-- ENDPOINT: '.$this->endpoint.' -->'.PHP_EOL;
-			print '<!-- QUERY: '.$jsonrpc_query.' -->'.PHP_EOL;
-			print '<!-- HEADER: '.$header.' -->'.PHP_EOL;
-			print '<!-- RESULT: '.$result.' -->'.PHP_EOL;
-		}
-		$result_arr=json_decode($result,true);
-		if(isset($result_arr['result'])){
-			return $result_arr['result'];
+		$result=$this->get_url($this->endpoint,$jsonrpc_query);
+		if(false!==$result){
+			list($header,$result)=$this->parse_web_result($result);
+			if($debug||$this->debug){
+				print PHP_EOL.'<!-- ENDPOINT: '.$this->endpoint.' -->'.PHP_EOL;
+				print '<!-- QUERY: '.$jsonrpc_query.' -->'.PHP_EOL;
+				print '<!-- HEADER: '.$header.' -->'.PHP_EOL;
+				print '<!-- RESULT: '.$result.' -->'.PHP_EOL;
+			}
+			$result_arr=json_decode($result,true);
+			if(isset($result_arr['result'])){
+				return $result_arr['result'];
+			}
+			else{
+				return false;
+			}
 		}
 		else{
 			return false;
