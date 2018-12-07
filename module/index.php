@@ -130,6 +130,9 @@ if('@'==mb_substr($path_array[1],0,1)){
 							print '<img src="'.$cover.'" itemprop="image" class="schema">';
 						}
 
+						if(!isset($data['cashout_time'])){
+							redis_add_ulist('update_content',$data['_id']);
+						}
 
 						print view_content($data);
 
