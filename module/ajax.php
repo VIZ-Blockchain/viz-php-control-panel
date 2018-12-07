@@ -190,7 +190,7 @@ if('transfers_history_table'==$path_array[2]){
 			print '<td><span class="timestamp" data-timestamp="'.$m['time'].'">'.date('d.m.Y H:i:s',$m['time']).'</span></td>';
 			print '<td><span class="wallet-recipient-set">'.get_user_login($m['from']).'</span></td>';
 			print '<td><span class="wallet-recipient-set">'.get_user_login($m['to']).'</span></td>';
-			print '<td rel="amount"><span class="wallet-balance-set">'.((float)$m['amount']!=0?$m['amount']:'&mdash;').'</span></td>';
+			print '<td rel="amount"><span class="wallet-amount-set">'.((float)$m['amount']!=0?$m['amount']:'&mdash;').'</span></td>';
 			print '<td><span class="wallet-asset-set">'.($currencies_id_arr[$m['currency']]?$currencies_id_arr[$m['currency']]:'&mdash;').'</span></td>';
 			print '<td class="wallet-memo-set">'.text_to_view($m['memo']).'</td>';
 			print '</tr>';

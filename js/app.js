@@ -2292,6 +2292,15 @@ function app_mouse(e){
 			}
 		}
 	}
+	if(0<$(target).closest('.wallet-memo-set').length){
+		$('.wallet-control input[name=memo]').val($(target).closest('.wallet-memo-set').text());
+	}
+	if($(target).hasClass('wallet-amount-set')){
+		$('.wallet-control input[name=amount]').val(parseFloat($(target).text()));
+	}
+	if($(target).hasClass('wallet-recipient-set')){
+		$('.wallet-control input[name=recipient]').val($(target).text());
+	}
 	if($(target).hasClass('auth-change')){
 		e.preventDefault();
 		let login=$(target).attr('data-login');
