@@ -1125,6 +1125,9 @@ input.wide{
 .wallet-history p{
 	margin:0 !important;
 }
+.wallet-history tr.new{
+	background:#fffaee;
+}
 .action-button{
 	display: inline-block;
 	padding: 6px 8px;

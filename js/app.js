@@ -621,7 +621,23 @@ function wallet_delegate(recipient,amount){
 		});
 	}
 }
+function escape_html(text){
+	if(typeof text !== 'undefined'){
+		var map={
+			'&': '&amp;',
+			'<': '&lt;',
+			'>': '&gt;',
+			'"': '&quot;',
+			"'": '&#039;'
+		};
+		return text.replace(/[&<>"']/g,function(m){return map[m];});
+	}
+	else{
+		return '';
+	}
+}
 function wallet_transfer(recipient,amount,memo){
+	$('.wallet-control .wallet-transfer-action').addClass('disabled');
 	let login=recipient.toLowerCase();
 	if('@'==login.substring(0,1)){
 		login=login.substring(1);
@@ -635,31 +651,47 @@ function wallet_transfer(recipient,amount,memo){
 				var shares=$('.wallet-control input[name=shares]').prop('checked');
 				if(shares){
 					gate.broadcast.transferToVesting(users[current_user].active_key,current_user,login,fixed_amount,function(err,result){
+						memo='TO VESTING SHARES';
 						if(!err){
+							let tr_html='<tr class="wallet-history-out new"><td>'+date_str(-1,true,true,true)+'</td><td><span class="wallet-recipient-set">'+current_user+'</span></td><td><span class="wallet-recipient-set">'+recipient+'</span></td><td>'+amount+'</td><td>VIZ</td><td class="wallet-memo-set">'+escape_html(memo)+'</td></tr>';
+							$('.wallet-history tbody').prepend(tr_html);
+							$('.wallet-control input[name=amount]').val('0');
 							wallet_control(true);
+							$('.wallet-control .wallet-transfer-action').removeClass('disabled');
 						}
 						else{
 							add_notify('Ошибка в переводе',true);
 							add_notify(err.payload.error.data.stack[0].format,true);
+							$('.wallet-control .wallet-transfer-action').removeClass('disabled');
 						}
 					});
 				}
 				else{
 					gate.broadcast.transfer(users[current_user].active_key,current_user,login,fixed_amount,memo,function(err,result){
 						if(!err){
+							let tr_html='<tr class="wallet-history-out new"><td>'+date_str(-1,true,true,true)+'</td><td><span class="wallet-recipient-set">'+current_user+'</span></td><td><span class="wallet-recipient-set">'+recipient+'</span></td><td>'+amount.toFixed(3)+'</td><td>VIZ</td><td class="wallet-memo-set">'+escape_html(memo)+'</td></tr>';
+							$('.wallet-history tbody').prepend(tr_html);
+							$('.wallet-control input[name=amount]').val('0');
 							wallet_control(true);
+							$('.wallet-control .wallet-transfer-action').removeClass('disabled');
 						}
 						else{
 							add_notify('Ошибка в переводе',true);
 							add_notify(err.payload.error.data.stack[0].format,true);
+							$('.wallet-control .wallet-transfer-action').removeClass('disabled');
 						}
 					});
 				}
 			}
 			else{
 				add_notify('Получатель не найден',true);
+				$('.wallet-control .wallet-transfer-action').removeClass('disabled');
 			}
 		});
+	}
+	else{
+		add_notify('Получатель не задан',true);
+		$('.wallet-control .wallet-transfer-action').removeClass('disabled');
 	}
 }
 function committee_worker_create_request(url,worker,min_amount,max_amount,duration){
@@ -2255,7 +2287,9 @@ function app_mouse(e){
 			if($(target).parent().hasClass('wallet-transfer-action')){
 				proper_target=$(target).parent();
 			}
-			wallet_transfer($('.wallet-control input[name=recipient]').val(),$('.wallet-control input[name=amount]').val(),$('.wallet-control input[name=memo]').val());
+			if(!$('.wallet-control .wallet-transfer-action').hasClass('disabled')){
+				wallet_transfer($('.wallet-control input[name=recipient]').val(),$('.wallet-control input[name=amount]').val(),$('.wallet-control input[name=memo]').val());
+			}
 		}
 	}
 	if($(target).hasClass('auth-change')){
