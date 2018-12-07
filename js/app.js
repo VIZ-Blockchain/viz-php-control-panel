@@ -1687,7 +1687,13 @@ function post_content(target){
 		var title=$('input[name=title]').val();
 		var permlink=$('input[name=permlink]').val();
 		if(''==$('input[name=permlink]').val()){
-			$('input[name=permlink]').val(title);
+			let permlink_from_title=title;
+			permlink_from_title=permlink_from_title.toLowerCase().trim();
+			permlink_from_title=permlink_from_title.replace(/[^ а-яА-Яa-zA-Z0-9\-_]/g,'');
+			permlink_from_title=permlink_from_title.replace(' ','-');
+			permlink_from_title=permlink_from_title.replace('---','-');
+			permlink_from_title=permlink_from_title.replace('--','-');
+			$('input[name=permlink]').val(permlink_from_title);
 			permlink=$('input[name=permlink]').val();
 		}
 		var content=$('textarea[name=content]').val();
