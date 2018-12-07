@@ -2,176 +2,223 @@
 set_time_limit(3);
 ob_start();
 if('@'==mb_substr($path_array[1],0,1)){
-	if($path_array[2] || isset($path_array[3])){
-		$author=mb_substr($path_array[1],1);
-		$author_id=get_user_id($author);
-		$permlink=urldecode($path_array[2]);
-		$data=get_content($author_id,$permlink);
-		if(isset($data['_id'])){
-			$author_arr=get_user_by_id($author_id);
-			$content_title=stripcslashes($data['title']);
-			if($author_arr['nickname']){
-				$replace['title']=htmlspecialchars($author_arr['nickname']).' - '.$replace['title'];
+	$account_id=get_user_id(mb_substr($path_array[1],1));
+	if(0<$account_id){
+		$account_arr=get_user_by_id($account_id);
+		if($_GET['manage_user'] && $admin){
+			if($_POST['show_user']){
+				$bulk=new MongoDB\Driver\BulkWrite;
+				$bulk->update(['_id'=>(int)$account_id],['$set'=>['status'=>0]]);
+				$mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
+				header('location:/@'.$account_arr['login'].'/?manage_user=1');
+				exit;
+			}
+			if($_POST['hide_user']){
+				$bulk=new MongoDB\Driver\BulkWrite;
+				$bulk->update(['_id'=>(int)$account_id],['$set'=>['status'=>1]]);
+				$mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
+				header('location:/@'.$account_arr['login'].'/?manage_user=1');
+				exit;
+			}
+			if($_POST['hide_user_content']){
+				$bulk=new MongoDB\Driver\BulkWrite;
+				$bulk->update(['author'=>(int)$account_id],['$set'=>['status'=>1]],['multi'=>true]);
+				$mongo->executeBulkWrite($config['db_prefix'].'.content',$bulk);
+				header('location:/@'.$account_arr['login'].'/?manage_user=1');
+				exit;
+			}
+			if($_POST['hide_user_subcontent']){
+				$bulk=new MongoDB\Driver\BulkWrite;
+				$bulk->update(['author'=>(int)$account_id],['$set'=>['status'=>1]],['multi'=>true]);
+				$mongo->executeBulkWrite($config['db_prefix'].'.subcontent',$bulk);
+				header('location:/@'.$account_arr['login'].'/?manage_user=1');
+				exit;
+			}
+			$replace['title']='Управление пользователем - @'.$account_arr['login'].' - '.$replace['title'];
+			print '<div class="page content">
+			<a class="right" href="/@'.$account_arr['login'].'/">&larr; Вернуться</a>
+			<h1>Управление пользователем - @'.$account_arr['login'].'</h1>';
+			print '<p>Account id: '.$account_id.'</p>';
+			print '<p>Status: '.$account_arr['status'].'</p>';
+			print '<form action="?manage_user=1" method="POST">';
+			if(1==$account_arr['status']){
+				print '<input type="submit" class="button" name="show_user" value="Отображать пользователя">';
 			}
 			else{
-				$replace['title']='@'.$author_arr['login'].' - '.$replace['title'];
+				print '<input type="submit" class="button" name="hide_user" value="Скрыть пользователя">';
 			}
-			$replace['title']=htmlspecialchars($content_title).' - '.$replace['title'];
+			print '<br><input type="submit" class="button" name="hide_user_content" value="Скрыть контент пользователя">';
+			print '<br><input type="submit" class="button" name="hide_user_subcontent" value="Скрыть субконтент пользователя">';
+			print '</form>';
+			print '</div>';
+		}
+		else
+		if(0==$account_arr['status']){
+			if($path_array[2] || isset($path_array[3])){
+				$permlink=urldecode($path_array[2]);
+				$data=get_content($account_id,$permlink);
+				if(isset($data['_id'])){
+					$content_title=stripcslashes($data['title']);
+					if($account_arr['nickname']){
+						$replace['title']=htmlspecialchars($account_arr['nickname']).' - '.$replace['title'];
+					}
+					else{
+						$replace['title']='@'.$account_arr['login'].' - '.$replace['title'];
+					}
+					$replace['title']=htmlspecialchars($content_title).' - '.$replace['title'];
 
-			if(('edit'==$path_array[3])&&($auth)&&(($data['author']==$user_arr['_id'])||$admin)){
-				$replace['title']=htmlspecialchars('Редактирование').' - '.$replace['title'];
-				print $config['wysiwyg'];
-				print '<div class="page content">
-				<a class="right" href="/@'.$author.'/'.stripcslashes($data['permlink']).'/">&larr; Вернуться</a>
-				<h1>Редактирование</h1>
-				<div class="article post-content control">';
-				print '<p><input type="text" name="permlink" class="round wide" placeholder="URL" value="'.htmlspecialchars(stripcslashes($data['permlink'])).'" disabled="disabled"></p>';
-				print '<p><input type="text" name="title" class="round wide" placeholder="Заголовок" value="'.htmlspecialchars(stripcslashes($data['title'])).'"></p>';
-				print '<p><input type="text" name="foreword" class="round wide" placeholder="Предисловие (превью для текста)" value="'.htmlspecialchars(stripcslashes($data['foreword'])).'"></p>';
-				print '<p><input type="text" name="cover" class="round wide" placeholder="Ссылка на обложку (миниатюра для превью)" value="'.htmlspecialchars(stripcslashes($data['cover'])).'"></p>';
-				print '<p><textarea name="content" rows="20" class="round wide" placeholder="Содержимое контента">'.htmlspecialchars(stripcslashes($data['body'])).'</textarea></p>';
-				print '<p><input id="upload-file" type="file"><a class="upload-image-action action-button"><i class="fas fa-fw fa-file-image"></i> Загрузить изображение</a> <a class="wysiwyg-action action-button"><i class="fas fa-fw fa-pen-square"></i> WYSIWYG</a></p>';
-				$tags_list=array();
-				$tags=$mongo->executeQuery($config['db_prefix'].'.content_tags',new MongoDB\Driver\Query(['content'=>(int)$data['_id']],['sort'=>array('_id'=>1),'limit'=>(int)100]));
-				$tags->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
-				foreach($tags as $tag_id){
-					$tag=get_tag($tag_id['tag']);
-					if($tag){
-						$tags_list[]=htmlspecialchars(stripcslashes($tag));
+					if(('edit'==$path_array[3])&&($auth)&&(($data['author']==$user_arr['_id'])||$admin)){
+						$replace['title']=htmlspecialchars('Редактирование').' - '.$replace['title'];
+						print $config['wysiwyg'];
+						print '<div class="page content">
+						<a class="right" href="/@'.$account_arr['login'].'/'.htmlspecialchars(stripcslashes($data['permlink'])).'/">&larr; Вернуться</a>
+						<h1>Редактирование</h1>
+						<div class="article post-content control">';
+						print '<p><input type="text" name="permlink" class="round wide" placeholder="URL" value="'.htmlspecialchars(stripcslashes($data['permlink'])).'" disabled="disabled"></p>';
+						print '<p><input type="text" name="title" class="round wide" placeholder="Заголовок" value="'.htmlspecialchars(stripcslashes($data['title'])).'"></p>';
+						print '<p><input type="text" name="foreword" class="round wide" placeholder="Предисловие (превью для текста)" value="'.htmlspecialchars(stripcslashes($data['foreword'])).'"></p>';
+						print '<p><input type="text" name="cover" class="round wide" placeholder="Ссылка на обложку (миниатюра для превью)" value="'.htmlspecialchars(stripcslashes($data['cover'])).'"></p>';
+						print '<p><textarea name="content" rows="20" class="round wide" placeholder="Содержимое контента">'.htmlspecialchars(stripcslashes($data['body'])).'</textarea></p>';
+						print '<p><input id="upload-file" type="file"><a class="upload-image-action action-button"><i class="fas fa-fw fa-file-image"></i> Загрузить изображение</a> <a class="wysiwyg-action action-button"><i class="fas fa-fw fa-pen-square"></i> WYSIWYG</a></p>';
+						$tags_list=array();
+						$tags=$mongo->executeQuery($config['db_prefix'].'.content_tags',new MongoDB\Driver\Query(['content'=>(int)$data['_id']],['sort'=>array('_id'=>1),'limit'=>(int)100]));
+						$tags->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+						foreach($tags as $tag_id){
+							$tag=get_tag($tag_id['tag']);
+							if($tag){
+								$tags_list[]=htmlspecialchars(stripcslashes($tag));
+							}
+						}
+
+						print '<p><input type="text" name="tags" class="round wide" placeholder="Тэги через запятую (ключевые термины для поиска контента)" value="'.implode(',',$tags_list).'"></p>';
+						print '<p>Процент кураторам: <input type="text" name="curation_percent" value="'.($data['curation_percent']/100).'" size="4" class="round" data-fixed="curation_percent_range" disabled="disabled"> <input type="range" name="curation_percent_range" data-fixed="curation_percent" min="0" max="+100" value="'.($data['curation_percent']/100).'" disabled="disabled"></p>';
+						print '<p><a class="post-content-action button">Сохранить изменения</a></p>';
+						print '</div></div>';
+					}
+					else{
+						if(''!=$path_array[3]){
+							header('location:/@'.$account_arr['login'].'/'.stripcslashes($data['permlink']).'/');
+							exit;
+						}
+						$descr='';
+						if(isset($data['foreword'])){
+							$descr=mb_substr(strip_tags(stripcslashes($data['foreword'])),0,250).'...';
+						}
+						else{
+							$descr=mb_substr(strip_tags(stripcslashes($data['body'])),0,250).'...';
+						}
+						$replace['description']=htmlspecialchars(trim($descr," \r\n\t"));
+						$replace['description']=str_replace("\n",' ',$replace['description']);
+						$replace['description']=str_replace('  ',' ',$replace['description']);
+
+						$replace['head_addon'].='
+						<meta property="og:url" content="https://viz.world/@'.$account_arr['login'].'/'.$data['permlink'].'/" />
+						<meta name="og:title" content="'.htmlspecialchars($content_title).'" />
+						<meta name="twitter:title" content="'.htmlspecialchars($content_title).'" />';
+
+						$cover=false;
+						if(isset($data['cover'])){
+							$cover=$data['cover'];
+							if(!preg_match('~^https://~iUs',$cover)){
+								$cover='https://i.goldvoice.club/0x0/'.$cover;
+							}
+							$replace['head_addon'].='
+				<link rel="image_src" href="'.$cover.'" />
+				<meta property="og:image" content="'.$cover.'" />
+				<meta name="twitter:image" content="'.$cover.'" />
+				<meta name="twitter:card" content="summary_large_image" />';
+							print '<img src="'.$cover.'" itemprop="image" class="schema">';
+						}
+
+
+						print view_content($data);
+
+						print '<div class="page comments" id="comments">
+			<div class="actions"><div class="reply reply-action content-reply unselectable">Оставить комментарий</div></div>
+			<div class="subtitle">Комментарии</div>
+			<hr>';
+
+						$find=array('content'=>(int)$data['_id']);
+						$sort=array('sort'=>['sort'=>1],'limit'=>5000);
+						$rows=$mongo->executeQuery($config['db_prefix'].'.subcontent',new MongoDB\Driver\Query($find,$sort));
+						$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+						foreach($rows as $row){
+							print view_subcontent($row);
+						}
+						print '</div>';
+						print '<div class="new-comments"></div>';
 					}
 				}
-
-				print '<p><input type="text" name="tags" class="round wide" placeholder="Тэги через запятую (ключевые термины для поиска контента)" value="'.implode(',',$tags_list).'"></p>';
-				print '<p>Процент кураторам: <input type="text" name="curation_percent" value="'.($data['curation_percent']/100).'" size="4" class="round" data-fixed="curation_percent_range" disabled="disabled"> <input type="range" name="curation_percent_range" data-fixed="curation_percent" min="0" max="+100" value="'.($data['curation_percent']/100).'" disabled="disabled"></p>';
-				print '<p><a class="post-content-action button">Сохранить изменения</a></p>';
-				print '</div></div>';
 			}
-			else{
-				if(''!=$path_array[3]){
-					header('location:/@'.$author.'/'.stripcslashes($data['permlink']).'/');
-					exit;
+			else
+			if(''==$path_array[2]){
+				if(!isset($account_arr['shares'])){
+					redis_add_ulist('update_user',$account_arr['login']);
 				}
-				$descr='';
-				if(isset($data['foreword'])){
-					$descr=mb_substr(strip_tags(stripcslashes($data['foreword'])),0,250).'...';
+				$account_name=$account_arr['login'];
+				$account_avatar='/default-avatar.png';
+				$account_about='';
+
+				if($account_arr['nickname']){
+					$account_name=htmlspecialchars($account_arr['nickname']);
+					$replace['title']=htmlspecialchars($account_name).' - '.$replace['title'];
 				}
 				else{
-					$descr=mb_substr(strip_tags(stripcslashes($data['body'])),0,250).'...';
+					$replace['title']='@'.$account_name.' - '.$replace['title'];
 				}
-				$replace['description']=htmlspecialchars(trim($descr," \r\n\t"));
-				$replace['description']=str_replace("\n",' ',$replace['description']);
-				$replace['description']=str_replace('  ',' ',$replace['description']);
-
-				$replace['head_addon'].='
-				<meta property="og:url" content="https://viz.world/@'.$author.'/'.$data['permlink'].'/" />
-				<meta name="og:title" content="'.htmlspecialchars($content_title).'" />
-				<meta name="twitter:title" content="'.htmlspecialchars($content_title).'" />';
-
-				$cover=false;
-				if(isset($data['cover'])){
-					$cover=$data['cover'];
-					if(!preg_match('~^https://~iUs',$cover)){
-						$cover='https://i.goldvoice.club/0x0/'.$cover;
+				if($account_arr['avatar']){
+					$account_avatar='https://i.goldvoice.club/64x64/'.htmlspecialchars($account_arr['avatar']);
+				}
+				if($account_arr['about']){
+					$account_about=htmlspecialchars(strip_tags(stripcslashes($account_arr['about'])));
+				}
+				$account_name=str_replace('@','',$account_name);
+				print '<div class="page user-badge clearfix">
+				<a href="/@'.$account_arr['login'].'/" class="avatar" style="background-image:url(\''.$account_avatar.'\')"></a>';
+				if($auth){
+					if($user_arr['_id']!=$account_id){
+						print '
+						<div class="actions" data-user-login="'.$account_arr['login'].'">';
+						$link=get_user_link($user_arr['_id'],$account_id);
+						if(false===$link){
+							print '<div class="follow follow-action">Подписаться</div><br><div class="ignore ignore-action">Игнорировать</div>';
+						}
+						if(1==$link){
+							print '<div class="unfollow unfollow-action">Отписаться</div>';
+						}
+						if(2==$link){
+							print '<div class="unfollow unfollow-action">Перестать игнорировать</div>';
+						}
+						print '</div>';
 					}
-					$replace['head_addon'].='
-		<link rel="image_src" href="'.$cover.'" />
-		<meta property="og:image" content="'.$cover.'" />
-		<meta name="twitter:image" content="'.$cover.'" />
-		<meta name="twitter:card" content="summary_large_image" />';
-					print '<img src="'.$cover.'" itemprop="image" class="schema">';
 				}
+				print '
+				<div class="info">
+					<div class="login"><a href="/@'.$account_arr['login'].'/">'.$account_name.'</a></div>
+					<div class="descr">
+						<p>'.$account_about.'</p>';
+						if(isset($account_arr['content_count'])){
+							print '<p>Контента: '.$account_arr['content_count'].', Голосов: '.$account_arr['vote_count'].'</p>';
+						}
+						print '<p>Баланс: '.($account_arr['balance']/1000).' VIZ, '.($account_arr['shares']/1000000).' SHARES</p>
+					</div>
+				</div>
+		</div>';
 
-
-				print view_content($data);
-
-				print '<div class="page comments" id="comments">
-	<div class="actions"><div class="reply reply-action content-reply unselectable">Оставить комментарий</div></div>
-	<div class="subtitle">Комментарии</div>
-	<hr>';
-
-				$find=array('content'=>(int)$data['_id']);
-				$sort=array('sort'=>['sort'=>1],'limit'=>5000);
-				$rows=$mongo->executeQuery($config['db_prefix'].'.subcontent',new MongoDB\Driver\Query($find,$sort));
+				print '<div class="page content">
+				<h2>Контент пользователя</h2>
+				</div>';
+				$find=array('author'=>(int)get_user_id($account_arr['login']),'status'=>0);
+				$perpage=50;
+				$offset=0;
+				$sort=array('_id'=>-1);
+				$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query($find,['sort'=>$sort,'limit'=>(int)$perpage,'skip'=>(int)$offset]));
 				$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
 				foreach($rows as $row){
-					print view_subcontent($row);
+					print preview_content($row);
 				}
-				print '</div>';
-				print '<div class="new-comments"></div>';
+				print '<div class="page content load-more" data-action="user-content" data-user-login="'.$account_arr['login'].'"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> Загрузка&hellip;</div></div>';
 			}
-		}
-	}
-	else{
-		$account_login=mb_substr($path_array[1],1);
-		$account_id=get_user_id($account_login);
-		if(0<$account_id){
-			$account_arr=get_user_by_id($account_id);
-			if(!isset($account_arr['shares'])){
-				redis_add_ulist('update_user',$account_arr['login']);
-			}
-			$account_name=$account_arr['login'];
-			$account_avatar='/default-avatar.png';
-			$account_about='';
-
-			if($account_arr['nickname']){
-				$account_name=htmlspecialchars($account_arr['nickname']);
-				$replace['title']=htmlspecialchars($account_name).' - '.$replace['title'];
-			}
-			else{
-				$replace['title']='@'.$account_name.' - '.$replace['title'];
-			}
-			if($account_arr['avatar']){
-				$account_avatar='https://i.goldvoice.club/64x64/'.htmlspecialchars($account_arr['avatar']);
-			}
-			if($account_arr['about']){
-				$account_about=htmlspecialchars(strip_tags(stripcslashes($account_arr['about'])));
-			}
-			$account_name=str_replace('@','',$account_name);
-			print '<div class="page user-badge clearfix">
-			<a href="/@'.$account_login.'/" class="avatar" style="background-image:url(\''.$account_avatar.'\')"></a>';
-			if($auth){
-				if($user_arr['_id']!=$account_id){
-					print '
-					<div class="actions" data-user-login="'.$account_login.'">';
-					$link=get_user_link($user_arr['_id'],$account_id);
-					if(false===$link){
-						print '<div class="follow follow-action">Подписаться</div><br><div class="ignore ignore-action">Игнорировать</div>';
-					}
-					if(1==$link){
-						print '<div class="unfollow unfollow-action">Отписаться</div>';
-					}
-					if(2==$link){
-						print '<div class="unfollow unfollow-action">Перестать игнорировать</div>';
-					}
-					print '</div>';
-				}
-			}
-			print '
-			<div class="info">
-				<div class="login"><a href="/@'.$account_login.'/">'.$account_name.'</a></div>
-				<div class="descr">
-					<p>'.$account_about.'</p>';
-					if(isset($account_arr['content_count'])){
-						print '<p>Контента: '.$account_arr['content_count'].', Голосов: '.$account_arr['vote_count'].'</p>';
-					}
-					print '<p>Баланс: '.($account_arr['balance']/1000).' VIZ, '.($account_arr['shares']/1000000).' SHARES</p>
-				</div>
-			</div>
-	</div>';
-
-			print '<div class="page content">
-			<h2>Контент пользователя</h2>
-			</div>';
-			$find=array('author'=>(int)get_user_id($account_login),'status'=>0);
-			$perpage=50;
-			$offset=0;
-			$sort=array('_id'=>-1);
-			$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query($find,['sort'=>$sort,'limit'=>(int)$perpage,'skip'=>(int)$offset]));
-			$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
-			foreach($rows as $row){
-				print preview_content($row);
-			}
-			print '<div class="page content load-more" data-action="user-content" data-user-login="'.$account_login.'"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> Загрузка&hellip;</div></div>';
 		}
 	}
 }
