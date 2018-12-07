@@ -1255,7 +1255,7 @@ function view_content($data){
 		<div class="votes_count" title="'.($data['curation_percent']/100).'% кураторские"><span>'.$votes_count.'</span> голосов</div>';
 	if($reward_amount){
 		$result.='
-		<div class="reward_amount"><i class="far fa-fw fa-gem"></i> <span'.(-1!=$data['cashout_time']?' title="Выплата ожидается '.date('d.m.Y H:i:s',$data['cashout_time']).'"':'').'>'.$reward_amount.'</span></div>';
+		<div class="reward_amount"><i class="far fa-fw fa-gem"></i> <span'.(-1!=$data['cashout_time']?' class="cashout_time" data-timestamp="'.$data['cashout_time'].'"':'').'>'.$reward_amount.'</span></div>';
 	}
 	$result.='
 		<a class="flag'.($flag?' active':'').' flag-action"'.($flag?' title="Вы поставили флаг с силой '.($vote_weight/100).'%"':'').'></a>

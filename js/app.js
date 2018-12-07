@@ -1580,6 +1580,9 @@ function update_datetime(){
 	$('.timestamp').each(function(){
 		$(this).html(date_str($(this).attr('data-timestamp')*1000,true,false,true));
 	});
+	$('.cashout_time').each(function(){
+		$(this).attr('title','Выплата ожидается '+date_str($(this).attr('data-timestamp')*1000,true,false,true));
+	});
 }
 
 $(window).on('hashchange',function(e){
