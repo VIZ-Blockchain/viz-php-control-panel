@@ -1,5 +1,5 @@
 var gate=viz;
-var api_gates=['wss://lexai.host/ws','wss://api.viz.blckchnd.com/ws','wss://ws.viz.ropox.tools/']
+var api_gates=['wss://viz.lexai.host/','wss://api.viz.blckchnd.com/ws','wss://ws.viz.ropox.tools/']
 var best_gate=-1;
 var best_gate_latency=-1;
 var api_gate;
