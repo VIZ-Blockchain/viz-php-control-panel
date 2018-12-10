@@ -296,6 +296,10 @@ if('tools'==$path_array[1]){
 					<h1>VIZ блок #'.$id.'</h1>
 					<div class="article">';
 					print '<pre class="view_block">';
+					function htmlspecialchars_filter(&$value){
+						$value = htmlspecialchars($value);
+					}
+					array_walk_recursive($id_arr,'htmlspecialchars_filter');
 					$view_block=print_r($id_arr,true);
 					$view_block=preg_replace('~\[(.[^\]]*)\] =\> (.*)\n~iUs','[<span style="color:red">$1</span>] => <span style="color:#1b72fa">$2</span>'.PHP_EOL,$view_block);
 					$view_block=str_replace('<span style="color:#1b72fa">Array</span>','<span style="color:#069c40">Array</span>',$view_block);
