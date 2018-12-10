@@ -226,6 +226,49 @@ if('@'==mb_substr($path_array[1],0,1)){
 	}
 }
 else
+if('users'==$path_array[1]){
+	$replace['title']=htmlspecialchars('Пользователи').' - '.$replace['title'];
+	if(''==$path_array[2]){
+		print '<div class="page content">
+		<h1><i class="fas fa-fw fa-users"></i> Пользователи</h1>';
+		$find=['status'=>0,'shares'=>['$ne'=>0]];
+		$sort=['login'=>1];
+		$page=1;
+		$users_count=mongo_count('users',$find);
+		$perpage=20;
+		$pages=ceil($users_count/$perpage);
+		if($_GET['page']){
+			$page=(int)$_GET['page'];
+		}
+		if($page<1){
+			$page=1;
+		}
+		if($page>$pages){
+			$page=$pages;
+		}
+		$offset=$perpage*($page - 1);
+		$prev_page=$page-1;
+		$next_page=$page+1;
+		print '<p>Всего пользователей: '.$users_count.', текущая страница: '.$page.', всего страниц: '.$pages.'</p>';
+		print '<p><em>Пользователи с нулевым SHARES скрыты.</em></p>';
+		print '<hr>';
+		print '<div class="pages clearfix">';
+		if($prev_page>0){
+			print '<a href="?page='.$prev_page.'">&larr; Предыдущая страница</a>';
+		}
+		if($next_page<=$pages){
+			print '<a class="right" href="?page='.$next_page.'">Следующая страница &rarr;</a>';
+		}
+		print '</div>';
+		print '</div>';
+		$rows=$mongo->executeQuery($config['db_prefix'].'.users',new MongoDB\Driver\Query($find,['sort'=>$sort,'limit'=>(int)$perpage,'skip'=>(int)$offset]));
+		$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
+		foreach($rows as $row){
+			print user_badge($row);
+		}
+	}
+}
+else
 if('tools'==$path_array[1]){
 	$replace['title']=htmlspecialchars('Инструменты').' - '.$replace['title'];
 	if(''==$path_array[2]){

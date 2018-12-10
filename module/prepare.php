@@ -293,7 +293,56 @@ function mongo_counter_set($collection_name,$count){
 	$mongo->executeBulkWrite($config['db_prefix'].'.auto_increment',$bulk);
 	return true;
 }
+function user_badge($account_arr){
+	global $auth,$user_arr;
+	$account_name=$account_arr['login'];
+	$account_avatar='/default-avatar.png';
+	$account_about='';
 
+	if($account_arr['nickname']){
+		$account_name=htmlspecialchars($account_arr['nickname']);
+	}
+	if($account_arr['avatar']){
+		$account_avatar='https://i.goldvoice.club/64x64/'.htmlspecialchars($account_arr['avatar']);
+	}
+	if($account_arr['about']){
+		$account_about=htmlspecialchars(strip_tags(stripcslashes($account_arr['about'])));
+	}
+	$account_name=str_replace('@','',$account_name);
+	$ret='
+<div class="page user-badge clearfix">
+	<a href="/@'.$account_arr['login'].'/" class="avatar" style="background-image:url(\''.$account_avatar.'\')"></a>';
+	if($auth){
+		if($user_arr['_id']!=$account_arr['_id']){
+			$ret.='
+	<div class="actions" data-user-login="'.$account_arr['login'].'">';
+			$link=get_user_link($user_arr['_id'],$account_arr['_id']);
+			if(false===$link){
+				$ret.='<div class="follow follow-action">Подписаться</div><br><div class="ignore ignore-action">Игнорировать</div>';
+			}
+			if(1==$link){
+				$ret.='<div class="unfollow unfollow-action">Отписаться</div>';
+			}
+			if(2==$link){
+				$ret.='<div class="unfollow unfollow-action">Перестать игнорировать</div>';
+			}
+			$ret.='</div>';
+		}
+	}
+	$ret.='
+	<div class="info">
+		<div class="login"><a href="/@'.$account_arr['login'].'/">'.$account_name.'</a></div>
+		<div class="descr">
+			<p>'.$account_about.'</p>';
+			if(isset($account_arr['content_count'])){
+				$ret.='<p>Контента: '.$account_arr['content_count'].', Голосов: '.$account_arr['vote_count'].'</p>';
+			}
+			$ret.='<p>Баланс: '.($account_arr['balance']/1000).' VIZ, '.($account_arr['shares']/1000000).' SHARES</p>
+		</div>
+	</div>
+</div>';
+	return $ret;
+}
 // looking html and try close opened tags
 function repair_html_tags($html){
 	$tags_counter=array();

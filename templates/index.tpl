@@ -56,7 +56,7 @@
 {menu}
 		<div class="menu-el"><i class="fas fa-fw fa-home"></i><a href="/">Обзор сети</a></div>
 		<div class="menu-el"><i class="fas fa-fw fa-newspaper"></i><a href="/feed/">Лента контента</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-users"></i><a href="#/users/">Пользователи</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-users"></i><a href="/users/">Пользователи</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-user-friends"></i><a href="#/social/">Социальные связи</a></div>
 		<div class="menu-el inactive"><i class="fas fa-fw fa-bell"></i><a href="#/notifications/">Уведомления</a></div>
 		<hr>
