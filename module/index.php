@@ -225,6 +225,16 @@ if('users'==$path_array[1]){
 		foreach($rows as $row){
 			print user_badge($row);
 		}
+		print '<div class="page content">';
+		print '<div class="pages clearfix">';
+		if($prev_page>0){
+			print '<a href="?page='.$prev_page.'">&larr; Предыдущая страница</a>';
+		}
+		if($next_page<=$pages){
+			print '<a class="right" href="?page='.$next_page.'">Следующая страница &rarr;</a>';
+		}
+		print '</div>';
+		print '</div>';
 	}
 }
 else
