@@ -158,55 +158,14 @@ if('@'==mb_substr($path_array[1],0,1)){
 				if(!isset($account_arr['shares'])){
 					redis_add_ulist('update_user',$account_arr['login']);
 				}
-				$account_name=$account_arr['login'];
-				$account_avatar='/default-avatar.png';
-				$account_about='';
-
 				if($account_arr['nickname']){
-					$account_name=htmlspecialchars($account_arr['nickname']);
-					$replace['title']=htmlspecialchars($account_name).' - '.$replace['title'];
+					$replace['title']=htmlspecialchars($account_arr['nickname']).' - '.$replace['title'];
 				}
 				else{
-					$replace['title']='@'.$account_name.' - '.$replace['title'];
+					$replace['title']='@'.$account_arr['login'].' - '.$replace['title'];
 				}
-				if($account_arr['avatar']){
-					$account_avatar='https://i.goldvoice.club/64x64/'.htmlspecialchars($account_arr['avatar']);
-				}
-				if($account_arr['about']){
-					$account_about=htmlspecialchars(strip_tags(stripcslashes($account_arr['about'])));
-				}
-				$account_name=str_replace('@','',$account_name);
-				print '<div class="page user-badge clearfix">
-				<a href="/@'.$account_arr['login'].'/" class="avatar" style="background-image:url(\''.$account_avatar.'\')"></a>';
-				if($auth){
-					if($user_arr['_id']!=$account_id){
-						print '
-						<div class="actions" data-user-login="'.$account_arr['login'].'">';
-						$link=get_user_link($user_arr['_id'],$account_id);
-						if(false===$link){
-							print '<div class="follow follow-action">Подписаться</div><br><div class="ignore ignore-action">Игнорировать</div>';
-						}
-						if(1==$link){
-							print '<div class="unfollow unfollow-action">Отписаться</div>';
-						}
-						if(2==$link){
-							print '<div class="unfollow unfollow-action">Перестать игнорировать</div>';
-						}
-						print '</div>';
-					}
-				}
-				print '
-				<div class="info">
-					<div class="login"><a href="/@'.$account_arr['login'].'/">'.$account_name.'</a></div>
-					<div class="descr">
-						<p>'.$account_about.'</p>';
-						if(isset($account_arr['content_count'])){
-							print '<p>Контента: '.$account_arr['content_count'].', Голосов: '.$account_arr['vote_count'].'</p>';
-						}
-						print '<p>Баланс: '.($account_arr['balance']/1000).' VIZ, '.($account_arr['shares']/1000000).' SHARES</p>
-					</div>
-				</div>
-		</div>';
+
+				print user_badge($account_arr);
 
 				print '<div class="page content">
 				<h2>Контент пользователя</h2>
