@@ -176,12 +176,24 @@ function wait_session(){
 		users[current_user].session_attempts++;
 		if(users[current_user].session_attempts>20){
 			users[current_user].session_attempts=0;
-			$('.auth-error').html('Ошибка при инициализации сессии, попробуйте авторизоваться повторно позже');
-			$('.auth-action').removeClass('disabled');
+			if(users[current_user].shield){
+				$('.shield-auth-error').html('Ошибка при инициализации сессии, попробуйте авторизоваться повторно позже');
+				$('.shield-auth-action').removeClass('disabled');
+			}
+			else{
+				$('.auth-error').html('Ошибка при инициализации сессии, попробуйте авторизоваться повторно позже');
+				$('.auth-action').removeClass('disabled');
+			}
+			$('.header .account').html('<a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
 		}
 		else{
 			$('.header .account').html('<i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;');
-			$('.auth-error').html('Вы успешно авторизованы, инициализируем сессию, подождите (попытка '+users[current_user].session_attempts+')');
+			if(current_user.shield){
+				$('.shield-auth-error').html('Инициализируем сессию, подождите (попытка '+users[current_user].session_attempts+')');
+			}
+			else{
+				$('.auth-error').html('Вы успешно авторизованы, инициализируем сессию, подождите (попытка '+users[current_user].session_attempts+')');
+			}
 			$.ajax({
 				type:'POST',
 				url:'/ajax/check_session/',
@@ -202,8 +214,14 @@ function wait_session(){
 						wait_session_timer=0;
 						users[current_user].session_verify=1;
 						save_session();
-						$('.auth-error').html('Вы успешно авторизованы, сессия инициализирована');
-						$('.auth-action').removeClass('disabled');
+						if(current_user.shield){
+							$('.shield-auth-error').html('Вы успешно авторизованы, сессия инициализирована');
+							$('.shield-auth-action').removeClass('disabled');
+						}
+						else{
+							$('.auth-error').html('Вы успешно авторизованы, сессия инициализирована');
+							$('.auth-action').removeClass('disabled');
+						}
 						//initialize user_session_status (feed status, notifications)
 						if('/'==document.location.pathname){
 							document.location='https://'+domain+'/feed/';
@@ -277,18 +295,38 @@ function session_generate(){
 				users[current_user].session_verify=0;
 				users[current_user].session_attempts=0;
 				set_session_cookie();
-				gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'session','["auth",{"key":"'+key+'"}]',function(err,result){
-					if(!err){
-						console.log(result);
-						save_session();
-						wait_session_timer=window.setTimeout('wait_session()',3000);
+				let session_success=function(result){
+					save_session();
+					wait_session_timer=window.setTimeout('wait_session()',3000);
+				}
+				let session_failure=function(err){
+					if(users[current_user].shield){
+						$('.shield-auth-error').html('Не удается отправить custom операцию для инициализации сессии');
+						$('.shield-auth-action').removeClass('disabled');
 					}
 					else{
 						$('.auth-error').html('Не удается отправить custom операцию для инициализации сессии');
 						$('.auth-action').removeClass('disabled');
-						console.log(err);
 					}
-				});
+					console.log(err);
+					users[current_user].session_id=null;
+					users[current_user].session_verify=0;
+					users[current_user].session_attempts=0;
+					$('.header .account').html('<a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
+				}
+				if(users[current_user].shield){
+					shield_action(current_user,'custom',{id:'session',required_auths:[],required_posting_auths:[current_user],json:'["auth",{"key":"'+key+'"}]'},session_success,session_failure);
+				}
+				else{
+					gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'session','["auth",{"key":"'+key+'"}]',function(err,result){
+						if(!err){
+							session_success(result);
+						}
+						else{
+							session_failure(err);
+						}
+					});
+				}
 			}
 		});
 	}
@@ -332,6 +370,151 @@ function load_session(){
 	create_account_control();
 	reset_account_control();
 	invite_control();
+	shield_control();
+}
+function shield_status(id,success=()=>{},failure=()=>{}){
+	var xhr=new XMLHttpRequest();
+	xhr.open('POST','http://127.0.0.1:51280/status/'+id+'/');
+	xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+	xhr.onreadystatechange = function() {
+		if(4==xhr.readyState && 200==xhr.status){
+			json=JSON.parse(xhr.responseText);
+			if(typeof json.error !== 'undefined'){
+				failure(json.error);
+			}
+			else{
+				if(0==json.status){//wait user decision
+					setTimeout(()=>{shield_status(id,success,failure)},1000);
+				}
+				else
+				if(1==json.status){//denied
+					failure(json);
+				}
+				else
+				if(2==json.status){//wait execution
+					setTimeout(()=>{shield_status(id,success,failure)},1000);
+				}
+				else
+				if(3==json.status){//error result
+					failure(json);
+				}
+				else
+				if(4==json.status){//success result
+					success(json);
+				}
+			}
+		}
+	}
+	xhr.onerror=function(){
+		failure();
+	}
+	xhr.send();
+}
+function shield_action(login,operation,data,success=()=>{},failure=()=>{}){
+	var xhr=new XMLHttpRequest();
+	xhr.open('POST','http://127.0.0.1:51280/action');
+	xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+	xhr.onreadystatechange = function() {
+		if(4==xhr.readyState && 200==xhr.status){
+			json=JSON.parse(xhr.responseText);
+			if(typeof json.error !== 'undefined'){
+				failure(json.error);
+			}
+			else{
+				shield_status(json.action,success,failure);
+			}
+		}
+	}
+	xhr.onerror=function(){
+		failure();
+	}
+	let xhr_data='login='+login+'&operation='+operation;
+	for(i in data){
+		if(typeof data[i] === 'object'){
+			xhr_data+='&data['+i+']='+encodeURIComponent(JSON.stringify(data[i]));
+		}
+		else{
+			xhr_data+='&data['+i+']='+encodeURIComponent(data[i]);
+		}
+	}
+	xhr.send(xhr_data);
+}
+function shield_control(){
+	if(0!=$('.shield-auth-control').length){
+		let locked=function(){
+			let view=$('.shield-auth-control');
+			let result='';
+			result+='<p>У вас заблокирован кошелек. После разблокировки перезагрузите страницу или <a class="shield-auth-control-action link">нажмите на ссылку</a>.</p>';
+			view.html(result);
+		}
+		let accounts_list=function(json=[]){
+			let view=$('.shield-auth-control');
+			let result='';
+			result+='<p>Выберите аккаунт для авторизации на сайте:</p>';
+			result+='<p><select class="shield-auth-accounts round">';
+			for(i in json.accounts){
+				let account_login=escape_html(json.accounts[i]);
+				result+='<option value="'+account_login+'"'+(json.default==account_login?' selected':'')+'>'+account_login+'</option>';
+			}
+			result+='</select><p>';
+			result+='<p><span class="shield-auth-error"></span></p>';
+			result+='<p><input type="button" class="shield-auth-action button" value="Авторизироваться"></p>';
+			view.html(result);
+		}
+		let xhr=new XMLHttpRequest();
+		xhr.open('POST','http://127.0.0.1:51280/accounts/');
+		xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+		xhr.onreadystatechange = function() {
+			if(4==xhr.readyState && 200==xhr.status){
+				json=JSON.parse(xhr.responseText);
+				if(typeof json.error !== 'undefined'){
+					locked();
+				}
+				else{
+					accounts_list(json);
+				}
+			}
+		}
+		xhr.onerror=function(){
+			console.log('error',xhr.status);
+			console.log('readyState',xhr.readyState);
+		}
+		xhr.send();
+	}
+}
+function try_auth_shield(login){
+	$('.shield-auth-action').addClass('disabled');
+	$('.shield-auth-error').html('');
+	let xhr=new XMLHttpRequest();
+	xhr.open('POST','http://127.0.0.1:51280/accounts/'+login+'/');
+	xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+	xhr.onreadystatechange = function() {
+		if(4==xhr.readyState && 200==xhr.status){
+			json=JSON.parse(xhr.responseText);
+			if(typeof json.error !== 'undefined'){
+				$('.shield-auth-error').html('Не удается получить информацию о пользователе');
+				$('.shield-auth-action').removeClass('disabled');
+				return;
+			}
+			else{
+				users[login]={'posting_key':'','active_key':'','shield':true};
+				if(json.posting){
+					users[login].posting_key=true;
+				}
+				if(json.active){
+					users[login].active_key=true;
+				}
+				current_user=login;
+				session_generate();
+			}
+		}
+	}
+	xhr.onerror=function(){
+		console.log('error',xhr.status);
+		console.log('readyState',xhr.readyState);
+	}
+	xhr.send();
+
 }
 function view_session(){
 	if(''!=current_user){
@@ -2007,6 +2190,14 @@ function app_mouse(e){
 	var target=e.target || e.srcElement;
 	if($(target).closest('.go-top-left-wrapper').length>0){
 		scroll_top_action();
+	}
+	if($(target).hasClass('shield-auth-action')){
+		e.preventDefault();
+		try_auth_shield($('.shield-auth-accounts').val());
+	}
+	if($(target).hasClass('shield-auth-control-action')){
+		e.preventDefault();
+		shield_control();
 	}
 	if($(target).hasClass('post-content-action')){
 		e.preventDefault();

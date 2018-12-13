@@ -419,7 +419,10 @@ if('login'==$path_array[1]){
 	print '<p><span class="auth-error"></span></p>';
 	print '<p><input type="button" class="auth-action button" value="Сохранить доступ и авторизоваться"></p>';
 	print '</p>';
-	print '</div></div>';
+	print '<hr><h3><img src="/shield-icon.svg"> Авторизация через VIZ Shield</h3>';
+	print '<div class="shield-auth-control"></div>';
+	print '</div>';
+	print '</div>';
 }
 else
 if('publication'==$path_array[1]){
