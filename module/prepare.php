@@ -331,7 +331,7 @@ function user_badge($account_arr){
 	}
 	$ret.='
 	<div class="info">
-		<div class="login"><a href="/@'.$account_arr['login'].'/">'.$account_name.'</a></div>
+		<div class="login"><a href="/@'.$account_arr['login'].'/">'.$account_name.'</a>'.($account_name!=$account_arr['login']?'<span class="account-login"><a href="/@'.$account_arr['login'].'/">@'.$account_arr['login'].'</a></span>':'').'</div>
 		<div class="descr">
 			<p>'.$account_about.'</p>';
 			if(isset($account_arr['content_count'])){

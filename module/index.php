@@ -59,8 +59,9 @@ if('@'==mb_substr($path_array[1],0,1)){
 				$data=get_content($account_id,$permlink);
 				if(isset($data['_id'])){
 					$content_title=stripcslashes($data['title']);
+					$account_arr['nickname']=str_replace('@','',$account_arr['nickname']);
 					if($account_arr['nickname']){
-						$replace['title']=htmlspecialchars($account_arr['nickname']).' - '.$replace['title'];
+						$replace['title']=htmlspecialchars($account_arr['nickname']).' @'.$account_arr['login'].' - '.$replace['title'];
 					}
 					else{
 						$replace['title']='@'.$account_arr['login'].' - '.$replace['title'];
@@ -158,8 +159,9 @@ if('@'==mb_substr($path_array[1],0,1)){
 				if(!isset($account_arr['shares'])){
 					redis_add_ulist('update_user',$account_arr['login']);
 				}
+				$account_arr['nickname']=str_replace('@','',$account_arr['nickname']);
 				if($account_arr['nickname']){
-					$replace['title']=htmlspecialchars($account_arr['nickname']).' - '.$replace['title'];
+					$replace['title']=htmlspecialchars($account_arr['nickname']).' @'.$account_arr['login'].' - '.$replace['title'];
 				}
 				else{
 					$replace['title']='@'.$account_arr['login'].' - '.$replace['title'];
