@@ -831,39 +831,51 @@ function wallet_transfer(recipient,amount,memo){
 			if(typeof response[0] !== 'undefined'){
 				amount=parseFloat(amount);
 				let fixed_amount=''+amount.toFixed(3)+' VIZ';
+				let transfer_success=function(result){
+					let tr_html='<tr class="wallet-history-out new"><td>'+date_str(-1,true,true,true)+'</td><td><span class="wallet-recipient-set">'+current_user+'</span></td><td><span class="wallet-recipient-set">'+recipient+'</span></td><td>'+amount.toFixed(3)+'</td><td>VIZ</td><td class="wallet-memo-set">'+escape_html(memo)+'</td></tr>';
+					$('.wallet-history tbody').prepend(tr_html);
+					$('.wallet-control input[name=amount]').val('0');
+					wallet_control(true);
+					$('.wallet-control .wallet-transfer-action').removeClass('disabled');
+				}
+				let transfer_failure=function(err){
+					add_notify('Ошибка в переводе',true);
+					$('.wallet-control .wallet-transfer-action').removeClass('disabled');
+					if(typeof err.payload !== 'undefined'){
+						add_notify(err.payload.error.data.stack[0].format,true);
+					}
+				}
 				var shares=$('.wallet-control input[name=shares]').prop('checked');
 				if(shares){
-					gate.broadcast.transferToVesting(users[current_user].active_key,current_user,login,fixed_amount,function(err,result){
-						memo='TO VESTING SHARES';
-						if(!err){
-							let tr_html='<tr class="wallet-history-out new"><td>'+date_str(-1,true,true,true)+'</td><td><span class="wallet-recipient-set">'+current_user+'</span></td><td><span class="wallet-recipient-set">'+recipient+'</span></td><td>'+amount+'</td><td>VIZ</td><td class="wallet-memo-set">'+escape_html(memo)+'</td></tr>';
-							$('.wallet-history tbody').prepend(tr_html);
-							$('.wallet-control input[name=amount]').val('0');
-							wallet_control(true);
-							$('.wallet-control .wallet-transfer-action').removeClass('disabled');
-						}
-						else{
-							add_notify('Ошибка в переводе',true);
-							add_notify(err.payload.error.data.stack[0].format,true);
-							$('.wallet-control .wallet-transfer-action').removeClass('disabled');
-						}
-					});
+					memo='TO VESTING SHARES';
+					if(users[current_user].shield){
+						shield_action(current_user,'transfer_to_vesting',{to:login,amount:fixed_amount},transfer_success,transfer_failure);
+					}
+					else{
+						gate.broadcast.transferToVesting(users[current_user].active_key,current_user,login,fixed_amount,function(err,result){
+							if(!err){
+								transfer_success(result);
+							}
+							else{
+								transfer_failure(err);
+							}
+						});
+					}
 				}
 				else{
-					gate.broadcast.transfer(users[current_user].active_key,current_user,login,fixed_amount,memo,function(err,result){
-						if(!err){
-							let tr_html='<tr class="wallet-history-out new"><td>'+date_str(-1,true,true,true)+'</td><td><span class="wallet-recipient-set">'+current_user+'</span></td><td><span class="wallet-recipient-set">'+recipient+'</span></td><td>'+amount.toFixed(3)+'</td><td>VIZ</td><td class="wallet-memo-set">'+escape_html(memo)+'</td></tr>';
-							$('.wallet-history tbody').prepend(tr_html);
-							$('.wallet-control input[name=amount]').val('0');
-							wallet_control(true);
-							$('.wallet-control .wallet-transfer-action').removeClass('disabled');
-						}
-						else{
-							add_notify('Ошибка в переводе',true);
-							add_notify(err.payload.error.data.stack[0].format,true);
-							$('.wallet-control .wallet-transfer-action').removeClass('disabled');
-						}
-					});
+					if(users[current_user].shield){
+						shield_action(current_user,'transfer',{to:login,amount:fixed_amount,memo:memo},transfer_success,transfer_failure);
+					}
+					else{
+						gate.broadcast.transfer(users[current_user].active_key,current_user,login,fixed_amount,memo,function(err,result){
+							if(!err){
+								transfer_success(result);
+							}
+							else{
+								transfer_failure(err);
+							}
+						});
+					}
 				}
 			}
 			else{
