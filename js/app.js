@@ -188,7 +188,7 @@ function wait_session(){
 		}
 		else{
 			$('.header .account').html('<i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;');
-			if(current_user.shield){
+			if(users[current_user].shield){
 				$('.shield-auth-error').html('Инициализируем сессию, подождите (попытка '+users[current_user].session_attempts+')');
 			}
 			else{
@@ -214,7 +214,7 @@ function wait_session(){
 						wait_session_timer=0;
 						users[current_user].session_verify=1;
 						save_session();
-						if(current_user.shield){
+						if(users[current_user].shield){
 							$('.shield-auth-error').html('Вы успешно авторизованы, сессия инициализирована');
 							$('.shield-auth-action').removeClass('disabled');
 						}
@@ -1155,15 +1155,28 @@ function flag_content(author,permlink,target){
 	}
 }
 function vote_witness(witness_login,value){
-	gate.broadcast.accountWitnessVote(users[current_user]['active_key'],current_user,witness_login,value,function(err, result){
-		if(!err){
-			witness_control();
-		}
-		else{
-			add_notify('Вы не можете голосовать',true);
+	let vote_witness_success=function(result){
+		witness_control();
+	}
+	let vote_witness_failure=function(err){
+		add_notify('Вы не можете голосовать',true);
+		if(typeof err.payload !== 'undefined'){
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
-	});
+	}
+	if(users[current_user].shield){
+		shield_action(current_user,'account_witness_vote',{witness:witness_login,approve:value},vote_witness_success,vote_witness_failure);
+	}
+	else{
+		gate.broadcast.accountWitnessVote(users[current_user]['active_key'],current_user,witness_login,value,function(err, result){
+			if(!err){
+				vote_witness_success(result);
+			}
+			else{
+				vote_witness_failure(err);
+			}
+		});
+	}
 }
 function witness_control(){
 	if(0!=$('.witness-votes').length){
