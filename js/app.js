@@ -999,18 +999,31 @@ function witness_chain_properties_update(witness_login,url,signing_key){
 	}
 }
 function unvote_subcontent(author,permlink,target){
-	gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,0,function(err,result){
-		if(!err){
-			target.find('.flag-subcontent-action').removeClass('active').attr('title','');
-			target.find('.award-subcontent-action').removeClass('active').attr('title','');
-			add_notify('Вы успешно сняли голос');
-			view_energy();
-		}
-		else{
-			add_notify('Ошибка',true);
+	let unvote_success=function(result){
+		target.find('.flag-subcontent-action').removeClass('active').attr('title','');
+		target.find('.award-subcontent-action').removeClass('active').attr('title','');
+		add_notify('Вы успешно сняли голос');
+		view_energy();
+	}
+	let unvote_failure=function(err){
+		add_notify('Ошибка',true);
+		if(typeof err.payload !== 'undefined'){
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
-	});
+	}
+	if(users[current_user].shield){
+		shield_action(current_user,'vote',{author:author,permlink:permlink,weight:0},unvote_success,unvote_failure);
+	}
+	else{
+		gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,0,function(err,result){
+			if(!err){
+				unvote_success(result);
+			}
+			else{
+				unvote_failure(err);
+			}
+		});
+	}
 }
 function upvote_subcontent(author,permlink,target){
 	let weight=10000/10;
@@ -1018,34 +1031,60 @@ function upvote_subcontent(author,permlink,target){
 		weight=10000;
 		$('.header-menu-el.energy').removeClass('powerup');
 	}
-	gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,weight,function(err,result){
-		if(!err){
-			target.find('.flag-subcontent-action').removeClass('active').attr('title','');
-			target.find('.award-subcontent-action').addClass('active').attr('title','Вы проголосовали с силой '+(weight/100)+'%');
-			add_notify('Вы успешно проголосовали');
-			view_energy();
-		}
-		else{
-			add_notify('Ошибка',true);
+	let upvote_success=function(result){
+		target.find('.flag-subcontent-action').removeClass('active').attr('title','');
+		target.find('.award-subcontent-action').addClass('active').attr('title','Вы проголосовали с силой '+(weight/100)+'%');
+		add_notify('Вы успешно проголосовали');
+		view_energy();
+	}
+	let upvote_failure=function(err){
+		add_notify('Ошибка',true);
+		if(typeof err.payload !== 'undefined'){
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
-	});
+	}
+	if(users[current_user].shield){
+		shield_action(current_user,'vote',{author:author,permlink:permlink,weight:weight},upvote_success,upvote_failure);
+	}
+	else{
+		gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,weight,function(err,result){
+			if(!err){
+				upvote_success(result);
+			}
+			else{
+				upvote_failure(err);
+			}
+		});
+	}
 }
 function unvote_content(author,permlink,target){
-	gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,0,function(err,result){
-		if(!err){
-			target.find('.flag-action').removeClass('active').attr('title','');
-			target.find('.award-action').removeClass('active').attr('title','');
-			let votes_count=target.find('.votes_count span');
-			votes_count.html(parseInt(votes_count.html())-1);
-			add_notify('Вы успешно сняли голос');
-			view_energy();
-		}
-		else{
-			add_notify('Ошибка',true);
+	let unvote_success=function(result){
+		target.find('.flag-action').removeClass('active').attr('title','');
+		target.find('.award-action').removeClass('active').attr('title','');
+		let votes_count=target.find('.votes_count span');
+		votes_count.html(parseInt(votes_count.html())-1);
+		add_notify('Вы успешно сняли голос');
+		view_energy();
+	}
+	let unvote_failure=function(err){
+		add_notify('Ошибка',true);
+		if(typeof err.payload !== 'undefined'){
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
-	});
+	}
+	if(users[current_user].shield){
+		shield_action(current_user,'vote',{author:author,permlink:permlink,weight:0},unvote_success,unvote_failure);
+	}
+	else{
+		gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,0,function(err,result){
+			if(!err){
+				unvote_success(result);
+			}
+			else{
+				unvote_failure(err);
+			}
+		});
+	}
 }
 function upvote_content(author,permlink,target){
 	let weight=10000/10;
@@ -1053,20 +1092,33 @@ function upvote_content(author,permlink,target){
 		weight=10000;
 		$('.header-menu-el.energy').removeClass('powerup');
 	}
-	gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,weight,function(err,result){
-		if(!err){
-			target.find('.flag-action').removeClass('active').attr('title','');
-			target.find('.award-action').addClass('active').attr('title','Вы проголосовали с силой '+(weight/100)+'%');
-			let votes_count=target.find('.votes_count span');
-			votes_count.html(1+parseInt(votes_count.html()));
-			add_notify('Вы успешно проголосовали');
-			view_energy();
-		}
-		else{
-			add_notify('Ошибка',true);
+	let upvote_success=function(result){
+		target.find('.flag-action').removeClass('active').attr('title','');
+		target.find('.award-action').addClass('active').attr('title','Вы проголосовали с силой '+(weight/100)+'%');
+		let votes_count=target.find('.votes_count span');
+		votes_count.html(1+parseInt(votes_count.html()));
+		add_notify('Вы успешно проголосовали');
+		view_energy();
+	}
+	let upvote_failure=function(err){
+		add_notify('Ошибка',true);
+		if(typeof err.payload !== 'undefined'){
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
-	});
+	}
+	if(users[current_user].shield){
+		shield_action(current_user,'vote',{author:author,permlink:permlink,weight:weight},upvote_success,upvote_failure);
+	}
+	else{
+		gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,weight,function(err,result){
+			if(!err){
+				upvote_success(result);
+			}
+			else{
+				upvote_failure(err);
+			}
+		});
+	}
 }
 function flag_content(author,permlink,target){
 	let weight=10000/10;
@@ -1074,20 +1126,33 @@ function flag_content(author,permlink,target){
 		weight=10000;
 		$('.header-menu-el.energy').removeClass('powerup');
 	}
-	gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,-weight,function(err,result){
-		if(!err){
-			target.find('.award-action').removeClass('active').attr('title','');
-			target.find('.flag-action').addClass('active').attr('title','Вы поставили флаг с силой '+(weight/100)+'%');
-			let votes_count=target.find('.votes_count span');
-			votes_count.html(1+parseInt(votes_count.html()));
-			add_notify('Вы успешно поставили флаг');
-			view_energy();
-		}
-		else{
-			add_notify('Ошибка',true);
+	let flag_success=function(result){
+		target.find('.award-action').removeClass('active').attr('title','');
+		target.find('.flag-action').addClass('active').attr('title','Вы поставили флаг с силой '+(weight/100)+'%');
+		let votes_count=target.find('.votes_count span');
+		votes_count.html(1+parseInt(votes_count.html()));
+		add_notify('Вы успешно поставили флаг');
+		view_energy();
+	}
+	let flag_failure=function(err){
+		add_notify('Ошибка',true);
+		if(typeof err.payload !== 'undefined'){
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
-	});
+	}
+	if(users[current_user].shield){
+		shield_action(current_user,'vote',{author:author,permlink:permlink,weight:-weight},flag_success,flag_failure);
+	}
+	else{
+		gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,-weight,function(err,result){
+			if(!err){
+				flag_success(result);
+			}
+			else{
+				flag_failure(err);
+			}
+		});
+	}
 }
 function vote_witness(witness_login,value){
 	gate.broadcast.accountWitnessVote(users[current_user]['active_key'],current_user,witness_login,value,function(err, result){
