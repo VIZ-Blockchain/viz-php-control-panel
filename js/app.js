@@ -2137,7 +2137,7 @@ function post_content(target){
 						add_notify('Публикация прошла успешно, переадресация&hellip;');
 						setTimeout(function(){wait_content(current_user,permlink)},3500);
 					}
-					let content_failure=function(result){
+					let content_failure=function(err){
 						add_notify('Ошибка при публикации',true);
 						$('input[name=permlink]').removeAttr('disabled');
 						target.removeClass('disabled');
@@ -2196,17 +2196,28 @@ function save_profile(target){
 						metadata[$(this).attr('name')]=$(this).val();
 					}
 				});
-				gate.broadcast.accountMetadata(users[current_user].posting_key,current_user,JSON.stringify(metadata),function(err, result){
-					if(!err){
-						add_notify('Профиль аккаунта '+current_user+' изменен');
-						target.removeClass('disabled');
-					}
-					else{
-						console.log(err);
-						add_notify('Ошибка в сохранение метаданных '+current_user+'');
-						target.removeClass('disabled');
-					}
-				});
+				let metadata_success=function(result){
+					add_notify('Профиль аккаунта '+current_user+' изменен');
+					target.removeClass('disabled');
+				}
+				let metadata_failure=function(err){
+					add_notify('Ошибка в сохранение метаданных '+current_user+'');
+					target.removeClass('disabled');
+					console.log(err);
+				}
+				if(users[current_user].shield){
+					shield_action(current_user,'account_metadata',{json_metadata:JSON.stringify(metadata)},metadata_success,metadata_failure);
+				}
+				else{
+					gate.broadcast.accountMetadata(users[current_user].posting_key,current_user,JSON.stringify(metadata),function(err, result){
+						if(!err){
+							metadata_success(result);
+						}
+						else{
+							metadata_failure(err);
+						}
+					});
+				}
 			}
 			else{
 				add_notify('Ошибка в получении пользователя '+current_user,true);
