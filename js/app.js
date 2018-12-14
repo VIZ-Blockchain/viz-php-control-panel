@@ -627,16 +627,29 @@ function view_energy(){
 }
 function wallet_withdraw_shares(disable=false){
 	if(disable){
-		gate.broadcast.withdrawVesting(users[current_user].active_key,current_user,'0.000000 SHARES',function(err,response){
-			if(!err){
-				wallet_control(true);
-				add_notify('Понижение доли отменено');
-			}
-			else{
-				add_notify('Ошибка',true);
+		let withdraw_shares_success=function(result){
+			wallet_control(true);
+			add_notify('Понижение доли отменено');
+		}
+		let withdraw_shares_failure=function(err){
+			add_notify('Ошибка',true);
+			if(typeof err.payload !== 'undefined'){
 				add_notify(err.payload.error.data.stack[0].format,true);
 			}
-		});
+		}
+		if(users[current_user].shield){
+			shield_action(current_user,'withdraw_vesting',{vesting_shares:'0.000000 SHARES'},withdraw_shares_success,withdraw_shares_failure);
+		}
+		else{
+			gate.broadcast.withdrawVesting(users[current_user].active_key,current_user,'0.000000 SHARES',function(err,response){
+				if(!err){
+					withdraw_shares_success(result);
+				}
+				else{
+					withdraw_shares_failure(err);
+				}
+			});
+		}
 	}
 	else{
 		gate.api.getAccounts([current_user],function(err,response){
@@ -645,16 +658,29 @@ function wallet_withdraw_shares(disable=false){
 				delegated_vesting_shares=parseFloat(response[0].delegated_vesting_shares);
 				shares=vesting_shares-delegated_vesting_shares;
 				let fixed_shares=''+shares.toFixed(6)+' SHARES';
-				gate.broadcast.withdrawVesting(users[current_user].active_key,current_user,fixed_shares,function(err,response){
-					if(!err){
-						wallet_control(true);
-						add_notify('Понижение доли запущено');
-					}
-					else{
-						add_notify('Ошибка',true);
+				let withdraw_shares_success=function(result){
+					wallet_control(true);
+					add_notify('Понижение доли запущено');
+				}
+				let withdraw_shares_failure=function(err){
+					add_notify('Ошибка',true);
+					if(typeof err.payload !== 'undefined'){
 						add_notify(err.payload.error.data.stack[0].format,true);
 					}
-				});
+				}
+				if(users[current_user].shield){
+					shield_action(current_user,'withdraw_vesting',{vesting_shares:fixed_shares},withdraw_shares_success,withdraw_shares_failure);
+				}
+				else{
+					gate.broadcast.withdrawVesting(users[current_user].active_key,current_user,fixed_shares,function(err,response){
+						if(!err){
+							withdraw_shares_success(result);
+						}
+						else{
+							withdraw_shares_failure(err);
+						}
+					});
+				}
 			}
 			else{
 				add_notify('Информация по аккаунту не получена',true);
@@ -844,15 +870,30 @@ function wallet_delegate(recipient,amount){
 			if(typeof response[0] !== 'undefined'){
 				amount=parseFloat(amount);
 				let fixed_amount=''+amount.toFixed(6)+' SHARES';
-				gate.broadcast.delegateVestingShares(users[current_user].active_key,current_user,login,fixed_amount,function(err,result){
-					if(!err){
-						delegation_control();
-					}
-					else{
-						add_notify('Ошибка в переводе',true);
+
+				let delegate_success=function(result){
+					add_notify('Делегирование прошло успешно');
+					delegation_control();
+				}
+				let delegate_failure=function(err){
+					add_notify('Ошибка в переводе',true);
+					if(typeof err.payload !== 'undefined'){
 						add_notify(err.payload.error.data.stack[0].format,true);
 					}
-				});
+				}
+				if(users[current_user].shield){
+					shield_action(current_user,'delegate_vesting_shares',{delegatee:login,vesting_shares:fixed_amount},delegate_success,delegate_failure);
+				}
+				else{
+					gate.broadcast.delegateVestingShares(users[current_user].active_key,current_user,login,fixed_amount,function(err,result){
+						if(!err){
+							delegate_success(result);
+						}
+						else{
+							delegate_failure(err);
+						}
+					});
+				}
 			}
 			else{
 				add_notify('Получатель не найден',true);
