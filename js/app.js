@@ -241,46 +241,82 @@ function wait_session(){
 function follow_user(user,proper_target){
 	if(''!=current_user){
 		let json=JSON.stringify(['follow',{follower:current_user,following:user,what:['blog']}]);
-		gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'follow',json,function(err,result){
-			if(!err){
-				add_notify('Вы успешно подписались на '+user);
-				proper_target.html('<div class="unfollow unfollow-action">Отписаться</div>');
-			}
-			else{
-				add_notify('Не удается отправить операцию подписки на '+user,true);
-				console.log(err);
-			}
-		});
+
+		let follow_success=function(result){
+			add_notify('Вы успешно подписались на '+user);
+			proper_target.html('<div class="unfollow unfollow-action">Отписаться</div>');
+		}
+		let follow_failure=function(err){
+			add_notify('Не удается отправить операцию подписки на '+user,true);
+			console.log(err);
+		}
+		if(users[current_user].shield){
+			shield_action(current_user,'custom',{id:'follow',required_auths:[],required_posting_auths:[current_user],json:json},follow_success,follow_failure);
+		}
+		else{
+			gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'follow',json,function(err,result){
+				if(!err){
+					follow_success(result);
+				}
+				else{
+					follow_failure(err);
+				}
+			});
+		}
 	}
 }
 function unfollow_user(user,proper_target){
 	if(''!=current_user){
 		let json=JSON.stringify(['follow',{follower:current_user,following:user,what:[]}]);
-		gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'follow',json,function(err,result){
-			if(!err){
-				add_notify('Вы стали соблюдать нейтралитет с '+user);
-				proper_target.html('<div class="follow follow-action">Подписаться</div><br><div class="ignore ignore-action">Игнорировать</div>');
-			}
-			else{
-				add_notify('Не удается отправить операцию нейтралитета с '+user,true);
-				console.log(err);
-			}
-		});
+
+		let unfollow_success=function(result){
+			add_notify('Вы стали соблюдать нейтралитет с '+user);
+			proper_target.html('<div class="follow follow-action">Подписаться</div><br><div class="ignore ignore-action">Игнорировать</div>');
+		}
+		let unfollow_failure=function(err){
+			add_notify('Не удается отправить операцию нейтралитета с '+user,true);
+			console.log(err);
+		}
+		if(users[current_user].shield){
+			shield_action(current_user,'custom',{id:'follow',required_auths:[],required_posting_auths:[current_user],json:json},unfollow_success,unfollow_failure);
+		}
+		else{
+			gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'follow',json,function(err,result){
+				if(!err){
+					unfollow_success(result);
+				}
+				else{
+					unfollow_failure(err);
+				}
+			});
+		}
 	}
 }
 function ignore_user(user,proper_target){
 	if(''!=current_user){
 		let json=JSON.stringify(['follow',{follower:current_user,following:user,what:['ignore']}]);
-		gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'follow',json,function(err,result){
-			if(!err){
-				add_notify('Вы успешно начали игнорировать '+user);
-				proper_target.html('<div class="unfollow unfollow-action">Перестать игнорировать</div>');
-			}
-			else{
-				add_notify('Не удается отправить операцию игнорирования '+user,true);
-				console.log(err);
-			}
-		});
+
+		let ignore_success=function(result){
+			add_notify('Вы успешно начали игнорировать '+user);
+			proper_target.html('<div class="unfollow unfollow-action">Перестать игнорировать</div>');
+		}
+		let ignore_failure=function(err){
+			add_notify('Не удается отправить операцию игнорирования '+user,true);
+			console.log(err);
+		}
+		if(users[current_user].shield){
+			shield_action(current_user,'custom',{id:'follow',required_auths:[],required_posting_auths:[current_user],json:json},ignore_success,ignore_failure);
+		}
+		else{
+			gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'follow',json,function(err,result){
+				if(!err){
+					ignore_success(result);
+				}
+				else{
+					ignore_failure(err);
+				}
+			});
+		}
 	}
 }
 function session_generate(){
@@ -1958,19 +1994,30 @@ function post_subcontent(target){
 			permlink='re-'+parent_author+'-'+parseInt(new Date().getTime()/1000);
 		}
 		if(''!=parent_author){
-			gate.broadcast.content(users[current_user].posting_key,parent_author,parent_permlink,current_user,permlink,title,subcontent,curation_percent,json,[],function(err,result){
-				if(!err){
-					$(target).parent().remove();
-					set_update_comments_list();
-					add_notify('Комментарий отправлен',5000);
-				}
-				else{
-					console.log(err);
-					window.setTimeout(function(){set_update_comments_list(false)},100);
-					add_notify('Ошибка при отправке комментария',true);
-					target.removeClass('disabled');
-				}
-			});
+			let subcontent_success=function(result){
+				$(target).parent().remove();
+				set_update_comments_list();
+				add_notify('Комментарий отправлен',5000);
+			}
+			let subcontent_failure=function(err){
+				window.setTimeout(function(){set_update_comments_list(false)},100);
+				add_notify('Ошибка при отправке комментария',true);
+				target.removeClass('disabled');
+				console.log(err);
+			}
+			if(users[current_user].shield){
+				shield_action(current_user,'content',{parent_author:parent_author,parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:subcontent,curation_percent:curation_percent,json_metadata:json,extensions:[]},subcontent_success,subcontent_failure);
+			}
+			else{
+				gate.broadcast.content(users[current_user].posting_key,parent_author,parent_permlink,current_user,permlink,title,subcontent,curation_percent,json,[],function(err,result){
+					if(!err){
+						subcontent_success(result);
+					}
+					else{
+						subcontent_failure(err);
+					}
+				});
+			}
 		}
 	}
 }
@@ -1983,9 +2030,9 @@ function post_content(target){
 			let permlink_from_title=title;
 			permlink_from_title=permlink_from_title.toLowerCase().trim();
 			permlink_from_title=permlink_from_title.replace(/[^ а-яА-Яa-zA-Z0-9\-_]/g,'');
-			permlink_from_title=permlink_from_title.replace(' ','-');
-			permlink_from_title=permlink_from_title.replace('---','-');
-			permlink_from_title=permlink_from_title.replace('--','-');
+			permlink_from_title=permlink_from_title.replace(new RegExp(' ','g'),'-');
+			permlink_from_title=permlink_from_title.replace(new RegExp('---','g'),'-');
+			permlink_from_title=permlink_from_title.replace(new RegExp('--','g'),'-');
 			$('input[name=permlink]').val(permlink_from_title);
 			permlink=$('input[name=permlink]').val();
 		}
@@ -1994,7 +2041,7 @@ function post_content(target){
 		if(wysiwyg_active){
 			content=tinyMCE.activeEditor.getContent();
 		}
-		content=content.replace(' rel="noopener"','');
+		content=content.replace(new RegExp(' rel="noopener"','g'),'');
 		var foreword=$('input[name=foreword]').val().trim();
 		var curation_percent=parseInt($('input[name=curation_percent]').val())*100;
 		var cover=$('input[name=cover]').val().trim();
@@ -2050,43 +2097,66 @@ function post_content(target){
 									old_json[key]=json_object[key];
 								}
 								let new_json=JSON.stringify(old_json);
-								gate.broadcast.content(users[current_user].posting_key,result.parent_author,result.parent_permlink,current_user,permlink,title,content,result.curation_percent,new_json,old_extensions,function(err,result){
-									if(!err){
-										add_notify('Публикация успешно изменена, переадресация через 6 секунд&hellip;');
-										setTimeout(function(){wait_content(current_user,permlink)},6000);
-									}
-									else{
-										console.log(err);
-										add_notify('Ошибка при  получении публикации',true);
-										$('input[name=permlink]').removeAttr('disabled');
-										target.removeClass('disabled');
-										target.html('Опубликовать');
-									}
-								});
+
+								let edit_success=function(result){
+									add_notify('Публикация успешно изменена, переадресация через 6 секунд&hellip;');
+									setTimeout(function(){wait_content(current_user,permlink)},6000);
+								}
+								let edit_failure=function(err){
+									add_notify('Ошибка при  получении публикации',true);
+									$('input[name=permlink]').removeAttr('disabled');
+									target.removeClass('disabled');
+									target.html('Опубликовать');
+									console.log(err);
+								}
+								if(users[current_user].shield){
+									shield_action(current_user,'content',{parent_author:result.parent_author,parent_permlink:result.parent_permlink,author:current_user,permlink:permlink,title:title,body:content,curation_percent:result.curation_percent,json_metadata:new_json,extensions:old_extensions},edit_success,edit_failure);
+								}
+								else{
+									gate.broadcast.content(users[current_user].posting_key,result.parent_author,result.parent_permlink,current_user,permlink,title,content,result.curation_percent,new_json,old_extensions,function(err,result){
+										if(!err){
+											edit_success(result);
+										}
+										else{
+											edit_failure(err);
+										}
+									});
+								}
 							}
 							else{
-								console.log(err);
 								add_notify('Не получается запросить публикацию с публичной ноды',true);
 								target.removeClass('disabled');
 								target.html('Сохранить изменения');
+								console.log(err);
 							}
 						});
 					}
 				}
 				else{
-					gate.broadcast.content(users[current_user].posting_key,'',parent_permlink,current_user,permlink,title,content,curation_percent,json,[],function(err,result){
-						if(!err){
-							add_notify('Публикация прошла успешно, переадресация&hellip;');
-							setTimeout(function(){wait_content(current_user,permlink)},3500);
-						}
-						else{
-							console.log(err);
-							add_notify('Ошибка при публикации',true);
-							$('input[name=permlink]').removeAttr('disabled');
-							target.removeClass('disabled');
-							target.html('Опубликовать');
-						}
-					});
+					let content_success=function(result){
+						add_notify('Публикация прошла успешно, переадресация&hellip;');
+						setTimeout(function(){wait_content(current_user,permlink)},3500);
+					}
+					let content_failure=function(result){
+						add_notify('Ошибка при публикации',true);
+						$('input[name=permlink]').removeAttr('disabled');
+						target.removeClass('disabled');
+						target.html('Опубликовать');
+						console.log(err);
+					}
+					if(users[current_user].shield){
+						shield_action(current_user,'content',{parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:content,curation_percent:curation_percent,json_metadata:json,extensions:[]},content_success,content_failure);
+					}
+					else{
+						gate.broadcast.content(users[current_user].posting_key,'',parent_permlink,current_user,permlink,title,content,curation_percent,json,[],function(err,result){
+							if(!err){
+								content_success(result);
+							}
+							else{
+								content_failure(err);
+							}
+						});
+					}
 				}
 			}
 		});
