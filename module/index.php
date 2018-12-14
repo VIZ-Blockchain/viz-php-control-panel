@@ -264,7 +264,7 @@ if('tools'==$path_array[1]){
 			$date=date_parse_from_format('Y-m-d\TH:i:s',$dgp['genesis_time']);
 			$genesis_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
 			print '<p>Время запуска сети: <span class="timestamp" data-timestamp="'.$genesis_time.'">'.date('d.m.Y H:i:s',$genesis_time).'</span></p>';
-			print '<p>Количество блоков: '.$dgp['head_block_number'].'</p>';
+			print '<p>Количество блоков: '.$dgp['head_block_number'].' ('.$api->endpoint.')</p>';
 			print '<p>Количество в базе данных (индекс): '.mongo_counter('blocks').'</p>';
 			print '<p>Количество в базе данных (курсор): '.mongo_count('blocks').'</p>';
 			print '<p>Количество пользователей в бд: '.mongo_count('users').'</p>';
