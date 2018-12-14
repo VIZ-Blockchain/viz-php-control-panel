@@ -366,6 +366,9 @@ function load_session(){
 		delegation_control();
 		wait_session();
 		profile_control();
+		if(users[current_user].shield){
+			shield_check(()=>{},()=>{window.open('viz-shield://open/')});
+		}
 	}
 	create_account_control();
 	reset_account_control();
@@ -407,6 +410,23 @@ function shield_status(id,success=()=>{},failure=()=>{}){
 	}
 	xhr.onerror=function(){
 		failure();
+	}
+	xhr.send();
+}
+function shield_check(success=()=>{},failure=()=>{}){
+	var xhr=new XMLHttpRequest();
+	xhr.open('POST','http://127.0.0.1:51280/accounts/');
+	xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+	xhr.onreadystatechange = function() {
+		if(4==xhr.readyState && 200==xhr.status){
+			json=JSON.parse(xhr.responseText);
+			success(json);
+		}
+	}
+	xhr.onerror=function(){
+		if(4==xhr.readyState && 0==xhr.status){
+			failure();
+		}
 	}
 	xhr.send();
 }
