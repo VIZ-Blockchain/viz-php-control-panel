@@ -891,13 +891,10 @@ function text_to_view($text,$set_markdown=false){
 	usort($matches[1],'sort_by_value_length');
 	foreach($matches[0] as $k=>$match){
 		$match=trim($match,'.');
-		$matches[1][$k]=trim($matches[1][$k],'.');
+		$matches[1][$k]=trim($matches[1][$k],'., ');
 		if($matches[1][$k]){
-			$tag_ru=tags_translate(mb_strtolower($matches[1][$k]));
-			if($tag_ru!=$matches[1][$k]){
-				$tag_ru='ru--'.$tag_ru;
-			}
-			$replace_arr[$replace_num]='<a href="/tags/'.htmlspecialchars($tag_ru).'/">#'.$matches[1][$k].'</a>';
+			$tag=mb_strtolower($matches[1][$k]);
+			$replace_arr[$replace_num]='<a href="/tags/'.htmlspecialchars($tag).'/">#'.$matches[1][$k].'</a>';
 			$text=str_replace($match,'{replacerQarrQ'.$replace_num.'}',$text);
 			$replace_num++;
 		}

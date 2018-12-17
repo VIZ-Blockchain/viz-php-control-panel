@@ -130,7 +130,8 @@ class viz_plugin_content extends viz_plugin{
 				}
 				if(isset($json_metadata_encoded['tags'])){
 					foreach($json_metadata_encoded['tags'] as $tag){
-						$tag=trim($tag," \r\n\t");
+						$tag=trim($tag,"., \r\n\t");
+						$tag=mb_strtolower($tag);
 						$tag_id=mongo_find_id('tags',array('value'=>$tag));
 						if(!$tag_id){
 							$tag_id=mongo_counter('tags',true);
