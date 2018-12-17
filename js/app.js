@@ -704,32 +704,59 @@ function download(filename, text) {
 }
 function invite_register(secret_key,receiver,private_key){
 	public_key=gate.auth.wifToPublic(private_key);
-	gate.broadcast.inviteRegistration('5KcfoRuDfkhrLCxVcE9x51J6KN9aM9fpb78tLrvvFckxVV6FyFW','invite',receiver,secret_key,public_key,function(err,result){
-		if(!err){
-			add_notify('Код успешно активирован');
-			download('viz-registration.txt','VIZ.World registration\r\nAccount login: '+receiver+'\r\nPrivate key: '+private_key+'');
-		}
-		else{
-			add_notify('Ошибка при активации кода',true);
-			gate.api.getAccounts([receiver],function(err,response){
-				if(!err){
-					add_notify('Логин '+receiver+' недоступен',true);
-				}
-			});
+
+	let invite_success=function(result){
+		add_notify('Код успешно активирован');
+		download('viz-registration.txt','VIZ.World registration\r\nAccount login: '+receiver+'\r\nPrivate key: '+private_key+'');
+	}
+	let invite_failure=function(err){
+		add_notify('Ошибка при активации кода',true);
+		gate.api.getAccounts([receiver],function(err,response){
+			if(!err){
+				add_notify('Логин '+receiver+' недоступен',true);
+			}
+		});
+		if(typeof err.payload !== 'undefined'){
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
-	});
+	}
+	if(users[current_user].shield){
+		shield_action(current_user,'invite_registration',{new_account_name:receiver,invite_secret:secret_key,new_account_key:public_key},invite_success,invite_failure);
+	}
+	else{
+		gate.broadcast.inviteRegistration('5KcfoRuDfkhrLCxVcE9x51J6KN9aM9fpb78tLrvvFckxVV6FyFW','invite',receiver,secret_key,public_key,function(err,result){
+			if(!err){
+				invite_success(result);
+			}
+			else{
+				invite_failure(err);
+			}
+		});
+	}
 }
 function invite_claim(secret_key,receiver){
-	gate.broadcast.claimInviteBalance('5KcfoRuDfkhrLCxVcE9x51J6KN9aM9fpb78tLrvvFckxVV6FyFW','invite',receiver,secret_key,function(err,result){
-		if(!err){
-			add_notify('Код успешно активирован');
-		}
-		else{
-			add_notify('Ошибка при активации кода',true);
+	let invite_success=function(result){
+		add_notify('Код успешно активирован');
+	}
+	let invite_failure=function(err){
+		add_notify('Ошибка при активации кода',true);
+		if(typeof err.payload !== 'undefined'){
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
-	});
+	}
+	if(users[current_user].shield){
+		shield_action(current_user,'claim_invite_balance',{receiver:receiver,invite_secret:secret_key},invite_success,invite_failure);
+	}
+	else{
+		gate.broadcast.claimInviteBalance('5KcfoRuDfkhrLCxVcE9x51J6KN9aM9fpb78tLrvvFckxVV6FyFW','invite',receiver,secret_key,function(err,result){
+			if(!err){
+				invite_success(result);
+			}
+			else{
+				invite_failure(err);
+			}
+		});
+	}
 }
 function reset_account_with_general_key(account_login,owner_key,general_key){
 	let auth_types = ['posting','active','owner','memo'];
@@ -759,29 +786,43 @@ function reset_account_with_general_key(account_login,owner_key,general_key){
 	gate.api.getAccounts([account_login],function(err,response){
 		if(!err){
 			let json_metadata=response[0].json_metadata;
-			gate.broadcast.accountUpdate(owner_key,account_login,owner,active,posting,memo_key,json_metadata,function(err,result){
-				if(!err){
-					add_notify('Данные аккаунта успешно обновлены');
-					download('viz-reset-account.txt','VIZ.World Account: '+account_login+'\r\nGeneral key (for private keys): '+general_key+'\r\nPrivate owner key: '+keys.owner+'\r\nPrivate active key: '+keys.active+'\r\nPrivate posting key: '+keys.posting+'\r\nPrivate memo key: '+keys.memo+'');
-					if(typeof users[account_login] !== 'undefined'){
-						if(''!=users[account_login].posting_key){
-							users[account_login].posting_key=keys.posting;
-						}
-						if(''!=users[account_login].active_key){
-							users[account_login].active_key=keys.active;
-						}
+
+			let account_success=function(result){
+				add_notify('Данные аккаунта успешно обновлены');
+				download('viz-reset-account.txt','VIZ.World Account: '+account_login+'\r\nGeneral key (for private keys): '+general_key+'\r\nPrivate owner key: '+keys.owner+'\r\nPrivate active key: '+keys.active+'\r\nPrivate posting key: '+keys.posting+'\r\nPrivate memo key: '+keys.memo+'');
+				if(typeof users[account_login] !== 'undefined'){
+					if(''!=users[account_login].posting_key){
+						users[account_login].posting_key=keys.posting;
+					}
+					if(''!=users[account_login].active_key){
+						users[account_login].active_key=keys.active;
 					}
 				}
+			}
+			let account_failure=function(err){
+				add_notify('Ошибка при обновлении аккаунта',true);
+				if(typeof err.message !== 'undefined'){
+					add_notify(err.message,true);
+				}
 				else{
-					add_notify('Ошибка при обновлении аккаунта',true);
-					if(typeof err.message !== 'undefined'){
-						add_notify(err.message,true);
-					}
-					else{
+					if(typeof err.payload !== 'undefined'){
 						add_notify(err.payload.error.data.stack[0].format,true);
 					}
 				}
-			});
+			}
+			if(users[current_user].shield){
+				shield_action(current_user,'account_update',{owner:JSON.stringify(owner),active:JSON.stringify(active),posting:JSON.stringify(posting),memo_key:memo_key,json_metadata:json_metadata},account_success,account_failure);
+			}
+			else{
+				gate.broadcast.accountUpdate(owner_key,account_login,owner,active,posting,memo_key,json_metadata,function(err,result){
+					if(!err){
+						account_success(result);
+					}
+					else{
+						account_failure(err);
+					}
+				});
+			}
 		}
 		else{
 			add_notify('Ошибка в получении аккаунта '+account_login,true);
@@ -823,41 +864,70 @@ function create_account_with_general_key(account_login,token_amount,shares_amoun
 	let memo_key=keys.memoPubkey;
 	let json_metadata='';
 	let referrer='';
-	gate.broadcast.accountCreate(users[current_user].active_key,fixed_token_amount,fixed_shares_amount,current_user,account_login,owner,active,posting,memo_key,json_metadata, referrer,[],function(err,result){
-		if(!err){
-			add_notify('Аккаунт успешно создан');
-			download('viz-account.txt','VIZ.World Account: '+account_login+'\r\nGeneral key (for private keys): '+general_key+'\r\nPrivate owner key: '+keys.owner+'\r\nPrivate active key: '+keys.active+'\r\nPrivate posting key: '+keys.posting+'\r\nPrivate memo key: '+keys.memo+'');
-			gate.api.getAccounts([current_user],function(err,response){
-				if(!err){
-					$('.control .create-account-control .token[data-symbol=VIZ] .amount').html(parseFloat(response[0]['balance']));
-					$('.control .create-account-control .token[data-symbol=SHARES] .amount').html(parseFloat(response[0]['vesting_shares']));
-				}
-			});
-		}
-		else{
-			add_notify('Ошибка при создании аккаунта',true);
-			gate.api.getAccounts([account_login],function(err,response){
-				if(!err){
-					add_notify('Логин '+account_login+' недоступен',true);
-				}
-			});
+
+	let account_success=function(result){
+		add_notify('Аккаунт успешно создан');
+		download('viz-account.txt','VIZ.World Account: '+account_login+'\r\nGeneral key (for private keys): '+general_key+'\r\nPrivate owner key: '+keys.owner+'\r\nPrivate active key: '+keys.active+'\r\nPrivate posting key: '+keys.posting+'\r\nPrivate memo key: '+keys.memo+'');
+		gate.api.getAccounts([current_user],function(err,response){
+			if(!err){
+				$('.control .create-account-control .token[data-symbol=VIZ] .amount').html(parseFloat(response[0]['balance']));
+				$('.control .create-account-control .token[data-symbol=SHARES] .amount').html(parseFloat(response[0]['vesting_shares']));
+			}
+		});
+	}
+	let account_failure=function(err){
+		add_notify('Ошибка при создании аккаунта',true);
+		gate.api.getAccounts([account_login],function(err,response){
+			if(!err){
+				add_notify('Логин '+account_login+' недоступен',true);
+			}
+		});
+		if(typeof err.payload !== 'undefined'){
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
-	});
+	}
+	if(users[current_user].shield){
+		shield_action(current_user,'account_create',{referrer:current_user,fee:fixed_token_amount,delegation:fixed_shares_amount,new_account_name:account_login,owner:JSON.stringify(owner),active:JSON.stringify(active),posting:JSON.stringify(posting),memo_key:memo_key,json_metadata:json_metadata},account_success,account_failure);
+	}
+	else{
+		gate.broadcast.accountCreate(users[current_user].active_key,fixed_token_amount,fixed_shares_amount,current_user,account_login,owner,active,posting,memo_key,json_metadata, referrer,[],function(err,result){
+			if(!err){
+				account_success(result);
+			}
+			else{
+				account_failure(err);
+			}
+		});
+	}
 }
 function invite_create(private_key,public_key,amount){
 	amount=parseFloat(amount);
 	let fixed_amount=''+amount.toFixed(3)+' VIZ';
-	gate.broadcast.createInvite(users[current_user].active_key,current_user,fixed_amount,public_key,function(err,result){
-		if(!err){
-			download('viz-invite.txt','VIZ.World Invite code with amount: '+fixed_amount+'\r\nPublic key (for check): '+public_key+'\r\nPrivate key (for activation): '+private_key+'\r\nYou can check code and claim or use it on https://viz.world/tools/invites/');
-			add_notify('Инвайт код создан успешно');
-		}
-		else{
-			add_notify('Ошибка при создании инвайт кода',true);
+
+	let invite_success=function(result){
+		download('viz-invite.txt','VIZ.World Invite code with amount: '+fixed_amount+'\r\nPublic key (for check): '+public_key+'\r\nPrivate key (for activation): '+private_key+'\r\nYou can check code and claim or use it on https://viz.world/tools/invites/');
+		add_notify('Инвайт код создан успешно');
+	}
+	let invite_failure=function(err){
+		add_notify('Ошибка при создании инвайт кода',true);
+		if(typeof err.payload !== 'undefined'){
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
-	});
+		console.log(err);
+	}
+	if(users[current_user].shield){
+		shield_action(current_user,'create_invite',{balance:fixed_amount,invite_key:public_key},invite_success,invite_failure);
+	}
+	else{
+		gate.broadcast.createInvite(users[current_user].active_key,current_user,fixed_amount,public_key,function(err,result){
+			if(!err){
+				invite_success(result);
+			}
+			else{
+				invite_failure(err);
+			}
+		});
+	}
 }
 function wallet_delegate(recipient,amount){
 	let login=recipient.toLowerCase();
@@ -990,37 +1060,79 @@ function committee_worker_create_request(url,worker,min_amount,max_amount,durati
 	if(duration<=30){
 		duration=duration*3600*24;
 	}
-	gate.broadcast.committeeWorkerCreateRequest(users[current_user]['posting_key'],current_user,url,worker,min_amount,max_amount,duration,function(err,result) {
-		if(err){
-			add_notify('Ошибка',true);
+
+	let committee_success=function(result){
+		add_notify('Вы успешно создали заявку');
+		document.location='/committee/';
+	}
+	let committee_failure=function(err){
+		add_notify('Ошибка',true);
+		if(typeof err.payload !== 'undefined'){
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
-		else{
-			add_notify('Вы успешно создали заявку');
-			document.location='/committee/';
-		}
-	});
+	}
+	if(users[current_user].shield){
+		shield_action(current_user,'committee_worker_create_request',{url:url,worker:worker,required_amount_min:min_amount,required_amount_max:max_amount,duration:duration},committee_success,committee_failure);
+	}
+	else{
+		gate.broadcast.committeeWorkerCreateRequest(users[current_user]['posting_key'],current_user,url,worker,min_amount,max_amount,duration,function(err,result) {
+			if(!err){
+				committee_success(result);
+			}
+			else{
+				committee_failure(err);
+			}
+		});
+	}
 }
 function committee_cancel_request(request_id){
-	gate.broadcast.committeeWorkerCancelRequest(users[current_user]['posting_key'],current_user,parseInt(request_id),function(err,result) {
-		if(err){
-			add_notify('Ошибка',true);
+	let committee_success=function(result){
+		committee_control();
+		add_notify('Вы успешно отменили заявку');
+	}
+	let committee_failure=function(err){
+		add_notify('Ошибка',true);
+		if(typeof err.payload !== 'undefined'){
+			add_notify(err.payload.error.data.stack[0].format,true);
 		}
-		else{
-			committee_control();
-			add_notify('Вы успешно отменили заявку');
-		}
-	});
+	}
+	if(users[current_user].shield){
+		shield_action(current_user,'committee_worker_cancel_request',{request_id:request_id},committee_success,committee_failure);
+	}
+	else{
+		gate.broadcast.committeeWorkerCancelRequest(users[current_user]['posting_key'],current_user,parseInt(request_id),function(err,result) {
+			if(!err){
+				committee_success(result);
+			}
+			else{
+				committee_failure(err);
+			}
+		});
+	}
 }
 function committee_vote_request(request_id,percent){
-	gate.broadcast.committeeVoteRequest(users[current_user]['posting_key'],current_user,parseInt(request_id),percent*100,function(err,result) {
-		if(err){
-			add_notify('Ошибка при голосовании',true);
+	let committee_success=function(result){
+		add_notify('Вы успешно проголосовали');
+	}
+	let committee_failure=function(err){
+		add_notify('Ошибка при голосовании',true);
+		if(typeof err.payload !== 'undefined'){
+			add_notify(err.payload.error.data.stack[0].format,true);
 		}
-		else{
-			add_notify('Вы успешно проголосовали');
-		}
-	});
+	}
+	if(users[current_user].shield){
+		shield_action(current_user,'committee_vote_request',{request_id:request_id,vote_percent:percent*100},committee_success,committee_failure);
+	}
+	else{
+		gate.broadcast.committeeVoteRequest(users[current_user]['posting_key'],current_user,parseInt(request_id),percent*100,function(err,result) {
+			if(!err){
+				committee_success(result);
+			}
+			else{
+				committee_failure(err);
+			}
+		});
+	}
 }
 function witness_update(witness_login,url,signing_key){
 	if(current_user!=witness_login){
@@ -1030,15 +1142,29 @@ function witness_update(witness_login,url,signing_key){
 		if(''==signing_key){
 			signing_key=empty_signing_key;
 		}
-		gate.broadcast.witnessUpdate(users[current_user]['active_key'],current_user,url,signing_key,function(err,result){
-			if(!err){
-				witness_control();
-				add_notify('Данные успешно транслированы в сеть');
+		let witness_success=function(result){
+			witness_control();
+			add_notify('Данные успешно транслированы в сеть');
+		}
+		let witness_failure=function(err){
+			add_notify('Ошибка',true);
+			if(typeof err.payload !== 'undefined'){
+				add_notify(err.payload.error.data.stack[0].format,true);
 			}
-			else{
-				add_notify('Ошибка',true);
-			}
-		});
+		}
+		if(users[current_user].shield){
+			shield_action(current_user,'witness_update',{url:url,block_signing_key:signing_key},witness_success,witness_failure);
+		}
+		else{
+			gate.broadcast.witnessUpdate(users[current_user]['active_key'],current_user,url,signing_key,function(err,result){
+				if(!err){
+					witness_success(result);
+				}
+				else{
+					witness_failure(err);
+				}
+			});
+		}
 	}
 }
 function witness_chain_properties_update(witness_login,url,signing_key){
@@ -1061,16 +1187,30 @@ function witness_chain_properties_update(witness_login,url,signing_key){
 				props.min_delegation=$('.witness-control[data-witness='+witness_login+'] input[name=min_delegation]').val();
 				props.vote_accounting_min_rshares=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=vote_accounting_min_rshares]').val());
 				props.maximum_block_size=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=maximum_block_size]').val());
-				gate.broadcast.chainPropertiesUpdate(users[current_user]['active_key'],current_user,props,function(err,response){
-					if(!err){
-						witness_control();
-						add_notify('Параметры успешно транслированы в сеть');
-					}
-					else{
-						add_notify('Ошибка',true);
+
+				let properties_success=function(result){
+					witness_control();
+					add_notify('Параметры успешно транслированы в сеть');
+				}
+				let properties_failure=function(err){
+					add_notify('Ошибка',true);
+					if(typeof err.payload !== 'undefined'){
 						add_notify(err.payload.error.data.stack[0].format,true);
 					}
-				});
+				}
+				if(users[current_user].shield){
+					shield_action(current_user,'chain_properties_update',{props:JSON.stringify(props)},properties_success,properties_failure);
+				}
+				else{
+					gate.broadcast.chainPropertiesUpdate(users[current_user]['active_key'],current_user,props,function(err,response){
+						if(!err){
+							properties_success(result);
+						}
+						else{
+							properties_failure(err);
+						}
+					});
+				}
 			}
 		});
 	}
