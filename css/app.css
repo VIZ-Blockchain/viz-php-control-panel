@@ -139,7 +139,7 @@ a:hover{
 	overflow:hidden;
 }
 .header.shadow{
-	box-shadow: 0 2px 4px -1px rgba(0,0,0,0.07), 0 4px 5px 0 rgba(0,0,0,0.07), 0 1px 10px 0 rgba(0,0,0,0.1);
+	box-shadow: 0 2px 4px -1px rgba(0,0,0,0.07);
 }
 .header a{
 	color:rgba(0,0,0,0.6);
@@ -1541,10 +1541,23 @@ html.modal-open{
 }
 /* old mobile */
 @media only screen and (min-width:0) and (max-width:550px){
-
+	.main{
+		padding:8px;
+		padding-top:64px;
+	}
+	.main.menu-expand{
+		padding-left:8px;
+	}
 }
 /* so old mobile */
 @media only screen and (min-width:0) and (max-width:375px){
+	.main{
+		padding:0;
+		padding-top:64px;
+	}
+	.main.menu-expand{
+		padding-left:0;
+	}
 	.page.comments .actions{
 		margin-left:0;
 	}
