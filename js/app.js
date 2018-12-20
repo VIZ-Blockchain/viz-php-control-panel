@@ -2803,7 +2803,7 @@ function app_mouse(e){
 		e.preventDefault();
 		if($(target).closest('.control').length){
 			let general_key=$('.reset-account-control input[name=general_key]').val();
-			let account_login=$('.reset-account-control input[name=account_login]').val();
+			let account_login=$('.reset-account-control input[name=account_login]').val().toLowerCase();
 			let owner_key=$('.reset-account-control input[name=owner_key]').val();
 			reset_account_with_general_key(account_login,owner_key,general_key);
 		}
@@ -2812,7 +2812,7 @@ function app_mouse(e){
 		e.preventDefault();
 		if($(target).closest('.control').length){
 			let general_key=$('.create-account-control input[name=general_key]').val();
-			let account_login=$('.create-account-control input[name=account_login]').val();
+			let account_login=$('.create-account-control input[name=account_login]').val().toLowerCase();
 			let token_amount=$('.create-account-control input[name=token_amount]').val();
 			let shares_amount=$('.create-account-control input[name=shares_amount]').val();
 			create_account_with_general_key(account_login,token_amount,shares_amount,general_key);
