@@ -1,5 +1,7 @@
 var gate=viz;
-var api_gates=['wss://viz.lexai.host/','wss://api.viz.blckchnd.com/ws','wss://ws.viz.ropox.tools/']
+var api_ws_gates=['wss://viz.lexai.host/','wss://api.viz.blckchnd.com/ws','wss://ws.viz.ropox.tools/'];
+var api_http_gates=['https://rpc.viz.lexai.host/','https://api.viz.blckchnd.com/','https://rpc.viz.ropox.tools/'];
+var api_gates=api_ws_gates;
 var best_gate=-1;
 var best_gate_latency=-1;
 var api_gate;
@@ -7,7 +9,6 @@ api_gate=api_gates[Math.floor(Math.random()*api_gates.length)];
 if(null!=localStorage.getItem('api_gate_default')){
 	api_gate=localStorage.getItem('api_gate_default');
 	gate.config.set('websocket',api_gate);
-	gate.api.stop();
 }
 else{
 	select_best_gate();
@@ -22,7 +23,6 @@ function update_api_gate(value=false){
 	}
 	localStorage.setItem('api_gate_default',api_gate);
 	gate.config.set('websocket',api_gate);
-	gate.api.stop();
 }
 
 function select_best_gate(){
@@ -30,21 +30,49 @@ function select_best_gate(){
 		let current_gate=i;
 		let latency_start=new Date().getTime();
 		let latency=-1;
-		let socket = new WebSocket(api_gates[i]);
-		socket.onmessage=function(event){
-			latency=new Date().getTime() - latency_start;
-			if(best_gate!=current_gate){
-				if((best_gate_latency>latency)||(best_gate==-1)){
-					best_gate=current_gate;
-					best_gate_latency=latency;
-					update_api_gate();
+
+		let protocol='websocket';
+		let gate_protocol=api_gates[i].substring(0,api_gates[i].indexOf(':'));
+
+		if('http'==gate_protocol||'https'==gate_protocol){
+			protocol='http';
+		}
+		if('websocket'==protocol){
+			let socket = new WebSocket(api_gates[i]);
+			socket.onmessage=function(event){
+				latency=new Date().getTime() - latency_start;
+				if(best_gate!=current_gate){
+					if((best_gate_latency>latency)||(best_gate==-1)){
+						best_gate=current_gate;
+						best_gate_latency=latency;
+						update_api_gate();
+					}
+				}
+				socket.close();
+			}
+			socket.onopen=function(){
+				socket.send('{"id":1,"method":"call","jsonrpc":"2.0","params":["database_api","get_dynamic_global_properties",[]]}');
+			};
+		}
+		if('http'==protocol){
+			let xhr = new XMLHttpRequest();
+			xhr.open('GET',api_gates[i]);
+			xhr.setRequestHeader('accept','application/json, text/plain, */*');
+			xhr.setRequestHeader('content-type','application/json');
+			xhr.onreadystatechange = function() {
+				if(4==xhr.readyState && 200==xhr.status){
+					latency=new Date().getTime() - latency_start;
+					if(best_gate!=current_gate){
+						if((best_gate_latency>latency)||(best_gate==-1)){
+							best_gate=current_gate;
+							best_gate_latency=latency;
+							update_api_gate();
+						}
+					}
 				}
 			}
-			socket.close();
+			xhr.send('{"id":1,"method":"call","jsonrpc":"2.0","params":["database_api","get_dynamic_global_properties",[]]}');
 		}
-		socket.onopen=function(){
-			socket.send('{"id":1,"method":"call","jsonrpc":"2.0","params":["database_api","get_dynamic_global_properties",[]]}');
-		};
 	}
 }
 

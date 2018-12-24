@@ -166,6 +166,16 @@ a.icon{
 	font-size:24px;
 	display: inline-block;
 }
+.header .logo .symbol{
+	margin-right:8px;
+}
+.header .logo .symbol path{
+	background: linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB);
+	background-size: 400% 400%;
+	-webkit-animation: SymbolGradient 15s ease infinite;
+	-moz-animation: SymbolGradient 15s ease infinite;
+	animation: SymbolGradient 15s ease infinite;
+}
 .header .header-menu-el{
 	text-align:center;
 	display:inline-block;
@@ -1342,6 +1352,42 @@ html.modal-open{
     padding: 0 7px;
 }
 
+@-webkit-keyframes SymbolGradient {
+	0% {
+		background-position: 0% 50%
+	}
+	50% {
+		background-position: 100% 50%
+	}
+	100% {
+		background-position: 0% 50%
+	}
+}
+
+@-moz-keyframes SymbolGradient {
+	0% {
+		background-position: 0% 50%
+	}
+	50% {
+		background-position: 100% 50%
+	}
+	100% {
+		background-position: 0% 50%
+	}
+}
+
+@keyframes SymbolGradient {
+	0% {
+		background-position: 0% 50%
+	}
+	50% {
+		background-position: 100% 50%
+	}
+	100% {
+		background-position: 0% 50%
+	}
+}
+
 /* tablet */
 @media only screen and (min-width:0) and (max-width:968px){
 	.main{
@@ -1490,6 +1536,9 @@ html.modal-open{
 		font-size:22px;
 		display: inline-block;
 	}
+	.header .logo .symbol{
+		margin-right:6px;
+	}
 	.header .header-menu-el{
 		height:48px;
 		line-height:48px;
@@ -1548,6 +1597,9 @@ html.modal-open{
 	.main.menu-expand{
 		padding-left:8px;
 	}
+	.header .logo .symbol{
+		margin-right:4px;
+	}
 }
 /* so old mobile */
 @media only screen and (min-width:0) and (max-width:375px){
@@ -1560,5 +1612,8 @@ html.modal-open{
 	}
 	.page.comments .actions{
 		margin-left:0;
+	}
+	.header .logo span{
+		display:none;
 	}
 }
