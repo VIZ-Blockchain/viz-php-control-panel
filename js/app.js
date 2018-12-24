@@ -431,7 +431,7 @@ function load_session(){
 		wait_session();
 		profile_control();
 		if(users[current_user].shield){
-			shield_check(()=>{},()=>{window.open('viz-shield://open/')});
+			shield_check(()=>{},()=>{$('.start-shield-action').removeClass('hide');});
 		}
 	}
 	create_account_control();
@@ -602,7 +602,13 @@ function try_auth_shield(login){
 }
 function view_session(){
 	if(''!=current_user){
-		$('.header .account').html('<a href="/@'+current_user+'/">'+current_user+'</a> <a class="auth-logout icon"><i class="fas fa-fw fa-sign-out-alt"></i></a>');
+		let result='';
+		if(users[current_user].shield){
+			result+='<img class="start-shield-action hide" src="/shield-icon.svg">';
+		}
+		result+='<a href="/@'+current_user+'/">'+current_user+'</a>';
+		result+=' <a class="auth-logout icon"><i class="fas fa-fw fa-sign-out-alt"></i></a>';
+		$('.header .account').html(result);
 		view_energy();
 	}
 	else{
@@ -2588,6 +2594,9 @@ function app_keyboard(e){
 function app_mouse(e){
 	if(!e)e=window.event;
 	var target=e.target || e.srcElement;
+	if($(target).hasClass('start-shield-action')){
+		window.open('viz-shield://open/');
+	}
 	if($(target).closest('.go-top-left-wrapper').length>0){
 		scroll_top_action();
 	}

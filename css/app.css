@@ -91,6 +91,7 @@ input[type=button] {width: auto; overflow: visible;}
 	1% {display: block;opacity: 0;}
 	100% {display: block;opacity: 1;}
 }
+.hide{display:none;}
 .schema{
 	display:none !important;
 }
@@ -187,6 +188,11 @@ a.icon{
 }
 .header .header-menu-el:hover a{
 	color:rgba(0,0,0,0.8);
+}
+.header .header-menu-el .start-shield-action{
+	vertical-align: middle;
+	margin-right: 4px;
+	cursor:pointer;
 }
 .logo a{
 	text-decoration:none;
