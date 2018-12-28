@@ -1251,7 +1251,6 @@ function witness_chain_properties_update(witness_login,url,signing_key){
 }
 function unvote_subcontent(author,permlink,target){
 	let unvote_success=function(result){
-		target.find('.flag-subcontent-action').removeClass('active').attr('title','');
 		target.find('.award-subcontent-action').removeClass('active').attr('title','');
 		add_notify('Вы успешно сняли голос');
 		view_energy();
@@ -1283,7 +1282,6 @@ function upvote_subcontent(author,permlink,target){
 		$('.header-menu-el.energy').removeClass('powerup');
 	}
 	let upvote_success=function(result){
-		target.find('.flag-subcontent-action').removeClass('active').attr('title','');
 		target.find('.award-subcontent-action').addClass('active').attr('title','Вы проголосовали с силой '+(weight/100)+'%');
 		add_notify('Вы успешно проголосовали');
 		view_energy();
@@ -1310,7 +1308,6 @@ function upvote_subcontent(author,permlink,target){
 }
 function unvote_content(author,permlink,target){
 	let unvote_success=function(result){
-		target.find('.flag-action').removeClass('active').attr('title','');
 		target.find('.award-action').removeClass('active').attr('title','');
 		let votes_count=target.find('.votes_count span');
 		votes_count.html(parseInt(votes_count.html())-1);
@@ -1344,7 +1341,6 @@ function upvote_content(author,permlink,target){
 		$('.header-menu-el.energy').removeClass('powerup');
 	}
 	let upvote_success=function(result){
-		target.find('.flag-action').removeClass('active').attr('title','');
 		target.find('.award-action').addClass('active').attr('title','Вы проголосовали с силой '+(weight/100)+'%');
 		let votes_count=target.find('.votes_count span');
 		votes_count.html(1+parseInt(votes_count.html()));
@@ -1367,40 +1363,6 @@ function upvote_content(author,permlink,target){
 			}
 			else{
 				upvote_failure(err);
-			}
-		});
-	}
-}
-function flag_content(author,permlink,target){
-	let weight=10000/10;
-	if($('.header-menu-el.energy').hasClass('powerup')){
-		weight=10000;
-		$('.header-menu-el.energy').removeClass('powerup');
-	}
-	let flag_success=function(result){
-		target.find('.award-action').removeClass('active').attr('title','');
-		target.find('.flag-action').addClass('active').attr('title','Вы поставили флаг с силой '+(weight/100)+'%');
-		let votes_count=target.find('.votes_count span');
-		votes_count.html(1+parseInt(votes_count.html()));
-		add_notify('Вы успешно поставили флаг');
-		view_energy();
-	}
-	let flag_failure=function(err){
-		add_notify('Ошибка',true);
-		if(typeof err.payload !== 'undefined'){
-			add_notify(err.payload.error.data.stack[0].format,true);
-		}
-	}
-	if(users[current_user].shield){
-		shield_action(current_user,'vote',{author:author,permlink:permlink,weight:-weight},flag_success,flag_failure);
-	}
-	else{
-		gate.broadcast.vote(users[current_user].posting_key,current_user,author,permlink,-weight,function(err,result){
-			if(!err){
-				flag_success(result);
-			}
-			else{
-				flag_failure(err);
 			}
 		});
 	}
@@ -1495,12 +1457,12 @@ function witness_control(){
 							result+='<label class="input-descr">Доля сети, выделяемая для резервной пропускной способности (процент):<input type="text" name="bandwidth_reserve_percent" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_percent/100+'"></label>';
 							result+='<label class="input-descr">Резервная пропускная способность действует для аккаунтов с долей сети до порога:<input type="text" name="bandwidth_reserve_below" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_below+'"></label>';
 							result+='<label class="input-descr">Минимальный процент доли сети голосующих необходимый для принятия решения по заявке в комитете:<input type="text" name="committee_request_approve_min_percent" class="witness-chain-properties round wide" value="'+response.props.committee_request_approve_min_percent/100+'"></label>';
-							result+='<label class="input-descr">Дополнительная трата энергии на флаг (процент):<input type="text" name="flag_energy_additional_cost" class="witness-chain-properties round wide" value="'+response.props.flag_energy_additional_cost/100+'"></label>';
 							result+='<label class="input-descr">Минимально-допустимый процент кураторской награды:<input type="text" name="min_curation_percent" class="witness-chain-properties round wide" value="'+response.props.min_curation_percent/100+'"></label>';
 							result+='<label class="input-descr">Максимально-допустимый процент кураторской награды:<input type="text" name="max_curation_percent" class="witness-chain-properties round wide" value="'+response.props.max_curation_percent/100+'"></label>';
 							result+='<label class="input-descr">Минимальное количество токенов при делегировании:<input type="text" name="min_delegation" class="witness-chain-properties round wide" value="'+response.props.min_delegation+'"></label>';
 							result+='<label class="input-descr">Минимальный вес голоса для учета при голосовании за контент (rshares):<input type="text" name="vote_accounting_min_rshares" class="witness-chain-properties round wide" value="'+response.props.vote_accounting_min_rshares+'"></label>';
 							result+='<label class="input-descr">Максимальный размер блока в сети (байт):<input type="text" name="maximum_block_size" class="witness-chain-properties round wide" value="'+response.props.maximum_block_size+'"></label>';
+							result+='<label class="input-descr" style="opacity:0.4">(Устаревшее) Дополнительная трата энергии на флаг (процент):<input type="text" name="flag_energy_additional_cost" class="witness-chain-properties round wide" value="'+response.props.flag_energy_additional_cost/100+'"></label>';
 							result+='<input type="button" class="witness-chain-properties-update-action button" value="Установить параметры сети делегата">';
 							view.html(result);
 						}
@@ -2683,18 +2645,6 @@ function app_mouse(e){
 			}
 			else{
 				upvote_subcontent(proper_target.attr('data-author'),proper_target.attr('data-permlink'),proper_target);
-			}
-		}
-	}
-	if($(target).hasClass('flag-action')){
-		e.preventDefault();
-		proper_target=$(target).closest('.page');
-		if(typeof proper_target.attr('data-content-author') !== 'undefined'){
-			if($(target).hasClass('active')){
-				unvote_content(proper_target.attr('data-content-author'),proper_target.attr('data-content-permlink'),proper_target);
-			}
-			else{
-				flag_content(proper_target.attr('data-content-author'),proper_target.attr('data-content-permlink'),proper_target);
 			}
 		}
 	}

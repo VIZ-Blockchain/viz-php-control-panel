@@ -1185,14 +1185,10 @@ function preview_content($data){
 	$comments_count=mongo_count('subcontent',['content'=>(int)$data['_id']]);
 	$author_avatar=mongo_find_attr('users','avatar',['_id'=>(int)$data['author']]);
 	$upvote=false;
-	$flag=false;
 	if($auth){
 		$vote_weight=mongo_find_attr('content_votes','weight',['parent'=>(int)$data['_id'],'user'=>(int)$user_arr['_id']]);
 		if($vote_weight>0){
 			$upvote=true;
-		}
-		if($vote_weight<0){
-			$flag=true;
 		}
 	}
 	$result.='<div class="info">
@@ -1204,7 +1200,6 @@ function preview_content($data){
 		<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
 		<div class="right">
 			<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы проголосовали с силой '.($vote_weight/100).'%"':'').'></a>
-			<a class="flag'.($flag?' active':'').' flag-action"'.($flag?' title="Вы поставили флаг с силой '.($vote_weight/100).'%"':'').'></a>
 			<div class="votes_count"><span>'.$votes_count.'</span> голосов</div>
 			<div class="comments"><span>'.$comments_count.'</span><a href="/@'.$author_login.'/'.$data['permlink_href'].'/#comments" class="icon"><i class="far fa-comment"></i></a></div>
 		</div>
@@ -1268,14 +1263,10 @@ function view_content($data){
 	$votes_count=mongo_count('content_votes',['parent'=>(int)$data['_id']]);
 	$comments_count=mongo_count('subcontent',['content'=>(int)$data['_id']]);
 	$upvote=false;
-	$flag=false;
 	if($auth){
 		$vote_weight=mongo_find_attr('content_votes','weight',['parent'=>(int)$data['_id'],'user'=>(int)$user_arr['_id']]);
 		if($vote_weight>0){
 			$upvote=true;
-		}
-		if($vote_weight<0){
-			$flag=true;
 		}
 	}
 	$reward_amount='';
@@ -1304,7 +1295,6 @@ function view_content($data){
 		<div class="reward_amount"><i class="far fa-fw fa-gem"></i> <span'.(-1!=$data['cashout_time']?' class="cashout_time" data-timestamp="'.$data['cashout_time'].'"':'').'>'.$reward_amount.'</span></div>';
 	}
 	$result.='
-		<a class="flag'.($flag?' active':'').' flag-action"'.($flag?' title="Вы поставили флаг с силой '.($vote_weight/100).'%"':'').'></a>
 	</div>';
 
 	$result.='</div>';
