@@ -42,7 +42,7 @@
 <body>
 <div class="header shadow unselectable">
 	<div class="actions"><a class="menu-expand icon"><i class="fas fa-bars"></i></a></div>
-	<div class="logo"><a href="http://VIZ.World/" class="logo"><img src="/logo-symbol-anim.svg" class="symbol">VIZ<span>.World</span></a></div>
+	<div class="logo"><a href="/" class="logo"><img src="/logo-symbol-anim.svg" class="symbol">VIZ<span>.World</span></a></div>
 	<div class="right">
 		{header_menu}
 		<div class="header-menu-el social-links"><a href="https://discord.gg/nEu4MqR" target="_blank" class="icon" title="Discord"><i class="fab fa-fw fa-discord"></i></a><a href="https://t.me/viz_world" target="_blank" class="icon" title="Telegram"><i class="fas fa-fw fa-paper-plane"></i></a></div>
