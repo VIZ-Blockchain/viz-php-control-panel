@@ -92,7 +92,6 @@ if('@'==mb_substr($path_array[1],0,1)){
 						}
 
 						print '<p><input type="text" name="tags" class="round wide" placeholder="Тэги через запятую (ключевые термины для поиска контента)" value="'.implode(',',$tags_list).'"></p>';
-						print '<p>Процент кураторам: <input type="text" name="curation_percent" value="'.($data['curation_percent']/100).'" size="4" class="round" data-fixed="curation_percent_range" disabled="disabled"> <input type="range" name="curation_percent_range" data-fixed="curation_percent" min="0" max="+100" value="'.($data['curation_percent']/100).'" disabled="disabled"></p>';
 						print '<p><a class="post-content-action button">Сохранить изменения</a></p>';
 						print '</div></div>';
 					}
@@ -268,6 +267,13 @@ if('tools'==$path_array[1]){
 			print '<p>Количество в базе данных (индекс): '.mongo_counter('blocks').'</p>';
 			print '<p>Количество в базе данных (курсор): '.mongo_count('blocks').'</p>';
 			print '<p>Количество пользователей в бд: '.mongo_count('users').'</p>';
+			print '<h3>Глобальная переменная</h3>';
+			print '<pre class="view_block">';
+			$view_dgp=print_r($dgp,true);
+			$view_dgp=preg_replace('~\[(.[^\]]*)\] =\> (.*)\n~iUs','[<span style="color:red">$1</span>] => <span style="color:#1b72fa">$2</span>'.PHP_EOL,$view_dgp);
+			$view_dgp=str_replace('<span style="color:#1b72fa">Array</span>','<span style="color:#069c40">Array</span>',$view_dgp);
+			print $view_dgp;
+			print '</pre>';
 			print '<h3>Голосуемые параметры сети</h3>';
 			print '<pre class="view_block">';
 			$chain_properties=$api->execute_method('get_chain_properties');
@@ -438,7 +444,6 @@ if('publication'==$path_array[1]){
 	print '<p><textarea name="content" rows="20" class="round wide" placeholder="Содержимое контента"></textarea></p>';
 	print '<p><input id="upload-file" type="file"><a class="upload-image-action action-button"><i class="fas fa-fw fa-file-image"></i> Загрузить изображение</a> <a class="wysiwyg-action action-button"><i class="fas fa-fw fa-pen-square"></i> WYSIWYG</a></p>';
 	print '<p><input type="text" name="tags" class="round wide" placeholder="Тэги через запятую (ключевые термины для поиска контента)"></p>';
-	print '<p>Процент кураторам: <input type="text" name="curation_percent" value="0" size="4" class="round" data-fixed="curation_percent_range"> <input type="range" name="curation_percent_range" data-fixed="curation_percent" min="0" max="+100" value="0"></p>';
 	print '<p><a class="post-content-action button">Опубликовать</a></p>';
 	print '</div></div>';
 }

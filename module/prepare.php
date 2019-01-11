@@ -8,7 +8,7 @@ $replace['script_change_time']=filemtime($site_root.'/js/app.js');
 $replace['css_change_time']=filemtime($site_root.'/css/app.css');
 
 $api_ws_arr=array(
-	'https://api.viz.blckchnd.com/',
+	//'https://api.viz.blckchnd.com/',
 	'https://rpc.viz.ropox.tools/',
 	'https://rpc.viz.lexai.host/',
 );
@@ -1289,7 +1289,7 @@ function view_content($data){
 	<div class="addon">
 		<div class="right"><div class="comments"><span>'.$comments_count.'</span><a href="#comments" class="icon"><i class="far fa-comment"></i></a></div></div>
 		<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы проголосовали с силой '.($vote_weight/100).'%"':'').'></a>
-		<div class="votes_count" title="'.($data['curation_percent']/100).'% кураторские"><span>'.$votes_count.'</span> голосов</div>';
+		<div class="votes_count"><span>'.$votes_count.'</span> голосов</div>';
 	if($reward_amount){
 		$result.='
 		<div class="reward_amount"><i class="far fa-fw fa-gem"></i> <span'.(-1!=$data['cashout_time']?' class="cashout_time" data-timestamp="'.$data['cashout_time'].'"':'').'>'.$reward_amount.'</span></div>';

@@ -1,6 +1,6 @@
 var gate=viz;
-var api_ws_gates=['wss://viz.lexai.host/','wss://api.viz.blckchnd.com/ws','wss://ws.viz.ropox.tools/'];
-var api_http_gates=['https://rpc.viz.lexai.host/','https://api.viz.blckchnd.com/','https://rpc.viz.ropox.tools/'];
+var api_ws_gates=['wss://viz.lexai.host/'/*,'wss://api.viz.blckchnd.com/ws'*/,'wss://ws.viz.ropox.tools/'];
+var api_http_gates=['https://rpc.viz.lexai.host/'/*,'https://api.viz.blckchnd.com/'*/,'https://rpc.viz.ropox.tools/'];
 var api_gates=api_ws_gates;
 var best_gate=-1;
 var best_gate_latency=-1;
@@ -91,6 +91,18 @@ var wait_session_timer=0;
 var update_comments_list_timer=0;
 var update_comments_list_timeout=3500;
 
+function check_json(text){
+	if(typeof text!=="string"){
+		return false;
+	}
+	try{
+		JSON.parse(text);
+		return true;
+	}
+	catch(error){
+		return false;
+	}
+}
 function del_notify(id){
 	$('.notify-list .notify[rel="'+id+'"]').remove();
 }
@@ -1334,6 +1346,40 @@ function unvote_content(author,permlink,target){
 		});
 	}
 }
+function award_content(author,permlink,target){
+	let weight=10000/10/5;
+	if($('.header-menu-el.energy').hasClass('powerup')){
+		weight=10000/5;
+		$('.header-menu-el.energy').removeClass('powerup');
+	}
+	let award_success=function(result){
+		target.find('.award-action').addClass('active').attr('title','Вы потратили энергии '+(weight/100)+'%');
+		let votes_count=target.find('.votes_count span');
+		votes_count.html(1+parseInt(votes_count.html()));
+		add_notify('Вы успешно наградили автора');
+		view_energy();
+	}
+	let award_failure=function(err){
+		add_notify('Ошибка',true);
+		if(typeof err.payload !== 'undefined'){
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+	}
+	let memo=author+'/'+permlink;
+	if(users[current_user].shield){
+		shield_action(current_user,'award',{receiver:author,memo:memo,energy:weight,beneficiaries:[]},award_success,award_failure);
+	}
+	else{
+		gate.broadcast.award(users[current_user].posting_key,current_user,author,weight,0,memo,[],function(err,result){
+			if(!err){
+				award_success(result);
+			}
+			else{
+				award_failure(err);
+			}
+		});
+	}
+}
 function upvote_content(author,permlink,target){
 	let weight=10000/10;
 	if($('.header-menu-el.energy').hasClass('powerup')){
@@ -2065,6 +2111,7 @@ function update_dgp(auto=false){
 			$('.setter[rel=current_block]').html(current_block);
 		}
 	});
+	setTimeout(function(){if(0==Object.keys(dgp).length){select_best_gate();}},10000);
 	if(auto){
 		setTimeout("update_dgp(true)",3000);
 	}
@@ -2159,7 +2206,6 @@ function post_subcontent(target){
 		let permlink='';
 		let title='';
 		let json='';
-		let curation_percent=0;
 		if(0<content_id){
 			parent_author=$('.page.content[data-content-id='+content_id+']').attr('data-content-author');
 			parent_permlink=$('.page.content[data-content-id='+content_id+']').attr('data-content-permlink');
@@ -2182,11 +2228,13 @@ function post_subcontent(target){
 				target.removeClass('disabled');
 				console.log(err);
 			}
+
+			var custom_json=['content',{parent_author:parent_author,parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:subcontent}];
 			if(users[current_user].shield){
-				shield_action(current_user,'content',{parent_author:parent_author,parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:subcontent,curation_percent:curation_percent,json_metadata:json,extensions:[]},subcontent_success,subcontent_failure);
+				shield_action(current_user,'custom',{id:'media',required_auths:[],required_posting_auths:[current_user],json:JSON.stringify(custom_json)},subcontent_success,subcontent_failure);
 			}
 			else{
-				gate.broadcast.content(users[current_user].posting_key,parent_author,parent_permlink,current_user,permlink,title,subcontent,curation_percent,json,[],function(err,result){
+				gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'media',JSON.stringify(custom_json),function(err,result){
 					if(!err){
 						subcontent_success(result);
 					}
@@ -2220,7 +2268,6 @@ function post_content(target){
 		}
 		content=content.replace(new RegExp(' rel="noopener"','g'),'');
 		var foreword=$('input[name=foreword]').val().trim();
-		var curation_percent=parseInt($('input[name=curation_percent]').val())*100;
 		var cover=$('input[name=cover]').val().trim();
 		if(''==cover){
 			let links_arr=content.match(/((https?:|)\/\/[^\s]+)/g);
@@ -2269,11 +2316,15 @@ function post_content(target){
 									let old_extensions=[[0,{'beneficiaries':old_beneficiaries}]];
 								}
 								*/
-								let old_json=JSON.parse(result.json_metadata);
+								let old_json={};
+								if(check_json(result.json_metadata)){
+									old_json=JSON.parse(result.json_metadata);
+								}
 								for(key in json_object){
 									old_json[key]=json_object[key];
 								}
-								let new_json=JSON.stringify(old_json);
+								let new_meta=old_json;
+								let new_json=JSON.stringify(new_meta);
 
 								let edit_success=function(result){
 									add_notify('Публикация успешно изменена, переадресация через 6 секунд&hellip;');
@@ -2286,11 +2337,13 @@ function post_content(target){
 									target.html('Опубликовать');
 									console.log(err);
 								}
+
+								var custom_json=['content',{parent_author:result.parent_author,parent_permlink:result.parent_permlink,author:current_user,permlink:permlink,title:title,body:content,metadata:new_meta}];
 								if(users[current_user].shield){
-									shield_action(current_user,'content',{parent_author:result.parent_author,parent_permlink:result.parent_permlink,author:current_user,permlink:permlink,title:title,body:content,curation_percent:result.curation_percent,json_metadata:new_json,extensions:old_extensions},edit_success,edit_failure);
+									shield_action(current_user,'custom',{id:'media',required_auths:[],required_posting_auths:[current_user],json:JSON.stringify(custom_json)},edit_success,edit_failure);
 								}
 								else{
-									gate.broadcast.content(users[current_user].posting_key,result.parent_author,result.parent_permlink,current_user,permlink,title,content,result.curation_percent,new_json,old_extensions,function(err,result){
+									gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'media',JSON.stringify(custom_json),function(err,result){
 										if(!err){
 											edit_success(result);
 										}
@@ -2321,11 +2374,13 @@ function post_content(target){
 						target.html('Опубликовать');
 						console.log(err);
 					}
+
+					var custom_json=['content',{parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:content,metadata:json_object}];
 					if(users[current_user].shield){
-						shield_action(current_user,'content',{parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:content,curation_percent:curation_percent,json_metadata:json,extensions:[]},content_success,content_failure);
+						shield_action(current_user,'custom',{id:'media',required_auths:[],required_posting_auths:[current_user],json:JSON.stringify(custom_json)},content_success,content_failure);
 					}
 					else{
-						gate.broadcast.content(users[current_user].posting_key,'',parent_permlink,current_user,permlink,title,content,curation_percent,json,[],function(err,result){
+						gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'media',JSON.stringify(custom_json),function(err,result){
 							if(!err){
 								content_success(result);
 							}
