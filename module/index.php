@@ -510,8 +510,10 @@ if('witnesses'==$path_array[1]){
 			}
 			if($witness_hf!=$hf){
 				if('0.0.0'!=$witness_arr['hardfork_version_vote']){
-					if($witness_arr['hardfork_version_vote']!=$witness_arr['running_version']){
-						print ', голосует за переход с версии: '.$witness_arr['hardfork_version_vote'].' начиная с: ';
+					$witness_hf_vote=intval(str_replace('.','',$witness_arr['hardfork_version_vote']));
+					$witness_hf_vote=intval($witness_hf_vote/10);
+					if($witness_hf_vote>$hf){
+						print ', голосует за переход на версию '.$witness_arr['hardfork_version_vote'].' начиная с ';
 						$date=date_parse_from_format('Y-m-d\TH:i:s',$witness_arr['hardfork_time_vote']);
 						$vote_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
 						print '<span class="timestamp" data-timestamp="'.$vote_time.'">'.date('d.m.Y H:i:s',$vote_time).'</span>';
