@@ -7,12 +7,11 @@ $replace['menu']='';
 $replace['script_change_time']=filemtime($site_root.'/js/app.js');
 $replace['css_change_time']=filemtime($site_root.'/css/app.css');
 
-$api_ws_arr=array(
-	//'https://api.viz.blckchnd.com/',
+$api_arr=array(
 	'https://rpc.viz.ropox.tools/',
 	'https://rpc.viz.lexai.host/',
 );
-$api=new viz_jsonrpc_web($api_ws_arr[array_rand($api_ws_arr)]);
+$api=new viz_jsonrpc_web($api_arr[array_rand($api_arr)]);
 
 $currencies_arr=array(
 	'SHARES'=>1,
