@@ -766,10 +766,14 @@ function invite_register(secret_key,receiver,private_key){
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
 	}
-	if(users[current_user].shield){
-		shield_action(current_user,'invite_registration',{new_account_name:receiver,invite_secret:secret_key,new_account_key:public_key},invite_success,invite_failure);
+	let find_shield=false;
+	if(current_user){
+		if(users[current_user].shield){
+			shield_action(current_user,'invite_registration',{new_account_name:receiver,invite_secret:secret_key,new_account_key:public_key},invite_success,invite_failure);
+			find_shield=true;
+		}
 	}
-	else{
+	if(!find_shield){
 		gate.broadcast.inviteRegistration('5KcfoRuDfkhrLCxVcE9x51J6KN9aM9fpb78tLrvvFckxVV6FyFW','invite',receiver,secret_key,public_key,function(err,result){
 			if(!err){
 				invite_success(result);
@@ -790,10 +794,14 @@ function invite_claim(secret_key,receiver){
 			add_notify(err.payload.error.data.stack[0].format,true);
 		}
 	}
-	if(users[current_user].shield){
-		shield_action(current_user,'claim_invite_balance',{receiver:receiver,invite_secret:secret_key},invite_success,invite_failure);
+	let find_shield=false;
+	if(current_user){
+		if(users[current_user].shield){
+			shield_action(current_user,'claim_invite_balance',{receiver:receiver,invite_secret:secret_key},invite_success,invite_failure);
+			find_shield=true;
+		}
 	}
-	else{
+	if(!find_shield){
 		gate.broadcast.claimInviteBalance('5KcfoRuDfkhrLCxVcE9x51J6KN9aM9fpb78tLrvvFckxVV6FyFW','invite',receiver,secret_key,function(err,result){
 			if(!err){
 				invite_success(result);
