@@ -1242,6 +1242,10 @@ function witness_chain_properties_update(witness_login,url,signing_key){
 				props.vote_accounting_min_rshares=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=vote_accounting_min_rshares]').val());
 				props.maximum_block_size=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=maximum_block_size]').val());
 
+				props.inflation_witness_percent=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=inflation_witness_percent]').val());
+				props.inflation_ratio_committee_vs_reward_fund=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=inflation_ratio_committee_vs_reward_fund]').val());
+				props.inflation_recalc_period=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=inflation_recalc_period]').val());
+
 				let properties_success=function(result){
 					witness_control();
 					add_notify('Параметры успешно транслированы в сеть');
@@ -1253,10 +1257,10 @@ function witness_chain_properties_update(witness_login,url,signing_key){
 					}
 				}
 				if(users[current_user].shield){
-					shield_action(current_user,'chain_properties_update',{props:JSON.stringify(props)},properties_success,properties_failure);
+					shield_action(current_user,'versioned_chain_properties_update',{props:JSON.stringify([1,props])},properties_success,properties_failure);
 				}
 				else{
-					gate.broadcast.chainPropertiesUpdate(users[current_user]['active_key'],current_user,props,function(err,response){
+					gate.broadcast.versionedChainPropertiesUpdate(users[current_user]['active_key'],current_user,[1,props],function(err,response){
 						if(!err){
 							properties_success(result);
 						}
@@ -1511,11 +1515,25 @@ function witness_control(){
 							result+='<label class="input-descr">Доля сети, выделяемая для резервной пропускной способности (процент):<input type="text" name="bandwidth_reserve_percent" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_percent/100+'"></label>';
 							result+='<label class="input-descr">Резервная пропускная способность действует для аккаунтов с долей сети до порога:<input type="text" name="bandwidth_reserve_below" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_below+'"></label>';
 							result+='<label class="input-descr">Минимальный процент доли сети голосующих необходимый для принятия решения по заявке в комитете:<input type="text" name="committee_request_approve_min_percent" class="witness-chain-properties round wide" value="'+response.props.committee_request_approve_min_percent/100+'"></label>';
-							result+='<label class="input-descr">Минимально-допустимый процент кураторской награды:<input type="text" name="min_curation_percent" class="witness-chain-properties round wide" value="'+response.props.min_curation_percent/100+'"></label>';
-							result+='<label class="input-descr">Максимально-допустимый процент кураторской награды:<input type="text" name="max_curation_percent" class="witness-chain-properties round wide" value="'+response.props.max_curation_percent/100+'"></label>';
 							result+='<label class="input-descr">Минимальное количество токенов при делегировании:<input type="text" name="min_delegation" class="witness-chain-properties round wide" value="'+response.props.min_delegation+'"></label>';
 							result+='<label class="input-descr">Минимальный вес голоса для учета при голосовании за контент (rshares):<input type="text" name="vote_accounting_min_rshares" class="witness-chain-properties round wide" value="'+response.props.vote_accounting_min_rshares+'"></label>';
 							result+='<label class="input-descr">Максимальный размер блока в сети (байт):<input type="text" name="maximum_block_size" class="witness-chain-properties round wide" value="'+response.props.maximum_block_size+'"></label>';
+							result+='<hr>';
+							if(typeof response.props.inflation_witness_percent == 'undefined'){
+								response.props.inflation_witness_percent=2000;
+							}
+							if(typeof response.props.inflation_ratio_committee_vs_reward_fund == 'undefined'){
+								response.props.inflation_ratio_committee_vs_reward_fund=5000;
+							}
+							if(typeof response.props.inflation_recalc_period == 'undefined'){
+								response.props.inflation_recalc_period=806400;
+							}
+							result+='<label class="input-descr">Доля инфляции для награды делегатам (процент):<input type="text" name="inflation_witness_percent" class="witness-chain-properties round wide" value="'+response.props.inflation_witness_percent/100+'"></label>';
+							result+='<label class="input-descr">Соотношение разделения остатка инфляции между комитетом и фондом наград (процент):<input type="text" name="inflation_ratio_committee_vs_reward_fund" class="witness-chain-properties round wide" value="'+response.props.inflation_ratio_committee_vs_reward_fund/100+'"></label>';
+							result+='<label class="input-descr">Количество блоков между пересчетом инфляционной модели:<input type="text" name="inflation_recalc_period" class="witness-chain-properties round wide" value="'+response.props.inflation_recalc_period+'"></label>';
+							result+='<hr>';
+							result+='<label class="input-descr" style="opacity:0.4">(Устаревшее) Минимально-допустимый процент кураторской награды:<input type="text" name="min_curation_percent" class="witness-chain-properties round wide" value="'+response.props.min_curation_percent/100+'"></label>';
+							result+='<label class="input-descr" style="opacity:0.4">(Устаревшее) Максимально-допустимый процент кураторской награды:<input type="text" name="max_curation_percent" class="witness-chain-properties round wide" value="'+response.props.max_curation_percent/100+'"></label>';
 							result+='<label class="input-descr" style="opacity:0.4">(Устаревшее) Дополнительная трата энергии на флаг (процент):<input type="text" name="flag_energy_additional_cost" class="witness-chain-properties round wide" value="'+response.props.flag_energy_additional_cost/100+'"></label>';
 							result+='<input type="button" class="witness-chain-properties-update-action button" value="Установить параметры сети делегата">';
 							view.html(result);
