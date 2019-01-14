@@ -2692,10 +2692,10 @@ function app_mouse(e){
 		proper_target=$(target).closest('.page');
 		if(typeof proper_target.attr('data-content-author') !== 'undefined'){
 			if($(target).hasClass('active')){
-				unvote_content(proper_target.attr('data-content-author'),proper_target.attr('data-content-permlink'),proper_target);
+				add_notify('Вы уже награждали данный контент');
 			}
 			else{
-				upvote_content(proper_target.attr('data-content-author'),proper_target.attr('data-content-permlink'),proper_target);
+				award_content(proper_target.attr('data-content-author'),proper_target.attr('data-content-permlink'),proper_target);
 			}
 		}
 	}
@@ -2704,10 +2704,10 @@ function app_mouse(e){
 		proper_target=$(target).closest('.comment');
 		if(typeof proper_target.attr('data-author') !== 'undefined'){
 			if($(target).hasClass('active')){
-				unvote_subcontent(proper_target.attr('data-author'),proper_target.attr('data-permlink'),proper_target);
+				add_notify('Вы уже награждали данный контент');
 			}
 			else{
-				upvote_subcontent(proper_target.attr('data-author'),proper_target.attr('data-permlink'),proper_target);
+				award_content(proper_target.attr('data-author'),proper_target.attr('data-permlink'),proper_target);
 			}
 		}
 	}
