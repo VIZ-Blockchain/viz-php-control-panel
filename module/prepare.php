@@ -1270,14 +1270,7 @@ function view_content($data){
 	}
 	$reward_amount='';
 	if($votes_count){
-		if(0==$data['last_payout']){
-			if($data['total_pending_payout_value']){
-				$reward_amount='~'.$data['total_pending_payout_value'];
-			}
-		}
-		else{
-			$reward_amount=$data['payout_value'].' + '.$data['shares_payout_value'];
-		}
+		$reward_amount=($data['receive_award']/1000000).' SHARES';
 	}
 	if($auth && $data['author']==$user_arr['_id']){
 		$result.='<hr><div class="content-actions">';
@@ -1291,7 +1284,7 @@ function view_content($data){
 		<div class="votes_count"><span>'.$votes_count.'</span> голосов</div>';
 	if($reward_amount){
 		$result.='
-		<div class="reward_amount"><i class="far fa-fw fa-gem"></i> <span'.(-1!=$data['cashout_time']?' class="cashout_time" data-timestamp="'.$data['cashout_time'].'"':'').'>'.$reward_amount.'</span></div>';
+		<div class="reward_amount"><i class="far fa-fw fa-gem"></i> <span>'.$reward_amount.'</span></div>';
 	}
 	$result.='
 	</div>';
