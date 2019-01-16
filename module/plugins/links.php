@@ -5,13 +5,12 @@ class viz_plugin_links extends viz_plugin{
 		if(in_array('content',$config['plugins'])){
 			if(in_array('votes',$config['plugins_extensions']['links'])){
 				$memo=$data['memo'];
-				if(false!==strpos($memo,'/')){
-					$author=substr($memo,0,strpos($memo,'/'));
+				if(false!==mb_strpos($memo,'/')){
+					$author=mb_substr($memo,0,strpos($memo,'/'));
 					if($data['receiver']==$author){
-						$permlink=substr($memo,strpos($memo,'/')+1);
+						$permlink=mb_substr($memo,mb_strpos($memo,'/')+1);
 						$weight=(int)$data['energy'];
 						$author_id=get_user_id($author);
-						print '$author='.$author.'/$permlink='.$permlink.PHP_EOL;
 						if($author_id){
 							$user_login=$data['initiator'];
 							$user_id=get_user_id($user_login);
