@@ -2329,60 +2329,31 @@ function post_content(target){
 				data_obj=JSON.parse(data_json);
 				if('ok'==data_obj.status){//content already exist
 					if(confirm('Контент с таким URL уже существует, вы хотите заменить его?')){
-						gate.api.getContent(current_user,permlink,0,function(err, result){
-							if(!err){
-								let old_beneficiaries=result.beneficiaries;
-								let old_extensions=[];
-								/*
-								//not necessary
-								if(0<old_beneficiaries.length){
-									let old_extensions=[[0,{'beneficiaries':old_beneficiaries}]];
-								}
-								*/
-								let old_json={};
-								if(check_json(result.json_metadata)){
-									old_json=JSON.parse(result.json_metadata);
-								}
-								for(key in json_object){
-									old_json[key]=json_object[key];
-								}
-								let new_meta=old_json;
-								let new_json=JSON.stringify(new_meta);
-
-								let edit_success=function(result){
-									add_notify('Публикация успешно изменена, переадресация через 6 секунд&hellip;');
-									setTimeout(function(){wait_content(current_user,permlink)},6000);
-								}
-								let edit_failure=function(err){
-									add_notify('Ошибка при  получении публикации',true);
-									$('input[name=permlink]').removeAttr('disabled');
-									target.removeClass('disabled');
-									target.html('Опубликовать');
-									console.log(err);
-								}
-
-								var custom_json=['content',{parent_author:result.parent_author,parent_permlink:result.parent_permlink,author:current_user,permlink:permlink,title:title,body:content,metadata:new_meta}];
-								if(users[current_user].shield){
-									shield_action(current_user,'custom',{id:'media',required_auths:[],required_posting_auths:[current_user],json:JSON.stringify(custom_json)},edit_success,edit_failure);
+						let edit_success=function(result){
+							add_notify('Публикация успешно изменена, переадресация через 6 секунд&hellip;');
+							setTimeout(function(){wait_content(current_user,permlink)},6000);
+						}
+						let edit_failure=function(err){
+							add_notify('Ошибка при  получении публикации',true);
+							$('input[name=permlink]').removeAttr('disabled');
+							target.removeClass('disabled');
+							target.html('Сохранить изменения');
+							console.log(err);
+						}
+						var custom_json=['content',{parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:content,metadata:json_object}];
+						if(users[current_user].shield){
+							shield_action(current_user,'custom',{id:'media',required_auths:[],required_posting_auths:[current_user],json:JSON.stringify(custom_json)},edit_success,edit_failure);
+						}
+						else{
+							gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'media',JSON.stringify(custom_json),function(err,result){
+								if(!err){
+									edit_success(result);
 								}
 								else{
-									gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'media',JSON.stringify(custom_json),function(err,result){
-										if(!err){
-											edit_success(result);
-										}
-										else{
-											edit_failure(err);
-										}
-									});
+									edit_failure(err);
 								}
-							}
-							else{
-								add_notify('Не получается запросить публикацию с публичной ноды',true);
-								target.removeClass('disabled');
-								target.html('Сохранить изменения');
-								console.log(err);
-							}
-						});
+							});
+						}
 					}
 				}
 				else{

@@ -75,6 +75,7 @@ if('@'==mb_substr($path_array[1],0,1)){
 						<a class="right" href="/@'.$account_arr['login'].'/'.htmlspecialchars(stripcslashes($data['permlink'])).'/">&larr; Вернуться</a>
 						<h1>Редактирование</h1>
 						<div class="article post-content control">';
+						print '<p><input type="hidden" name="parent_permlink" value="'.htmlspecialchars(stripcslashes($data['parent_permlink']?$data['parent_permlink']:'')).'"></p>';
 						print '<p><input type="text" name="permlink" class="round wide" placeholder="URL" value="'.htmlspecialchars(stripcslashes($data['permlink'])).'" disabled="disabled"></p>';
 						print '<p><input type="text" name="title" class="round wide" placeholder="Заголовок" value="'.htmlspecialchars(stripcslashes($data['title'])).'"></p>';
 						print '<p><input type="text" name="foreword" class="round wide" placeholder="Предисловие (превью для текста)" value="'.htmlspecialchars(stripcslashes($data['foreword'])).'"></p>';
