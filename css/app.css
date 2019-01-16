@@ -109,6 +109,20 @@ body{
 b{
 	font-weight:700;
 }
+pre{
+	font-size: 14px;
+	border-radius: 3px;
+	background-color: #F8F8F8;
+	border: 2px solid #CCC;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	padding: 5px;
+}
+code{
+	font-size: 14px;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
 a{
 	color:#000;
 	cursor:pointer;
