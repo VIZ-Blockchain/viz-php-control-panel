@@ -1239,7 +1239,7 @@ function view_content($data){
 		<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
 	</div>';
 	$result.='<div class="article">';
-	$result.=text_to_view($data['body'],true);
+	$result.=text_to_view($data['body'],false);
 	$result.='</b></strong></em></i>';//fix styles
 	$result.='</div>';
 
