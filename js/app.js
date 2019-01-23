@@ -384,11 +384,11 @@ function session_generate(){
 						$('.auth-error').html('Не удается отправить custom операцию для инициализации сессии');
 						$('.auth-action').removeClass('disabled');
 					}
-					console.log(err);
 					users[current_user].session_id=null;
 					users[current_user].session_verify=0;
 					users[current_user].session_attempts=0;
 					$('.header .account').html('<a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
+					console.log(err);
 				}
 				if(users[current_user].shield){
 					shield_action(current_user,'custom',{id:'session',required_auths:[],required_posting_auths:[current_user],json:'["auth",{"key":"'+key+'"}]'},session_success,session_failure);
@@ -682,12 +682,13 @@ function wallet_withdraw_shares(disable=false){
 			if(typeof err.payload !== 'undefined'){
 				add_notify(err.payload.error.data.stack[0].format,true);
 			}
+			console.log(err);
 		}
 		if(users[current_user].shield){
 			shield_action(current_user,'withdraw_vesting',{vesting_shares:'0.000000 SHARES'},withdraw_shares_success,withdraw_shares_failure);
 		}
 		else{
-			gate.broadcast.withdrawVesting(users[current_user].active_key,current_user,'0.000000 SHARES',function(err,response){
+			gate.broadcast.withdrawVesting(users[current_user].active_key,current_user,'0.000000 SHARES',function(err,result){
 				if(!err){
 					withdraw_shares_success(result);
 				}
@@ -718,7 +719,7 @@ function wallet_withdraw_shares(disable=false){
 					shield_action(current_user,'withdraw_vesting',{vesting_shares:fixed_shares},withdraw_shares_success,withdraw_shares_failure);
 				}
 				else{
-					gate.broadcast.withdrawVesting(users[current_user].active_key,current_user,fixed_shares,function(err,response){
+					gate.broadcast.withdrawVesting(users[current_user].active_key,current_user,fixed_shares,function(err,result){
 						if(!err){
 							withdraw_shares_success(result);
 						}
@@ -1260,7 +1261,7 @@ function witness_chain_properties_update(witness_login,url,signing_key){
 					shield_action(current_user,'versioned_chain_properties_update',{props:JSON.stringify([1,props])},properties_success,properties_failure);
 				}
 				else{
-					gate.broadcast.versionedChainPropertiesUpdate(users[current_user]['active_key'],current_user,[1,props],function(err,response){
+					gate.broadcast.versionedChainPropertiesUpdate(users[current_user]['active_key'],current_user,[1,props],function(err,result){
 						if(!err){
 							properties_success(result);
 						}
