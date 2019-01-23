@@ -19,20 +19,6 @@ class viz_jsonrpc_web{
 		'get_block_info'=>'block_info',
 		'get_blocks_with_info'=>'block_info',
 
-		//https://github.com/VIZ-World/viz-world/blob/master/plugins/follow/plugin.cpp
-		'get_followers'=>'follow',
-		'get_following'=>'follow',
-		'get_follow_count'=>'follow',
-		'get_feed_entries'=>'follow',
-		'get_feed'=>'follow',
-		'get_blog_entries'=>'follow',
-		'get_blog'=>'follow',
-		'get_reblogged_by'=>'follow',
-		'get_blog_authors'=>'follow',
-
-		'get_inbox'=>'private_message',
-		'get_outbox'=>'private_message',
-
 		//https://github.com/VIZ-World/viz-world/blob/master/plugins/operation_history/plugin.cpp
 		'get_ops_in_block'=>'operation_history',
 		'get_transaction'=>'operation_history',
@@ -75,34 +61,14 @@ class viz_jsonrpc_web{
 		'verify_authority'=>'database_api',
 		'verify_account_authority'=>'database_api',
 
-		//https://github.com/VIZ-World/viz-world/blob/master/plugins/social_network/social_network.cpp
-		'get_content'=>'social_network',
-		'get_replies_by_last_update'=>'social_network',
-		'get_active_votes'=>'social_network',
-		'get_content_replies'=>'social_network',
-		'get_all_content_replies'=>'social_network',
-		'get_account_votes'=>'social_network',
 		/* Committee */
-		'get_committee_request'=>'social_network',
-		'get_committee_request_votes'=>'social_network',
-		'get_committee_requests_list'=>'social_network',
-
-		//https://github.com/VIZ-World/viz-world/blob/master/plugins/tags/plugin.cpp
-		'get_trending_tags'=>'tags',
-		'get_tags_used_by_author'=>'tags',
-		'get_discussions_by_payout'=>'tags',
-		'get_discussions_by_trending'=>'tags',
-		'get_discussions_by_created'=>'tags',
-		'get_discussions_by_active'=>'tags',
-		'get_discussions_by_cashout'=>'tags',
-		'get_discussions_by_votes'=>'tags',
-		'get_discussions_by_children'=>'tags',
-		'get_discussions_by_hot'=>'tags',
-		'get_discussions_by_feed'=>'tags',
-		'get_discussions_by_blog'=>'tags',
-		'get_discussions_by_contents'=>'tags',
-		'get_discussions_by_author_before_date'=>'tags',
-		'get_languages'=>'tags',
+		'get_committee_request'=>'committee_api',
+		'get_committee_request_votes'=>'committee_api',
+		'get_committee_requests_list'=>'committee_api',
+		/* Invites */
+		'get_invites_list'=>'invite_api',
+		'get_invite_by_id'=>'invite_api',
+		'get_invite_by_key'=>'invite_api',
 
 		//https://github.com/VIZ-World/viz-world/blob/master/plugins/raw_block/plugin.cpp
 		'get_raw_block'=>'raw_block',
