@@ -1,9 +1,10 @@
-[![VIZ](logo-square-160.png)](http://viz.world/)
-# VIZ.World Control Panel
+# VIZ.World ![](logo-symbol-anim.svg) Control Panel
 ## Features
-* Light VIZ PHP blockchain client
-* Cache-layer in redis for prevent request DDOS
-* JS client
+* VIZ PHP blockchain client
+* Waterfall for block analysys
+* Plugins system for waterfall
+* JS actions for most VIZ features
+* Cache-layer in redis
 
 ## Installation
 ```
@@ -16,6 +17,7 @@ nano config.php
 
 ## Dependencies
 - [PHP 7](https://thishosting.rocks/install-php-on-ubuntu/)
+- [PHP EXT secp256k1](https://github.com/On1x/secp256k1-php) need to check signatures
 - [MongoDB](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/) ([how to create user](https://docs.mongodb.com/manual/reference/method/db.createUser/))
 - [Redis](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04)
 - Nginx (look [nginx-example.conf](nginx-example.conf))
