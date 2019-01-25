@@ -131,6 +131,9 @@ a{
 	-o-transition: all 0.2s linear;
 	transition: all 0.2s linear;
 }
+a.link{
+	text-decoration:underline;
+}
 a:visited{
 	color:#000;
 }
@@ -329,6 +332,9 @@ a.icon{
 	box-shadow: 0 2px 4px -1px rgba(97, 21, 0, 0.07), 0 4px 5px 0 rgba(121, 7, 0, 0.07), 0 2px 10px 1px rgba(255, 39, 0, 0.35);
 }
 .button.disabled{
+	opacity:0.5;
+}
+.opacity{
 	opacity:0.5;
 }
 label input[type=checkbox]{

@@ -56,27 +56,27 @@ if(in_array('content',$config['plugins'])){
 								print '{"session":"'.$cookie.'"}';
 							}
 							else{
-								print '{"error":"authority","error_str":"key not found or miss authority weight threshold"}';
+								print '{"error":"authority","error_str":"Key not found or miss authority weight threshold"}';
 							}
 						}
 						else{
-							print '{"error":"login","error_str":"account not found"}';
+							print '{"error":"login","error_str":"Account not found"}';
 						}
 					}
 					else{
-						print '{"error":"authority","error_str":"authorization only with posting key"}';
+						print '{"error":"authority","error_str":"Authorization only with posting key"}';
 					}
 				}
 				else{
-					print '{"error":"action","error_str":"only auth action available"}';
+					print '{"error":"action","error_str":"Only auth action available"}';
 				}
 			}
 			else{
-				print '{"error":"origin","error_str":"only viz.world origin available"}';
+				print '{"error":"origin","error_str":"Only viz.world origin available"}';
 			}
 		}
 		else{
-			print '{"error":"signature","error_str":"missing signature"}';
+			print '{"error":"signature","error_str":"Missing signature"}';
 		}
 	}
 	if('load_more'==$path_array[2]){

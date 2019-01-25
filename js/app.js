@@ -576,8 +576,10 @@ function shield_control(){
 			}
 		}
 		xhr.onerror=function(){
-			console.log('error',xhr.status);
-			console.log('readyState',xhr.readyState);
+			let view=$('.shield-auth-control');
+			let result='';
+			result+='<p>У вас не включен <a class="start-shield-action link">VIZ.Shield</a>. После <a class="start-shield-action link">запуска</a> и разблокировки перезагрузите страницу или <a class="shield-auth-control-action link">нажмите на ссылку</a>.</p>';
+			view.html(result);
 		}
 		xhr.send();
 	}
@@ -2073,51 +2075,82 @@ function auth_signature_check(hex){
 	return false;
 }
 function try_auth_signature(login,posting_key,active_key=''){
-	var nonce=0;
-	var data='';
-	var signature='';
-	while(!auth_signature_check(signature)){
-		data=auth_signature_data('viz.world','auth',login,'posting',nonce);
-		signature=gate.auth.signature.sign(data,posting_key).toHex();
-		nonce++;
+	$('.auth-action').addClass('disabled');
+	$('.auth-error').html('');
+	login=login.toLowerCase();
+	if('@'==login.substring(0,1)){
+		login=login.substring(1);
 	}
-	$.ajax({
-		type:'POST',
-		url:'/ajax/auth/',
-		data:{'data':data,'signature':signature,'posting_key':posting_key},
-		success:function(data_json){
-			console.log(data_json);
-			data_obj=JSON.parse(data_json);
-			if(typeof data_obj.error !== 'undefined'){
-				console.log(''+new Date().getTime()+': '+data_obj.error+' - '+data_obj.error_str);
-				add_notify(data_obj.error_str,true);
+	login=login.trim();
+	if(login){
+		if(!gate.auth.isWif(posting_key)){
+			$('.auth-error').html('Posting key не валидный');
+			$('.auth-action').removeClass('disabled');
+			return;
+		}
+		if(''!=active_key){
+			if(!gate.auth.isWif(active_key)){
+				$('.auth-error').html('Active key не валидный');
+				$('.auth-action').removeClass('disabled');
+				return;
 			}
-			else
-			if(typeof data_obj !== 'undefined'){
-				users[login]={'posting_key':posting_key,'active_key':active_key,'shield':false,'session_id':data_obj.session,'session_verify':1};
-				current_user=login;
-				save_session();
-				set_session_cookie();
-				$('.auth-error').html('Вы успешно авторизованы, сессия инициализирована');
-				if('/'==document.location.pathname){
-					document.location='https://'+domain+'/feed/';
+		}
+		var nonce=0;
+		var data='';
+		var signature='';
+		while(!auth_signature_check(signature)){
+			data=auth_signature_data('viz.world','auth',login,'posting',nonce);
+			signature=gate.auth.signature.sign(data,posting_key).toHex();
+			nonce++;
+		}
+		$.ajax({
+			type:'POST',
+			url:'/ajax/auth/',
+			data:{'data':data,'signature':signature,'posting_key':posting_key},
+			success:function(data_json){
+				console.log(data_json);
+				data_obj=JSON.parse(data_json);
+				if(typeof data_obj.error !== 'undefined'){
+					console.log(''+new Date().getTime()+': '+data_obj.error+' - '+data_obj.error_str);
+					add_notify(data_obj.error_str,true);
+					$('.auth-error').html(data_obj.error_str);
+					$('.auth-action').removeClass('disabled');
+					return;
 				}
 				else
-				if('/login/'==document.location.pathname){
-					document.location='https://'+domain+'/feed/';
+				if(typeof data_obj !== 'undefined'){
+					users[login]={'posting_key':posting_key,'active_key':active_key,'shield':false,'session_id':data_obj.session,'session_verify':1};
+					current_user=login;
+					save_session();
+					set_session_cookie();
+					$('.auth-error').html('Вы успешно авторизованы, сессия инициализирована');
+					if('/'==document.location.pathname){
+						document.location='https://'+domain+'/feed/';
+					}
+					else
+					if('/login/'==document.location.pathname){
+						document.location='https://'+domain+'/feed/';
+					}
+					else{
+						document.location=document.location;
+					}
 				}
 				else{
-					document.location=document.location;
+					add_notify('Service unavailable',true);
+					$('.auth-action').removeClass('disabled');
+					return;
 				}
-			}
-			else{
-				add_notify('Service unavailable',true);
-			}
-		},
-	});
+			},
+		});
+	}
+	else{
+		$('.auth-error').html('Пользователь не указан');
+		$('.auth-action').removeClass('disabled');
+		return;
+	}
 }
 function try_auth(login,posting_key,active_key){
-	$('.auth-action').addClass('disabled');
+	$('.auth-custom-action').addClass('disabled');
 	$('.auth-error').html('');
 	login=login.toLowerCase();
 	if('@'==login.substring(0,1)){
@@ -2137,14 +2170,14 @@ function try_auth(login,posting_key,active_key){
 						}
 						catch(e){
 							$('.auth-error').html('Posting ключ не валидный');
-							$('.auth-action').removeClass('disabled');
+							$('.auth-custom-action').removeClass('disabled');
 							return;
 						}
 					}
 				}
 				if(!posting_valid){
 					$('.auth-error').html('Posting ключ не подходит');
-					$('.auth-action').removeClass('disabled');
+					$('.auth-custom-action').removeClass('disabled');
 					return;
 				}
 				if(active_key){
@@ -2158,14 +2191,14 @@ function try_auth(login,posting_key,active_key){
 							}
 							catch(e){
 								$('.auth-error').html('Active ключ не валидный');
-								$('.auth-action').removeClass('disabled');
+								$('.auth-custom-action').removeClass('disabled');
 								return;
 							}
 						}
 					}
 					if(!active_valid){
 						$('.auth-error').html('Active ключ не подходит');
-						$('.auth-action').removeClass('disabled');
+						$('.auth-custom-action').removeClass('disabled');
 						return;
 					}
 				}
@@ -2175,14 +2208,14 @@ function try_auth(login,posting_key,active_key){
 			}
 			else{
 				$('.auth-error').html('Пользователь не найден');
-				$('.auth-action').removeClass('disabled');
+				$('.auth-custom-action').removeClass('disabled');
 				return;
 			}
 		});
 	}
 	else{
 		$('.auth-error').html('Пользователь не указан');
-		$('.auth-action').removeClass('disabled');
+		$('.auth-custom-action').removeClass('disabled');
 		return;
 	}
 }
@@ -2756,6 +2789,14 @@ function app_mouse(e){
 		}
 	}
 	if($(target).hasClass('auth-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			if(!$(target).hasClass('disabled')){
+				try_auth_signature($('input[name=login]').val(),$('input[name=posting_key]').val(),$('input[name=active_key]').val());
+			}
+		}
+	}
+	if($(target).hasClass('auth-custom-action')){
 		e.preventDefault();
 		if($(target).closest('.control').length){
 			if(!$(target).hasClass('disabled')){
