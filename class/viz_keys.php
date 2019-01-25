@@ -85,15 +85,24 @@ if(!function_exists('base58_decode')){
 		return $output;
 	}
 }
+if(!function_exists(ec_compact2der)){
+	function ec_compact2der($data){
+		$x=substr($data,2,64);
+		$y=substr($data,66,64);
+		return '30440220'.$x.'0220'.$y;
+	}
+}
 class viz_keys{
 	public $bin='';
 	public $hex='';
 	function viz_keys($data=''){
-		if(preg_match('/^[0-9a-f]+$/i',$data)){
-			$this->import_hex($data);
-		}
-		else{
-			$this->import_bin($data);
+		if($data){
+			if(preg_match('/^[0-9a-f]+$/i',$data)){
+				$this->import_hex($data);
+			}
+			else{
+				$this->import_bin($data);
+			}
 		}
 	}
 	function import_hex($hex){
@@ -191,18 +200,19 @@ class viz_keys{
 			return false;
 		}
 		$context=secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
-		$data_hash=hash('sha256',$data,true);
-		$signature_bin=hex2bin($signature);
 
 		$public_key_point=null;
 		if(1 !== secp256k1_ec_pubkey_parse($context,$public_key_point,$this->bin)){
 			return false;
 		}
+
+		$signature_bin=hex2bin($signature);
 		$signature_point=null;
 		if(1 !== secp256k1_ecdsa_signature_parse_der($context,$signature_point,$signature_bin)){
 			return false;
 		}
 
+		$data_hash=hash('sha256',$data,true);
 		if(1 == secp256k1_ecdsa_verify($context,$signature_point,$data_hash,$public_key_point)){
 			return true;
 		}
