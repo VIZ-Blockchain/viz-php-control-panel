@@ -266,6 +266,10 @@ function wait_session(){
 						if('/'==document.location.pathname){
 							document.location='https://'+domain+'/feed/';
 						}
+						else
+						if('/login/'==document.location.pathname){
+							document.location='https://'+domain+'/feed/';
+						}
 						else{
 							document.location=document.location;
 						}
@@ -2058,6 +2062,59 @@ function logout(login='',redirect=true){
 			document.location='/';
 		}
 	}
+}
+function auth_signature_data(origin,action,login,authority,nonce){
+	return origin+':'+action+':'+login+':'+authority+':'+Math.floor((new Date()).getTime() / 1000)+':'+nonce;
+}
+function auth_signature_check(hex){
+	if('1f'==hex.substring(0,2)){
+		return true;
+	}
+	return false;
+}
+function try_auth_signature(login,posting_key,active_key=''){
+	var nonce=0;
+	var data='';
+	var signature='';
+	while(!auth_signature_check(signature)){
+		data=auth_signature_data('viz.world','auth',login,'posting',nonce);
+		signature=gate.auth.signature.sign(data,posting_key).toHex();
+		nonce++;
+	}
+	$.ajax({
+		type:'POST',
+		url:'/ajax/auth/',
+		data:{'data':data,'signature':signature,'posting_key':posting_key},
+		success:function(data_json){
+			console.log(data_json);
+			data_obj=JSON.parse(data_json);
+			if(typeof data_obj.error !== 'undefined'){
+				console.log(''+new Date().getTime()+': '+data_obj.error+' - '+data_obj.error_str);
+				add_notify(data_obj.error_str,true);
+			}
+			else
+			if(typeof data_obj !== 'undefined'){
+				users[login]={'posting_key':posting_key,'active_key':active_key,'shield':false,'session_id':data_obj.session,'session_verify':1};
+				current_user=login;
+				save_session();
+				set_session_cookie();
+				$('.auth-error').html('Вы успешно авторизованы, сессия инициализирована');
+				if('/'==document.location.pathname){
+					document.location='https://'+domain+'/feed/';
+				}
+				else
+				if('/login/'==document.location.pathname){
+					document.location='https://'+domain+'/feed/';
+				}
+				else{
+					document.location=document.location;
+				}
+			}
+			else{
+				add_notify('Service unavailable',true);
+			}
+		},
+	});
 }
 function try_auth(login,posting_key,active_key){
 	$('.auth-action').addClass('disabled');

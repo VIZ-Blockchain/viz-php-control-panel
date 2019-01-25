@@ -1,6 +1,84 @@
 <?php
 header("Content-type:text/html; charset=UTF-8");
 if(in_array('content',$config['plugins'])){
+	if('auth'==$path_array[2]){
+		$data=$_POST['data'];//viz.world:auth:login:authority:unixtime:nonce
+		$signature=$_POST['signature'];
+		$data_arr=explode(':',$data);
+		if($signature){
+			$signature=ec_compact2der($signature);//js post signature in compact format
+			if('viz.world'==$data_arr[0]){
+				if('auth'==$data_arr[1]){
+					if('posting'==$data_arr[3]){
+						$login=$data_arr[2];
+						$unixtime=(int)$data_arr[4];
+						if($unixtime<(time()-60)){
+							print '{"error":"time","error_str":"time offset: '.(time()-$unixtime).' sec"}';
+							exit;
+						}
+						if($unixtime>(time()+60)){
+							print '{"error":"time","error_str":"time offset: '.(time()-$unixtime).' sec"}';
+							exit;
+						}
+						$account=$api->execute_method('get_accounts',array(array($login)))[0];
+						if($login==$account['name']){
+							$weight_threshold=$account['posting']['weight_threshold'];
+							$summary_weight=0;
+							foreach($account['posting']['key_auths'] as $authority){
+								$key=new viz_keys();
+								$key->import_public($authority[0]);
+								if($key->verify($data,$signature)){
+									$summary_weight+=(int)$authority[1];
+								}
+							}
+							if($summary_weight>=$weight_threshold){
+								$key=mt_rand(1,100000);
+								$cookie_time=time();
+								$cookie=md5($cookie_time.'VIZ'.$key).md5($key.'WORLD'.date('d.m.Y').$login);
+								$check_session_id=$redis->zscore('session_cookie',$cookie);
+								if($check_session_id){
+									$check_ip=$redis->hget('session:'.$check_session_id,'ip');
+									if($check_ip==$ip){
+										$redis->del('session:'.$check_session_id);
+									}
+								}
+								$new_id=$redis->incr('id:session');
+								if($new_id){
+									$redis->zadd('session_cookie',$new_id,$cookie);
+									$redis->hset('session:'.$new_id,'id',$new_id);
+									$redis->hset('session:'.$new_id,'time',$cookie_time);
+									$redis->hset('session:'.$new_id,'ip',$ip);
+									$redis->hset('session:'.$new_id,'cookie',$cookie);
+									$user_id=get_user_id($login);
+									$redis->hset('session:'.$new_id,'user',$user_id);
+								}
+								header('HTTP/1.1 200 Ok');
+								print '{"session":"'.$cookie.'"}';
+							}
+							else{
+								print '{"error":"authority","error_str":"key not found or miss authority weight threshold"}';
+							}
+						}
+						else{
+							print '{"error":"login","error_str":"account not found"}';
+						}
+					}
+					else{
+						print '{"error":"authority","error_str":"authorization only with posting key"}';
+					}
+				}
+				else{
+					print '{"error":"action","error_str":"only auth action available"}';
+				}
+			}
+			else{
+				print '{"error":"origin","error_str":"only viz.world origin available"}';
+			}
+		}
+		else{
+			print '{"error":"signature","error_str":"missing signature"}';
+		}
+	}
 	if('load_more'==$path_array[2]){
 		$action=$_POST['action'];
 		if('new-content'==$action){
