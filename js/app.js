@@ -845,6 +845,9 @@ function reset_account_with_general_key(account_login,owner_key,general_key){
 	};
 	let memo_key=keys.memoPubkey;
 	gate.api.getAccounts([account_login],function(err,response){
+		if(0==response.length){
+			err=true;
+		}
 		if(!err){
 			let json_metadata=response[0].json_metadata;
 
@@ -871,10 +874,14 @@ function reset_account_with_general_key(account_login,owner_key,general_key){
 					}
 				}
 			}
-			if(users[current_user].shield){
-				shield_action(current_user,'account_update',{owner:JSON.stringify(owner),active:JSON.stringify(active),posting:JSON.stringify(posting),memo_key:memo_key,json_metadata:json_metadata},account_success,account_failure);
+			let find_shield=false;
+			if(current_user){
+				if(users[current_user].shield){
+					shield_action(current_user,'account_update',{owner:JSON.stringify(owner),active:JSON.stringify(active),posting:JSON.stringify(posting),memo_key:memo_key,json_metadata:json_metadata},account_success,account_failure);
+					find_shield=true;
+				}
 			}
-			else{
+			if(!find_shield){
 				gate.broadcast.accountUpdate(owner_key,account_login,owner,active,posting,memo_key,json_metadata,function(err,result){
 					if(!err){
 						account_success(result);
