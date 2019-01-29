@@ -415,18 +415,18 @@ if('tools'==$path_array[1]){
 }
 else
 if('login'==$path_array[1]){
-	$replace['title']=htmlspecialchars('Авторизиация').' - '.$replace['title'];
+	$replace['title']=htmlspecialchars('Аутентификация').' - '.$replace['title'];
 	print '<div class="page content">
-	<h1>Авторизация</h1>
+	<h1>Аутентификация</h1>
 	<div class="article control">';
-	print '<p>Внимание! При авторизации ключ записывается в ваш браузер и не передается на сервер. Если вы очистите кэш браузера или localStorage, то вам нужно будет вновь ввести свои данные для входа.</p>';
+	print '<p>Внимание! При аутентификации ключ записывается в ваш браузер и не передается на сервер. Если вы очистите кэш браузера или localStorage, то вам нужно будет вновь ввести свои данные для входа.</p>';
 	print '<p><label><input type="text" name="login" class="round"> &mdash; логин</label></p>';
 	print '<p><input type="password" name="posting_key" class="round"> &mdash; posting ключ</label></p>';
 	print '<p><input type="password" name="active_key" class="round"> &mdash; active ключ (по желанию)</label></p>';
 	print '<p><span class="auth-error"></span></p>';
-	print '<p><input type="button" class="auth-action button" value="Сохранить доступ и авторизоваться"></p>';
-	print '<hr><p><input type="button" class="auth-custom-action button opacity" value="Авторизоваться через отправку custom операции в блокчейн"></p>';
-	print '<hr><h3><img src="/shield-icon.svg"> Авторизация через VIZ Shield</h3>';
+	print '<p><input type="button" class="auth-action button" value="Сохранить доступ и пройти аутентификацию"></p>';
+	print '<hr><p><input type="button" class="auth-custom-action button opacity" value="Пройти аутентификацию через отправку custom операции в блокчейн"></p>';
+	print '<hr><h3><img src="/shield-icon.svg"> Аутентификация через VIZ Shield</h3>';
 	print '<div class="shield-auth-control"></div>';
 	print '</div>';
 	print '</div>';
@@ -472,7 +472,7 @@ if('accounts'==$path_array[1]){
 	print '<div class="page content">
 	<h1><i class="fas fa-fw fa-user-cog"></i> Аккаунты</h1>
 	<div class="article control">';
-	print '<p>Внимание! Авторизовать дополнительный аккаунты вы можете <a href="/login/">по этой ссылке</a>. Выход из аккаунта значит выход из сессии конкретным аккаунтом.<br>Для очистки сессии отключите все аккаунты.<br>';
+	print '<p>Внимание! Пройти аутентификацию дополнительныи аккаунтом вы можете <a href="/login/">по этой ссылке</a>. Выход из аккаунта значит выход из сессии конкретным аккаунтом.<br>Для очистки сессии отключите все аккаунты.<br>';
 	print '<div class="session-control"></div>';
 	print '</div></div>';
 }
@@ -837,7 +837,7 @@ if('feed'==$path_array[1]){
 	print '<div class="page content">
 	<h1>Лента новостей</h1>';
 	if(!$auth){
-		print '<p>Личная лента новостей доступна после авторизации и подписки на других пользователей.</p>';
+		print '<p>Личная лента новостей доступна после аутентификации и подписки на других пользователей.</p>';
 		print '</div>';
 	}
 	else{
