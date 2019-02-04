@@ -11,6 +11,7 @@ if(null!=localStorage.getItem('api_gate_default')){
 	gate.config.set('websocket',api_gate);
 }
 else{
+	update_api_gate(api_gate);
 	select_best_gate();
 }
 
