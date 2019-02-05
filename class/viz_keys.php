@@ -85,11 +85,23 @@ if(!function_exists('base58_decode')){
 		return $output;
 	}
 }
-if(!function_exists(ec_compact2der)){
+if(!function_exists('ec_check_der')){
+	function ec_check_der($data){
+		return '30440220'==substr($data,0,8) && '0220'==substr($data,72,4);
+	}
+}
+if(!function_exists('ec_compact2der')){
 	function ec_compact2der($data){
 		$x=substr($data,2,64);
 		$y=substr($data,66,64);
 		return '30440220'.$x.'0220'.$y;
+	}
+}
+if(!function_exists('ec_der2compact')){
+	function ec_der2compact($data){
+		$x=substr($data,8,64);
+		$y=substr($data,-64);
+		return '1f'.$x.$y;
 	}
 }
 class viz_keys{
@@ -194,6 +206,44 @@ class viz_keys{
 		$serialized='';
 		secp256k1_ecdsa_signature_serialize_der($context,$serialized,$signature);
 		return bin2hex($serialized);
+	}
+	function sign_compact($data){
+		if(!function_exists('secp256k1_context_create')){
+			return false;
+		}
+		$context=secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+		$data_hash=hash('sha256',$data,true);
+		$signature=null;
+		if (1 !== secp256k1_ecdsa_sign($context,$signature,$data_hash,$this->bin)) {
+			return false;
+		}
+		$serialized='';
+		if(!function_exists('secp256k1_ecdsa_signature_serialize_compact')){
+			return false;
+		}
+		secp256k1_ecdsa_signature_serialize_compact($context,$serialized,$signature);
+		return dechex(4+27).bin2hex($serialized);
+	}
+	function sign_recoverable_compact($data){
+		if(!function_exists('secp256k1_context_create')){
+			return false;
+		}
+		$context=secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+		$data_hash=hash('sha256',$data,true);
+		$signature_recoverable = null;
+		if(!function_exists('secp256k1_ecdsa_sign_recoverable')){
+			return false;
+		}
+		if(1 !== secp256k1_ecdsa_sign_recoverable($context,$signature_recoverable,$data_hash,$this->bin)){
+			return false;
+		}
+		$serialized='';
+		if(!function_exists('secp256k1_ecdsa_recoverable_signature_serialize_compact')){
+			return false;
+		}
+		$recid=0;
+		secp256k1_ecdsa_recoverable_signature_serialize_compact($context,$serialized,$recid,$signature_recoverable);
+		return dechex($recid+4+27).bin2hex($serialized);
 	}
 	function verify($data,$signature){
 		if(!function_exists('secp256k1_context_create')){
