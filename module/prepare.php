@@ -336,7 +336,15 @@ function user_badge($account_arr){
 			if(isset($account_arr['content_count'])){
 				$ret.='<p>Контента: '.$account_arr['content_count'].', Голосов: '.$account_arr['vote_count'].'</p>';
 			}
-			$ret.='<p>Баланс: '.($account_arr['balance']/1000).' VIZ, '.($account_arr['shares']/1000000).' SHARES</p>
+			$ret.='<p>Баланс: '.($account_arr['balance']/1000).' VIZ, ';
+			if($account_arr['effective_shares'] && ($account_arr['effective_shares']!=$account_arr['shares'])){
+				$ret.='<span title="Effective '.($account_arr['effective_shares']/1000000).' SHARES">';
+			}
+			$ret.=($account_arr['shares']/1000000).' SHARES';
+			if($account_arr['effective_shares'] && ($account_arr['effective_shares']!=$account_arr['shares'])){
+				$ret.='</span>';
+			}
+			$ret.='</p>
 		</div>
 	</div>
 </div>';
