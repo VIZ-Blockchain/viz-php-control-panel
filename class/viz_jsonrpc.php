@@ -104,10 +104,20 @@ class viz_jsonrpc_web{
 			$host=substr($host,0,strpos($host,':'));
 		}
 		$path=$stock2[1];
+
+		$content_type='application/json';
+		if(is_array($post)){
+			$post_str_arr=array();
+			foreach($post as $k=>$v){
+				$post_str_arr[]=urlencode($k).'='.$v;
+			}
+			$post=implode('&',$post_str_arr);
+			$content_type='application/x-www-form-urlencoded';
+		}
 		$request=$method." /".$path." HTTP/1.1\r\n";
 		$request.="Host: ".$host."\r\n";
 		$request.="Connection: close\r\n";
-		$request.="Content-Type: application/x-www-form-urlencoded\r\n";
+		$request.="Content-Type: ".$content_type."\r\n";
 		$request.="Content-Length: ".strlen($post)."\r\n\r\n";
 		$request.=$post;
 		$request.="\r\n";
@@ -149,6 +159,11 @@ class viz_jsonrpc_web{
 		if(false!==strpos($headers,'Transfer-Encoding: chunked')){$clear_r=clear_chunked($clear_r);}
 		if(false!==strpos($headers,'Content-Encoding: gzip')){$clear_r=gzdecode($clear_r);}
 		return array($headers,$clear_r);
+	}
+	function raw_method($method,$params){
+		$return='{"id":'.$this->post_num.',"jsonrpc":"2.0","method":"call","params":["'.$this->api[$method].'","'.$method.'",['.$params.']]}';
+		$this->post_num++;
+		return $return;
 	}
 	function build_method($method,$params){
 		$params_arr=array();
@@ -192,7 +207,12 @@ class viz_jsonrpc_web{
 		return $return;
 	}
 	function execute_method($method,$params=array(),$debug=false){
-		$jsonrpc_query=$this->build_method($method,$params);
+		if(!is_array($params)){
+			$jsonrpc_query=$this->raw_method($method,$params);
+		}
+		else{
+			$jsonrpc_query=$this->build_method($method,$params);
+		}
 		$result=$this->get_url($this->endpoint,$jsonrpc_query);
 		if(false!==$result){
 			list($header,$result)=$this->parse_web_result($result);
