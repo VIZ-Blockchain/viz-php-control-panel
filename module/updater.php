@@ -82,6 +82,9 @@ while($work){
 			$date=date_parse_from_format('Y-m-d\TH:i:s',$user_arr['last_post']);
 			$last_post=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
 			$json_metadata=array();
+			$effective_shares=(int)substr($user_arr['vesting_shares'],0,strpos($user_arr['vesting_shares'],' '))*1000000;
+			$effective_shares-=(int)substr($user_arr['delegated_vesting_shares'],0,strpos($user_arr['delegated_vesting_shares'],' '))*1000000;
+			$effective_shares+=(int)substr($user_arr['received_vesting_shares'],0,strpos($user_arr['received_vesting_shares'],' '))*1000000;
 			$user_data=array(
 				'login'=>$user_login,
 				'_id'=>(int)$user_arr['id'],
@@ -98,6 +101,7 @@ while($work){
 
 				'balance'=>(int)substr($user_arr['balance'],0,strpos($user_arr['balance'],' '))*1000,
 				'shares'=>(int)substr($user_arr['vesting_shares'],0,strpos($user_arr['vesting_shares'],' '))*1000000,
+				'effective_shares'=>$effective_shares,
 
 				'avatar'=>'',
 				'nickname'=>'',
