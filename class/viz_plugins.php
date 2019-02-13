@@ -29,13 +29,13 @@ class viz_plugins{
 	private $api;
 	private $redis;
 	private $mongo;
-	function viz_plugins(){
+	function viz_plugins($plugins_type='plugins'){
 		global $config,$site_root,$api,$redis,$mongo;
 		$this->api=&$api;
 		$this->redis=&$redis;
 		$this->mongo=&$mongo;
-		foreach($config['plugins'] as $plugin_name){
-			include($site_root.'/module/plugins/'.$plugin_name.'.php');
+		foreach($config[$plugins_type] as $plugin_name){
+			include($site_root.'/module/'.$plugins_type.'/'.$plugin_name.'.php');
 			$plugin_class='viz_plugin_'.$plugin_name;
 			if(class_exists($plugin_class)){
 				$$plugin_class=new $plugin_class($this->api,$this->redis,$this->mongo);
