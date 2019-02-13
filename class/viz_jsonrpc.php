@@ -138,7 +138,7 @@ class viz_jsonrpc_web{
 		if(false!==$use_port){
 			$port=$use_port;
 		}
-		if($sock=fsockopen($host, $port, $errno, $errstr, 1)){
+		if($sock=fsockopen($host, $port, $errno, $errstr, 2)){//timeout=2
 			fwrite($sock,$request,strlen($request));
 			while(!feof($sock)){
 				$result.=fread($sock,1024);
