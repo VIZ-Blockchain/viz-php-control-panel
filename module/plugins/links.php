@@ -17,6 +17,7 @@ class viz_plugin_links extends viz_plugin{
 							if($user_id){
 								if(in_array('users',$config['plugins'])){
 									redis_add_ulist('update_user',$user_login);
+									redis_add_ulist('update_user',$author);
 									$this->redis->zadd('users_action_time',$info['unixtime'],$user_login);
 								}
 								$find_content=mongo_find_id('content',array('author'=>(int)$author_id,'permlink'=>mongo_prepare($permlink)));
