@@ -1,6 +1,6 @@
 var gate=viz;
-var api_ws_gates=['wss://viz.lexai.host/','wss://ws.viz.ropox.tools/'];
-var api_http_gates=['https://rpc.viz.lexai.host/','https://rpc.viz.ropox.tools/'];
+var api_ws_gates=['wss://viz.lexai.host/','wss://solox.world/ws','wss://ws.viz.ropox.app/'];
+var api_http_gates=['https://rpc.viz.lexai.host/','https://solox.world/','https://rpc.viz.ropox.app/'];
 var api_gates=api_http_gates;
 var best_gate=-1;
 var best_gate_latency=-1;
