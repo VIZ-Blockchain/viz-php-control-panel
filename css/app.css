@@ -467,6 +467,10 @@ label input[type=checkbox]{
 	margin-left:21px;
 	margin-bottom:12px;
 }
+.page .article ol li{
+	margin-left:21px;
+	margin-bottom:12px;
+}
 .page .article ul ul{
 	margin-left:12px;
 	list-style:circle;
