@@ -1,5 +1,8 @@
 <?php
 class viz_plugin_users extends viz_plugin{
+	function claim_invite_balance($info,$data){
+		redis_add_ulist('update_user',$data['receiver']);
+	}
 	function account_witness_proxy($info,$data){
 		redis_add_ulist('update_user',$data['account']);
 	}
