@@ -14,6 +14,9 @@ class viz_plugin_content extends viz_plugin{
 			$user_login=$data['author'];
 			if('content'==$custom_action){
 				if(in_array($user_login,$required_posting_auths)){
+					if(!isset($data['parent_author'])){
+						$data['parent_author']='';
+					}
 					if(''==$data['parent_author']){//content
 						$parent_permlink=mongo_prepare($data['parent_permlink']);
 						$user_id=get_user_id($data['author']);
