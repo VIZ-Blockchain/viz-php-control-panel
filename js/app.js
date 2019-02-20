@@ -455,6 +455,7 @@ function load_session(){
 	reset_account_control();
 	invite_control();
 	shield_control();
+	paid_subscriptions_control();
 }
 function shield_status(id,success=()=>{},failure=()=>{}){
 	var xhr=new XMLHttpRequest();
@@ -788,6 +789,62 @@ function invite_register(secret_key,receiver,private_key){
 			}
 			else{
 				invite_failure(err);
+			}
+		});
+	}
+}
+function paid_subscribe(account,level,amount,period,auto_renewal){
+	let action_success=function(result){
+		add_notify('Условия соглашения подписаны');
+	}
+	let action_failure=function(err){
+		add_notify('Ошибка при подписи условий соглашения',true);
+		if(typeof err.payload !== 'undefined'){
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+	}
+	let find_shield=false;
+	if(current_user){
+		if(users[current_user].shield){
+			shield_action(current_user,'paid_subscribe',{account:account,level:level,period:period,auto_renewal:auto_renewal},action_success,action_failure);
+			find_shield=true;
+		}
+	}
+	if(!find_shield){
+		gate.broadcast.paidSubscribe(users[current_user].active_key,current_user,account,level,amount,period,auto_renewal,function(err,result){
+			if(!err){
+				action_success(result);
+			}
+			else{
+				action_failure(err);
+			}
+		});
+	}
+}
+function set_paid_subscription(url,levels,amount,period){
+	let action_success=function(result){
+		add_notify('Условия соглашения установлены');
+	}
+	let action_failure=function(err){
+		add_notify('Ошибка при установке условий соглашения',true);
+		if(typeof err.payload !== 'undefined'){
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+	}
+	let find_shield=false;
+	if(current_user){
+		if(users[current_user].shield){
+			shield_action(current_user,'set_paid_subscription',{url:url,levels:levels,amount:amount,period:period},action_success,action_failure);
+			find_shield=true;
+		}
+	}
+	if(!find_shield){
+		gate.broadcast.setPaidSubscription(users[current_user].active_key,current_user,url,levels,amount,period,function(err,result){
+			if(!err){
+				action_success(result);
+			}
+			else{
+				action_failure(err);
 			}
 		});
 	}
@@ -1645,6 +1702,101 @@ function create_account_control(){
 				});
 			});
 		}
+	}
+}
+function paid_subscriptions_control(){
+	if(0!=$('.control .manage-subscription').length){
+		let control=$('.manage-subscription');
+		let result='';
+		if(''==current_user){
+			result+='<p>Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
+		}
+		else{
+			result+='<p>Управление подписками: '+current_user+'.</p>';
+			if(''==users[current_user].active_key){
+				result+='<p>Для изменения параметров необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
+			}
+			result+='<div class="manage-subscription-list"></div>';
+		}
+		control.html(result);
+		gate.api.getActivePaidSubscriptions(current_user,function(err, response){
+			result='';
+			if(!err){
+				for(let i in response){
+					result+='<p><a class="manage-subscription-action link" data-login="'+current_user+'" data-creator="'+response[i]+'">Соглашение с '+response[i]+'</span></p>';
+					result+='<div class="manage-subscription-item" data-login="'+current_user+'" data-creator="'+response[i]+'"></div>';
+				}
+				if(0==response.length){
+					result+='<p>У аккаунта <a href="/@'+current_user+'/" target="_blank">'+current_user+'</a> отсутствуют активные платные подписки.</p>';
+				}
+				$('.manage-subscription-list').html(result);
+			}
+			else{
+				add_notify('Ошибка в API запросе',true);
+			}
+		});
+	}
+	if(0!=$('.control .set-paid-subscribe').length){
+		let control=$('.set-paid-subscribe');
+		let result='';
+		result+='<hr><p>Введите логин создателя соглашения, чтобы посмотреть условия соглашения платной подписки.</p>';
+		result+='<p><label class="input-descr">Логин:<br><input type="text" name="lookup-login" class="round wide"></label></p>';
+		result+='<p><a class="set-paid-subscribe-lookup-action button"><i class="fas fa-fw fa-search"></i> Запросить информацию</a>';
+		result+='<div class="set-paid-subscribe-agreement"></div>';
+		control.html(result);
+	}
+	if(0!=$('.control .set-paid-subscription').length){
+		let control=$('.set-paid-subscription');
+		let result='';
+		result+='<h3>Условия соглашения платной подписки</h3>';
+		if(''==current_user){
+			result+='<p>Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
+		}
+		else{
+			result+='<p>Создатель соглашения: '+current_user+'.</p>';
+			if(''==users[current_user].active_key){
+				result+='<p>Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.</p>';
+			}
+			else{
+				result+='<p><label class="input-descr">URL (ссылка на сервис или услугу):<br><input type="text" name="url" class="round wide" placeholder="https://"></label></p>';
+				result+='<p><label class="input-descr">Количество доступных уровней подписки<br>(укажите 0, если намерены остановить продление или подписание новых соглашений):<br><input type="text" name="levels" class="round wide" placeholder="0"></label></p>';
+				result+='<p><label class="input-descr">Количество токенов VIZ (например, 12.500):<br><input type="text" name="amount" class="round wide" placeholder="0.000"></label></p>';
+				result+='<p><label class="input-descr">Период действия подписки (количество дней, например 30):<br><input type="text" name="period" class="round wide" placeholder="0"></label></p>';
+				result+='<p><a class="set-paid-subscription-action button"><i class="fas fa-fw fa-search"></i> Установить условия соглашения для платных подписок</a>';
+			}
+		}
+		control.html(result);
+	}
+	if(0!=$('.control .paid-subscriptions-options').length){
+		let control=$('.paid-subscriptions-options');
+		let result='';
+		result+='<h3>Условия соглашения платной подписки</h3>';
+		result+='<p>Введите логин создателя соглашения, чтобы посмотреть условия соглашения платной подписки.</p>';
+		result+='<p><label class="input-descr">Логин:<br><input type="text" name="lookup-login" class="round wide"></label></p>';
+		result+='<p><a class="paid-subscriptions-options-action button"><i class="fas fa-fw fa-search"></i> Запросить информацию</a>';
+		result+='<div class="options-result"></div><hr>';
+		control.html(result);
+	}
+	if(0!=$('.control .paid-subscriptions-lookup').length){
+		let control=$('.paid-subscriptions-lookup');
+		let result='';
+		result+='<h3>Список соглашений на платные подписки</h3>';
+		result+='<p>Введите логин подписчика, чтобы посмотреть связанные с ним соглашения на платные подписки.</p>';
+		result+='<p><label class="input-descr">Логин:<br><input type="text" name="lookup-login" class="round wide"></label></p>';
+		result+='<p><a class="paid-subscriptions-lookup-action button"><i class="fas fa-fw fa-search"></i> Выполнить поиск</a>';
+		result+='<div class="lookup-result"></div><hr>';
+		control.html(result);
+	}
+	if(0!=$('.control .paid-subscription-lookup').length){
+		let control=$('.paid-subscription-lookup');
+		let result='';
+		result+='<h3>Информация о соглашении</h3>';
+		result+='<p>Введите логин подписчика, логин создателя соглашения, чтобы посмотреть текущий статус соглашения и информацию по нему.</p>';
+		result+='<p><label class="input-descr">Логин подписчика:<br><input type="text" name="lookup-login" class="round wide"></label></p>';
+		result+='<p><label class="input-descr">Логин создателя соглашения:<br><input type="text" name="lookup-creator" class="round wide"></label></p>';
+		result+='<p><a class="paid-subscription-lookup-action button"><i class="fas fa-fw fa-search"></i> Запросить информацию о соглашении</a>';
+		result+='<div class="lookup-result"></div><hr>';
+		control.html(result);
 	}
 }
 function invite_control(){
@@ -2909,6 +3061,234 @@ function app_mouse(e){
 			let secret_key=$('.invite-claim input[name=secret]').val();
 			let receiver=$('.invite-claim input[name=receiver]').val();
 			invite_claim(secret_key,receiver);
+		}
+	}
+	if($(target).hasClass('set-paid-subscription-action') || $(target).parent().hasClass('set-paid-subscription-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let url=$('.set-paid-subscription input[name=url]').val();
+			let levels=parseInt($('.set-paid-subscription input[name=levels]').val());
+			let amount=$('.set-paid-subscription input[name=amount]').val();
+			amount=(parseInt(parseFloat(amount)*1000)/1000).toFixed(3);
+			amount=amount+' VIZ';
+			let period=parseInt($('.set-paid-subscription input[name=period]').val());
+			set_paid_subscription(url,levels,amount,period);
+		}
+	};
+	if($(target).hasClass('manage-subscription-update-action') || $(target).parent().hasClass('manage-subscription-update-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let selected=$(target).closest('.manage-subscription-item');
+			let account=selected.find('input[name=account]').val();
+			let level=parseInt(selected.find('input[name=level]').val());
+			let amount=(parseInt(selected.find('input[name=amount]').val())/1000).toFixed(3);
+			amount=amount+' VIZ';
+			let period=parseInt(selected.find('input[name=period]').val());
+			let auto_renewal=selected.find('input[name=auto_renewal]').prop('checked');
+			paid_subscribe(account,level,amount,period,auto_renewal);
+		}
+	}
+	if($(target).hasClass('set-paid-subscribe-action') || $(target).parent().hasClass('set-paid-subscribe-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let account=$('.set-paid-subscribe .set-paid-subscribe-agreement input[name=account]').val();
+			let level=parseInt($('.set-paid-subscribe .set-paid-subscribe-agreement select[name=level]').val());
+			let amount=(parseInt($('.set-paid-subscribe .set-paid-subscribe-agreement input[name=amount]').val())/1000).toFixed(3);
+			amount=amount+' VIZ';
+			let period=parseInt($('.set-paid-subscribe .set-paid-subscribe-agreement input[name=period]').val());
+			let auto_renewal=$('.set-paid-subscribe .set-paid-subscribe-agreement input[name=auto_renewal]').prop('checked');
+			paid_subscribe(account,level,amount,period,auto_renewal);
+		}
+	}
+	if($(target).hasClass('set-paid-subscribe-lookup-action') || $(target).parent().hasClass('set-paid-subscribe-lookup-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let login=$('.set-paid-subscribe input[name=lookup-login]').val();
+			$('.set-paid-subscribe .set-paid-subscribe-agreement').html('');
+			gate.api.getPaidSubscriptionOptions(login,function(err, response){
+				let result='';
+				if(!err){
+					let update_time=Date.parse(response.update_time);
+					result+='<p>Создатель соглашения: <a href="/@'+response.creator+'" target="_blank">'+response.creator+'</a></p>';
+					result+='<input type="hidden" name="account" value="'+response.creator+'">';
+					if(0<response.url.length){
+						result+='<p>Ссылка с информацией: <a href="'+encodeURI(response.url)+'" target="_blank">'+response.url+'</a></p>';
+					}
+					result+='<p>Дата последнего изменения условий соглашения: '+date_str(update_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+					if(0==response.levels){
+						result+='<p><b>Новые соглашения и продление старых приостановлено</b></p>';
+					}
+					result+='<p>Количество уровней подписки: '+response.levels+'</p>';
+					result+='<p>Количество токенов за каждый уровень: '+(response.amount/1000)+' VIZ</p>';
+					result+='<input type="hidden" name="amount" value="'+response.amount+'">';
+					result+='<p>Длительность подписки (количество дней): '+response.period+'</p>';
+					result+='<input type="hidden" name="period" value="'+response.period+'">';
+					if(0<response.levels){
+						result+='<hr><p>Если вы согласны с условиями соглашения, выберите уровень подписки, установите при необходимости автоматическое продление соглашения:</p>';
+						result+='<p>Уровень платной подписки: <select name="level" class="round">';
+						for(let i=1;i<=response.levels;i++){
+							result+='<option value="'+i+'"'+(1==i?' selected':'')+'>'+i+' (итоговая стоимость подписки '+((i*response.amount)/1000)+' VIZ)</option>';
+						}
+						result+='</select></p>';
+						result+='<p><label><input type="checkbox" name="auto_renewal"> &mdash; Включить автоматическую оплату</label></p>';
+						result+='<p><a class="set-paid-subscribe-action button"><i class="fas fa-fw fa-file-signature"></i> Подписать соглашение по платной подписке</a>';
+					}
+				}
+				else{
+					result='<p>Условий соглашения не найдено</p>';
+				}
+				$('.set-paid-subscribe .set-paid-subscribe-agreement').html(result);
+			});
+		}
+	}
+	if($(target).hasClass('paid-subscriptions-options-action') || $(target).parent().hasClass('paid-subscriptions-options-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let login=$('.paid-subscriptions-options input[name=lookup-login]').val();
+			$('.paid-subscriptions-options .lookup-result').html('');
+			gate.api.getPaidSubscriptionOptions(login,function(err, response){
+				let result='';
+				if(!err){
+					let update_time=Date.parse(response.update_time);
+					result+='<p>Создатель соглашения: <a href="/@'+response.creator+'" target="_blank">'+response.creator+'</a></p>';
+					if(0<response.url.length){
+						result+='<p>Ссылка с информацией: <a href="'+encodeURI(response.url)+'" target="_blank">'+response.url+'</a></p>';
+					}
+					result+='<p>Дата последнего изменения условий соглашения: '+date_str(update_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+					if(0==response.levels){
+						result+='<p><b>Новые соглашения и продление старых приостановлено</b></p>';
+					}
+					result+='<p>Количество уровней подписки: '+response.levels+'</p>';
+					result+='<p>Количество токенов за каждый уровень: '+(response.amount/1000)+' VIZ</p>';
+					result+='<p>Длительность подписки (количество дней): '+response.period+'</p>';
+					if(0<response.active_subscribers_count){
+						result+='<h3>Дополнительная информация</h3>';
+						if(0<response.active_subscribers_with_auto_renewal_count){
+							result+='<p>Активные соглашения с автопродлением: '+response.active_subscribers_with_auto_renewal_count+'</p>';
+							result+='<p>Активные соглашения с автопродлением на сумму: '+(response.active_subscribers_with_auto_renewal_summary_amount/1000)+' VIZ</p>';
+						}
+						result+='<p>Активные соглашения: '+response.active_subscribers_count+'</p>';
+						result+='<p>Активные соглашения на сумму: '+(response.active_subscribers_summary_amount/1000)+' VIZ</p>';
+					}
+				}
+				else{
+					result='<p>Условий соглашения не найдено</p>';
+				}
+				$('.paid-subscriptions-options .options-result').html(result);
+			});
+		}
+	}
+	if($(target).hasClass('paid-subscriptions-lookup-action') || $(target).parent().hasClass('paid-subscriptions-lookup-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let login=$('.paid-subscriptions-lookup input[name=lookup-login]').val();
+			$('.paid-subscriptions-lookup .lookup-result').html('');
+			gate.api.getActivePaidSubscriptions(login,function(err, response){
+				if(!err){
+					let result='<h3>Активные соглашения</h3>';
+					for(let i in response){
+						result+='<p><a class="paid-subscription-lookup-action link" data-login="'+login+'" data-creator="'+response[i]+'">Соглашение с '+response[i]+'</span></p>';
+					}
+					if(0==response.length){
+						result+='<p>У аккаунта <a href="/@'+login+'/" target="_blank">'+login+'</a> отсутствуют активные платные подписки.</p>';
+					}
+					$('.paid-subscriptions-lookup .lookup-result').html($('.paid-subscriptions-lookup .lookup-result').html()+result);
+					gate.api.getInactivePaidSubscriptions(login,function(err, response){
+						if(!err){
+							let result='<h3>Неактивные соглашения</h3>';
+							for(let i in response){
+								result+='<p><a class="paid-subscription-lookup-action link" data-login="'+login+'" data-creator="'+response[i]+'">Соглашение с '+response[i]+'</span></p>';
+							}
+							if(0==response.length){
+								result+='<p>У аккаунта <a href="/@'+login+'/" target="_blank">'+login+'</a> отсутствуют неактивные платные подписки.</p>';
+							}
+							$('.paid-subscriptions-lookup .lookup-result').html($('.paid-subscriptions-lookup .lookup-result').html()+result);
+						}
+						else{
+							add_notify('Ошибка в API запросе',true);
+						}
+					});
+				}
+				else{
+					add_notify('Ошибка в API запросе',true);
+				}
+			});
+		}
+	}
+	if($(target).hasClass('manage-subscription-action') || $(target).parent().hasClass('manage-subscription-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let login=$(target).attr('data-login');
+			let creator=$(target).attr('data-creator');
+			$('.manage-subscription-item[data-creator='+creator+'][data-login='+login+']').html('');
+			gate.api.getPaidSubscriptionStatus(login,creator,function(err, response){
+				let result='';
+				if(!err){
+					result+='<input type="hidden" name="account" value="'+response.creator+'">';
+					result+='<p>Статус соглашения: '+(response.active?'Активное':'<span class="red">Неактивное</span>')+'</p>';
+					result+='<p>Автопродление: '+(response.auto_renewal?'Включено':'<span class="red">Отключено</span>')+'</p>';
+					result+='<p>Уровень подписки: '+response.level+'</p>';
+					result+='<input type="hidden" name="level" value="'+response.level+'">';
+					result+='<p>Количество токенов за каждый уровень: '+(response.amount/1000)+' VIZ</p>';
+					result+='<input type="hidden" name="amount" value="'+response.amount+'">';
+					result+='<p>Длительность подписки (количество дней): '+response.period+'</p>';
+					result+='<input type="hidden" name="period" value="'+response.period+'">';
+					let start_time=Date.parse(response.start_time);
+					result+='<p>Дата заключения соглашения: '+date_str(start_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+					if(response.active){
+						let next_time=Date.parse(response.next_time);
+						result+='<p>Дата следующего обновления действия соглашения: '+date_str(next_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+					}
+					result+='<p><label><input type="checkbox" name="auto_renewal"'+(response.auto_renewal?' checked':'')+'> &mdash; Включить автоматическую оплату</label></p>';
+					result+='<p><a class="manage-subscription-update-action button"><i class="fas fa-fw fa-file-signature"></i> Изменить автоматическую оплату</a>';
+				}
+				else{
+					result+='<p>Соглашение не найдено</p>';
+				}
+				result+='<hr>';
+				$('.manage-subscription-item[data-creator='+creator+'][data-login='+login+']').html(result);
+			});
+		}
+	}
+	if($(target).hasClass('paid-subscription-lookup-action') || $(target).parent().hasClass('paid-subscription-lookup-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let login=$('.paid-subscription-lookup input[name=lookup-login]').val();
+			let creator=$('.paid-subscription-lookup input[name=lookup-creator]').val();
+			if(typeof $(target).attr('data-login') !== 'undefined'){
+				login=$(target).attr('data-login');
+				$('.paid-subscription-lookup input[name=lookup-login]').val(login);
+			}
+			if(typeof $(target).attr('data-creator') !== 'undefined'){
+				creator=$(target).attr('data-creator');
+				$('.paid-subscription-lookup input[name=lookup-creator]').val(creator);
+			}
+			$('.paid-subscription-lookup .lookup-result').html('');
+			gate.api.getPaidSubscriptionStatus(login,creator,function(err, response){
+				let result='';
+				if(!err){
+					result+='<p>Соглашение между <a href="/@'+login+'/" target="_blank">'+login+'</a> и <a href="/@'+creator+'/" target="_blank">'+creator+'</a></p>';
+					result+='<p>Статус соглашения: '+(response.active?'Активное':'<span class="red">Неактивное</span>')+'</p>';
+					result+='<p>Автопродление: '+(response.auto_renewal?'Включено':'<span class="red">Отключено</span>')+'</p>';
+					result+='<p>Уровень подписки: '+response.level+'</p>';
+					result+='<p>Количество токенов за каждый уровень: '+(response.amount/1000)+' VIZ</p>';
+					result+='<p>Длительность подписки (количество дней): '+response.period+'</p>';
+					let start_time=Date.parse(response.start_time);
+					result+='<p>Дата заключения соглашения: '+date_str(start_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+					if(response.active){
+						let next_time=Date.parse(response.next_time);
+						result+='<p>Дата следующего обновления действия соглашения: '+date_str(next_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+					}
+					else{
+						let end_time=Date.parse(response.end_time);
+						result+='<p>Дата завершения действия соглашения: '+date_str(end_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+					}
+				}
+				else{
+					result+='<p>Соглашение не найдено</p>';
+				}
+				$('.paid-subscription-lookup .lookup-result').html(result);
+			});
 		}
 	}
 	if($(target).hasClass('invite-lookup-action') || $(target).parent().hasClass('invite-lookup-action')){

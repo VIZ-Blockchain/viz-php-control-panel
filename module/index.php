@@ -246,6 +246,7 @@ if('tools'==$path_array[1]){
 		print '<div class="page content">
 		<h1><i class="fas fa-fw fa-toolbox"></i> Инструменты</h1>
 		<div class="article control">';
+		print '<p><a href="/tools/paid-subscriptions/">Система платных подписок</a></p>';
 		print '<p><a href="/tools/invites/">Система инвайтов</a></p>';
 		print '<p><a href="/tools/create-account/">Создание аккаунта</a></p>';
 		print '<p><a href="/tools/delegation/">Делегирование доли</a></p>';
@@ -331,6 +332,53 @@ if('tools'==$path_array[1]){
 					print '</div></div>';
 				}
 			}
+		}
+	}
+	elseif('paid-subscriptions'==$path_array[2]){
+		if('set-options'==$path_array[3]){
+			$replace['title']=htmlspecialchars('Установка условий платной подписки').' - '.$replace['title'];
+			print '<div class="page content">
+			<a class="right" href="/tools/paid-subscriptions/">&larr; Вернуться</a>
+			<h1><i class="fas fa-fw fa-toolbox"></i> Установка условий платной подписки</h1>
+			<div class="article control">';
+			print '<p>Вы можете настроить опции для соглашения с периодическими платежами на ваш аккаунт (платная подписка). Заполните ниже форму и отправьте транзакцию в блокчейн VIZ.</p>';
+			print '<p>Любая сторона с помощью API запросов может проверить статус соглашения, список подписок или подписчиков зафиксированных в публичной блокчейн-системе VIZ.</p>';
+			print '<div class="set-paid-subscription"></div>';
+			print '</div></div>';
+		}
+		if('sign-agreement'==$path_array[3]){
+			$replace['title']=htmlspecialchars('Подпись соглашения платной подписки').' - '.$replace['title'];
+			print '<div class="page content">
+			<a class="right" href="/tools/paid-subscriptions/">&larr; Вернуться</a>
+			<h1><i class="fas fa-fw fa-toolbox"></i> Подпись соглашения платной подписки</h1>
+			<div class="article control">';
+			print '<p>Загрузите условия соглашения с создателем платной подписки. Выберите уровень подписки и подпишите соглашение, отправьте транзакцию в блокчейн VIZ.</p>';
+			print '<p>Любая сторона с помощью API запросов может проверить статус соглашения в публичной блокчейн-системе VIZ.</p>';
+			print '<div class="set-paid-subscribe"></div>';
+			print '</div></div>';
+		}
+		if('manage-subscription'==$path_array[3]){
+			$replace['title']=htmlspecialchars('Управление автоматическими платежами').' - '.$replace['title'];
+			print '<div class="page content">
+			<a class="right" href="/tools/paid-subscriptions/">&larr; Вернуться</a>
+			<h1><i class="fas fa-fw fa-toolbox"></i> Управление автоматическими платежами</h1>
+			<div class="article control">';
+			print '<p>Выберите действующую платную подписку и установите параметр по автоматической оплате.</p>';
+			print '<div class="manage-subscription"></div>';
+			print '</div></div>';
+		}
+		if(''==$path_array[3]){
+			$replace['title']=htmlspecialchars('Система платных подписок').' - '.$replace['title'];
+			print '<div class="page content">
+			<a class="right" href="/tools/">&larr; Инструменты</a>
+			<h1><i class="fas fa-fw fa-toolbox"></i> Система платных подписок</h1>
+			<div class="article control">';
+			print '<p>Система платных подписок &mdash; универсальный процессинговый инструмент для оформления периодических платежей VIZ за сервис или услуги. Аккаунт может <a href="/tools/paid-subscriptions/set-options/">настроить опции для соглашения с периодическими платежами</a> в его сторону. Другие пользователи могут <a href="/tools/paid-subscriptions/sign-agreement/">подписать соглашение на периодические платежи (оформить платную подписку)</a>, <a href="/tools/paid-subscriptions/manage-subscription/">управлять автоматическими платежами</a>.</p>';
+			print '<p>Любая сторона с помощью API запросов может проверить статус соглашения, список подписок или подписчиков зафиксированных в публичной блокчейн-системе VIZ.</p>';
+			print '<div class="paid-subscriptions-options"></div>';
+			print '<div class="paid-subscriptions-lookup"></div>';
+			print '<div class="paid-subscription-lookup"></div>';
+			print '</div></div>';
 		}
 	}
 	elseif('invites'==$path_array[2]){
