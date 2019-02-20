@@ -1199,7 +1199,7 @@ function preview_content($data){
 			$upvote=true;
 		}
 	}
-	$result.='<div class="info">
+	$result.='<div class="info clearfix">
 		<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a>';
 	if($custom_nickname){
 		$result.='<span class="account-login"><a href="/@'.$author_login.'/">@'.$author_login.'</a></span>';
