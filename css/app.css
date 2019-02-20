@@ -1232,6 +1232,7 @@ select.small-size{
 .award.active{
 	color:#fff !important;
 	background:#396ac5 !important;
+	border:1px solid #2353ad !important;
 }
 .award.active:hover::before{
 	color:#fff !important;
