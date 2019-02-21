@@ -2208,6 +2208,7 @@ function session_control(){
 	}
 }
 function logout(login='',redirect=true){
+	$('.menu .avatar').remove();
 	if(''==login){
 		login=current_user;
 	}
@@ -3398,6 +3399,7 @@ function app_mouse(e){
 		let login=$(target).attr('data-login');
 		if(typeof users[login] !== 'undefined'){
 			current_user=login;
+			$('.menu .avatar').remove();
 			save_session();
 		}
 	}
