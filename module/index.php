@@ -252,7 +252,7 @@ if('tools'==$path_array[1]){
 		print '<p><a href="/tools/delegation/">Делегирование доли</a></p>';
 		print '<p><a href="/tools/schedule/">Расписание делегатов</a></p>';
 		print '<p><a href="/tools/blocks/">Обзор блоков</a></p>';
-		print '<p><a href="/tools/reset-account/">Сброс доступов к аккаунту</a></p>';
+		print '<p><a href="/tools/reset-account/">Смена доступов к аккаунту</a></p>';
 		print '</div></div>';
 	}
 	elseif('blocks'==$path_array[2]){
@@ -396,7 +396,7 @@ if('tools'==$path_array[1]){
 			print '<div class="page content">
 			<h1><i class="fas fa-fw fa-toolbox"></i> Регистрация по инвайт-коду</h1>
 			<div class="article control">';
-			print '<p>Внимание! Вы можете <a href="/tools/invites/">проверить баланс кода до регистрации</a> с помощью публичного ключа. После регистрации весь баланс кода будет переведен в SHARES нового аккаунта. Все ключи аккаунта будут идентичны указанному в форме, при желании вы сможете изменить их позже.</p>';
+			print '<p>Внимание! Вы можете <a href="/tools/invites/">проверить баланс кода до регистрации</a> с помощью публичного ключа. После регистрации весь баланс кода будет переведен в SHARES нового аккаунта. Все ключи аккаунта будут идентичны указанному в форме, при желании вы можете <a href="/tools/reset-account/">разделить ключи для разных типов доступа</a>.</p>';
 			print '<div class="invite-register"></div>';
 			print '</div></div>';
 		}
@@ -423,12 +423,12 @@ if('tools'==$path_array[1]){
 		print '</div></div>';
 	}
 	elseif('reset-account'==$path_array[2]){
-		$replace['title']=htmlspecialchars('Сброс доступов к аккаунту').' - '.$replace['title'];
+		$replace['title']=htmlspecialchars('Смена доступов к аккаунту').' - '.$replace['title'];
 		print '<div class="page content">
 		<a class="right" href="/tools/">&larr; Инструменты</a>
-		<h1><i class="fas fa-fw fa-exchange-alt"></i> Сброс доступов к аккаунту</h1>
+		<h1><i class="fas fa-fw fa-exchange-alt"></i> Смена доступов к аккаунту</h1>
 		<div class="article control">';
-		print '<p>Внимание! Данная форма сброса доступа использует механизм главного пароля. С помощью него формируются приватные ключи и из них публичные, которые будут транслированы в блокчейн. Убедитесь, что сохранили дополнительно главный пароль, иначе вы рискуете потерять доступ к аккаунту и его токенам навсегда.</p>';
+		print '<p>Внимание! Данная форма смена доступов использует механизм главного пароля. С помощью него формируются приватные ключи для каждого типа доступа. Публичные ключи будут транслированы в блокчейн. Убедитесь, что сохранили дополнительно главный пароль, иначе вы рискуете потерять доступ к аккаунту и его токенам навсегда.</p>';
 		print '<div class="reset-account-control"></div>';
 		print '</div></div>';
 	}

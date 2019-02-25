@@ -1842,8 +1842,8 @@ function invite_control(){
 	if(0!=$('.control .invite-claim').length){
 		let invite_control=$('.invite-claim');
 		let result='';
-		result+='<p>Введите код и имя аккаунта, куда перевести баланс кода:</p>';
-		result+='<p><label class="input-descr">Код:<br><input type="text" name="secret" class="round wide"></label></p>';
+		result+='<p>Введите инвайт-код (приватный ключ) и имя аккаунта, куда перевести баланс кода:</p>';
+		result+='<p><label class="input-descr">Инвайт-код (приватный ключ):<br><input type="text" name="secret" class="round wide"></label></p>';
 		result+='<p><label class="input-descr">Получатель:<br><input type="text" name="receiver" class="round" value="'+current_user+'"></label></p>';
 		result+='<p><a class="invite-claim-action button"><i class="fas fa-fw fa-file-invoice-dollar"></i> Активировать код</a>';
 		invite_control.html(result);
@@ -1851,10 +1851,10 @@ function invite_control(){
 	if(0!=$('.control .invite-register').length){
 		let invite_control=$('.invite-register');
 		let result='';
-		result+='<p>Введите код, имя аккаунта и приватный ключ для него (сформирован автоматически):</p>';
-		result+='<p><label class="input-descr">Код:<br><input type="text" name="secret" class="round wide"></label></p>';
+		result+='<p>Введите инвайт-код (приватный ключ), имя аккаунта и приватный ключ для него (сформирован автоматически):</p>';
+		result+='<p><label class="input-descr">Инвайт-код (приватный ключ):<br><input type="text" name="secret" class="round wide"></label></p>';
 		result+='<p><label class="input-descr">Имя аккаунта:<br><input type="text" name="receiver" class="round wide"></label></p>';
-		result+='<p class="input-descr">Приватный ключ (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">сгенерировать новый</a>):<br><input type="text" name="private" class="generate-private round wide"></p>';
+		result+='<p class="input-descr">Приватный ключ для аккаунта (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">сгенерировать новый</a>):<br><input type="text" name="private" class="generate-private round wide"></p>';
 		result+='<p><a class="invite-register-action button"><i class="fas fa-fw fa-file-invoice-dollar"></i> Активировать код</a>';
 		invite_control.html(result);
 		generate_key();
