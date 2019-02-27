@@ -45,7 +45,7 @@
 	<div class="logo"><a href="/" class="logo"><img src="/logo-symbol-anim.svg" class="symbol">VIZ<span>.World</span></a></div>
 	<div class="right">
 		{header_menu}
-		<div class="header-menu-el social-links"><a href="https://discord.gg/nEu4MqR" target="_blank" class="icon" title="Discord"><i class="fab fa-fw fa-discord"></i></a><a href="https://t.me/viz_world" target="_blank" class="icon" title="Telegram"><i class="fas fa-fw fa-paper-plane"></i></a></div>
+		<div class="header-menu-el social-links"><a href="https://github.com/VIZ-Blockchain" target="_blank" class="icon" title="Github"><i class="fab fa-fw fa-github"></i></a><a href="https://discord.gg/nEu4MqR" target="_blank" class="icon" title="Discord"><i class="fab fa-fw fa-discord"></i></a><a href="https://t.me/viz_world" target="_blank" class="icon" title="Telegram"><i class="fas fa-fw fa-paper-plane"></i></a></div>
 		<div class="header-menu-el energy" title="Состояние энергии аккаунта">&hellip;</div>
 		<div class="header-menu-el account"><a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a></div>
 	</div>
