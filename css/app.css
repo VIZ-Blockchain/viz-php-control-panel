@@ -103,7 +103,7 @@ body{
 	margin:0;
 	padding:0;
 	overflow-x:hidden;
-	font-family:Georgia,Cambria,'Times New Roman',serif;
+	font-family:Arial,Helvetica,sans-serif;
 	font-size:16px;
 }
 b{
@@ -151,8 +151,7 @@ a:hover{
 	height:64px;
 	line-height:64px;
 	background:#fff;
-	border-bottom: 1px solid rgba(0,0,0,0.2);
-	font-family:'Roboto Slab',serif;
+	border-bottom: 1px solid rgba(0,70,160,0.3);
 	color:rgba(0,0,0,0.6);
 	overflow:hidden;
 }
@@ -228,7 +227,6 @@ a.icon{
 	z-index:11;
 	background:#fff;
 	border-right:1px solid rgba(0,0,0,0.2);
-	font-family:'Roboto Slab',serif;
 	color:rgba(0,0,0,0.6);
 	left:0;
 	bottom:0;
@@ -293,7 +291,7 @@ a.icon{
 	-moz-transition: all 0.2s linear;
 	-o-transition: all 0.2s linear;
 	transition: all 0.2s linear;
-	font-size:18px;
+	font-size:17px;
 }
 .main.menu-expand{
 	padding-left:calc(256px + 64px);
@@ -411,7 +409,7 @@ label input[type=checkbox]{
 .page h1{
 	margin:21px;
 	margin-bottom:12px;
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	font-weight: 700;
 	font-style: normal;
 	font-size: 32px;
@@ -420,7 +418,7 @@ label input[type=checkbox]{
 .page h2{
 	margin:21px;
 	margin-bottom:12px;
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	font-weight: 700;
 	font-style: normal;
 	font-size: 28px;
@@ -429,7 +427,7 @@ label input[type=checkbox]{
 .page h3{
 	margin:21px;
 	margin-bottom:10px;
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	font-weight: 700;
 	font-style: normal;
 	font-size: 26px;
@@ -438,7 +436,7 @@ label input[type=checkbox]{
 .page h4{
 	margin:21px;
 	margin-bottom:8px;
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	font-weight: 700;
 	font-style: normal;
 	font-size: 22px;
@@ -447,7 +445,7 @@ label input[type=checkbox]{
 .page h5{
 	margin:21px;
 	margin-bottom:6px;
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	font-weight: 700;
 	font-style: normal;
 	font-size: 20px;
@@ -457,8 +455,8 @@ label input[type=checkbox]{
 	word-wrap: break-word;
 }
 .page .article p{
-	margin: 0 21px 12px;
-	line-height: 1.4;
+	margin:0 21px 12px;
+	line-height:1.5;
 }
 .page .article ul{
 	list-style:disc;
@@ -477,26 +475,31 @@ label input[type=checkbox]{
 }
 .page .article>ol,.page .article>ul{
 	margin: 0 21px 12px;
-	line-height: 1.4;
+	line-height:1.5;
 }
 .page blockquote{
 	border-left:2px solid rgba(0,0,0,0.4);
 	margin-left:21px;
 	margin-bottom:12px;
-	padding-top:12px;
-	padding-bottom:12px;
+	padding:12px;
 }
 .page blockquote p{
+	margin:0;
+	padding:0;
+	margin-bottom:12px;
 	line-height:1.5;
 	font-style:italic;
 	font-size:16px;
 	color:rgba(0,0,0,0.8);
 }
+.page blockquote p:nth-last-child(1){
+	margin-bottom:0;
+}
 .page blockquote footer{
 	font-style:normal;
 }
 .page blockquote cite{
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	font-size:14px;
 	font-style:normal;
 	display:block;
@@ -513,7 +516,7 @@ label input[type=checkbox]{
 }
 
 .page .tags{
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	text-align: left;
 	font-size:14px;
 	margin: 0 21px 12px;
@@ -523,7 +526,7 @@ label input[type=checkbox]{
 	margin-bottom:12px;
 }
 .page .blocks{
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	text-align: left;
 	font-size:14px;
 	margin: 0 21px 12px;
@@ -564,7 +567,7 @@ label input[type=checkbox]{
 }
 
 .page.content .addon{
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	line-height:64px;
 }
 .page.content .addon .comments{
@@ -655,7 +658,7 @@ label input[type=checkbox]{
 	display:inline-block;
 	margin:0 21px;
 	margin-bottom:12px;
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	font-weight: 700;
 	font-style: normal;
 	font-size: 24px;
@@ -694,7 +697,7 @@ label input[type=checkbox]{
 	max-width: 100%;
 }
 .page.preview .addon{
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	line-height:32px;
 }
 .page.preview .addon .comments{
@@ -761,7 +764,7 @@ label input[type=checkbox]{
 }
 
 .page.user-badge{
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	display:block;
 	background:#fff;
 	border:1px solid #eee;
@@ -848,7 +851,7 @@ label input[type=checkbox]{
 .page.comments .subtitle{
 	margin:21px;
 	margin-bottom:8px;
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	font-weight: 700;
 	font-style: normal;
 	font-size: 26px;
@@ -863,7 +866,7 @@ label input[type=checkbox]{
 	font-size:14px;
 	margin-left:12px;
 	text-align:right;
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 }
 .page.comments .actions .reply{
 	cursor:pointer;
@@ -975,7 +978,7 @@ label input[type=checkbox]{
 	opacity:0.4;
 }
 .page.comments .comment .text{
-
+	font-size:16px;
 }
 .page.comments .comment .text p{
 	margin: 0 12px 12px;
@@ -988,7 +991,7 @@ label input[type=checkbox]{
 }
 
 .page.comments .comment .addon{
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	font-size:14px;
 	line-height:32px;
 	text-align:right;
@@ -1032,7 +1035,7 @@ label input[type=checkbox]{
 }
 
 .pages{
-	font-family:'Lucida Grande','Arimo',Arial,sans-serif;
+	font-family:'Lucida Grande',Arial,sans-serif;
 	text-align: left;
 	font-size:14px;
 	margin: 0 21px 12px;
@@ -1341,7 +1344,7 @@ html.modal-open{
 	z-index: 5;
 	left: 0;
 	position: fixed;
-	top: 48px;
+	top: 64px;
 	bottom: 0;
 	text-align: center;
 	font-size: 40px;
