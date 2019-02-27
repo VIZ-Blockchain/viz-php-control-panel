@@ -212,14 +212,25 @@ a.icon{
 }
 .logo a{
 	text-decoration:none;
-	font-family:'Roboto Slab',serif;
-	font-weight:700;
 }
-.logo:hover a{
-	color:rgba(0,0,0,0.8);
+.logo span.text{
+	display:inline-block;
+	line-height:22px;
+	position:relative;
+	bottom:-4px;
+	overflow:hidden;
+	width:115px;
+	opacity:0.6;
+	-webkit-transition: all 0.2s linear;
+	-moz-transition: all 0.2s linear;
+	-o-transition: all 0.2s linear;
+	transition: all 0.2s linear;
 }
-.logo span{
-	font-weight:400;
+.logo:hover span.text{
+	opacity:0.8;
+}
+.logo img{
+	max-width:none;
 }
 
 .menu{
@@ -1571,7 +1582,6 @@ html.modal-open{
 		display: inline-block;
 	}
 	.header .logo{
-		font-size:22px;
 		display: inline-block;
 	}
 	.header .logo .symbol{
@@ -1651,7 +1661,7 @@ html.modal-open{
 	.page.comments .actions{
 		margin-left:0;
 	}
-	.header .logo span{
-		display:none;
+	.header .logo span.text{
+		width:40px;
 	}
 }
