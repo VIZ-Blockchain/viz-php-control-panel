@@ -62,7 +62,7 @@ $(document).ready(function(){
 	var witness_rank=[];
 
 	function main(){
-		var server=api_gate;
+		var server=api_ws_gates[Math.floor(Math.random()*api_ws_gates.length)];
 		var ws=new WebSocketWrapper(server);
 		ws.connect().then(function(response){
 			var gate=new api_wrapper(ws);
