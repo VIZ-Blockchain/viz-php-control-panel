@@ -279,6 +279,9 @@ a.icon{
 .menu .menu-list .menu-el .fas{
 	margin-right:8px;
 }
+.menu .menu-list .menu-el .fab{
+	margin-right:8px;
+}
 .header-menu-el.energy{
 	display:none;
 	cursor:pointer;
@@ -1338,6 +1341,7 @@ html.modal-open{
 	background-color: #fff;
 	background-position: 50% 50%;
 	background-size: cover;
+	margin-bottom:28px;
 }
 
 .go-top-left-wrapper{

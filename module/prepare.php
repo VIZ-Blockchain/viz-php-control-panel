@@ -311,7 +311,7 @@ function user_badge($account_arr){
 	$account_name=str_replace('@','',$account_name);
 	$ret='
 <div class="page user-badge clearfix">
-	<a href="/@'.$account_arr['login'].'/" class="avatar" style="background-image:url(\''.$account_avatar.'\')"></a>';
+	<a href="/media/@'.$account_arr['login'].'/" class="avatar" style="background-image:url(\''.$account_avatar.'\')"></a>';
 	if($auth){
 		if($user_arr['_id']!=$account_arr['_id']){
 			$ret.='
@@ -331,7 +331,7 @@ function user_badge($account_arr){
 	}
 	$ret.='
 	<div class="info">
-		<div class="login"><a href="/@'.$account_arr['login'].'/">'.$account_name.'</a>'.($account_name!=$account_arr['login']?'<span class="account-login"><a href="/@'.$account_arr['login'].'/">@'.$account_arr['login'].'</a></span>':'').'</div>
+		<div class="login"><a href="/media/@'.$account_arr['login'].'/">'.$account_name.'</a>'.($account_name!=$account_arr['login']?'<span class="account-login"><a href="/media/@'.$account_arr['login'].'/">@'.$account_arr['login'].'</a></span>':'').'</div>
 		<div class="descr">
 			<p>'.$account_about.'</p>';
 			if(isset($account_arr['content_count'])){
@@ -902,7 +902,7 @@ function text_to_view($text,$set_markdown=false){
 		$matches[1][$k]=trim($matches[1][$k],'., ');
 		if($matches[1][$k]){
 			$tag=mb_strtolower($matches[1][$k]);
-			$replace_arr[$replace_num]='<a href="/tags/'.htmlspecialchars($tag).'/">#'.$matches[1][$k].'</a>';
+			$replace_arr[$replace_num]='<a href="/media/tags/'.htmlspecialchars($tag).'/">#'.$matches[1][$k].'</a>';
 			$text=str_replace($match,'{replacerQarrQ'.$replace_num.'}',$text);
 			$replace_num++;
 		}
@@ -1007,7 +1007,7 @@ function text_to_view($text,$set_markdown=false){
 	foreach($matches[0] as $k=>$match){
 		if($matches[1][$k]){
 			$user_login=trim($matches[1][$k]," \r\n\t.");
-			$replace_arr[$replace_num]='<a href="/@'.htmlspecialchars($user_login).'/">@'.$user_login.'</a>';
+			$replace_arr[$replace_num]='<a href="/media/@'.htmlspecialchars($user_login).'/">@'.$user_login.'</a>';
 			$text=str_replace('@'.$user_login,'{replacerQarrQ'.$replace_num.'}',$text);
 			$replace_num++;
 		}
@@ -1122,11 +1122,11 @@ function preview_content($data){
 	}
 
 	if($data['title']){
-		$result.='<a href="/@'.$author_login.'/'.$data['permlink_href'].'/" class="subtitle">'.htmlspecialchars($data['title']).'</a>';
+		$result.='<a href="/media/@'.$author_login.'/'.$data['permlink_href'].'/" class="subtitle">'.htmlspecialchars($data['title']).'</a>';
 	}
 
 	if($cover){
-		$result.='<div class="cover"><a href="/@'.$author_login.'/'.$data['permlink_href'].'/"><img src="https://i.goldvoice.club/0x0/'.htmlspecialchars($cover).'" alt=""></a></div>';
+		$result.='<div class="cover"><a href="/media/@'.$author_login.'/'.$data['permlink_href'].'/"><img src="https://i.goldvoice.club/0x0/'.htmlspecialchars($cover).'" alt=""></a></div>';
 	}
 
 	$result.='
@@ -1182,7 +1182,7 @@ function preview_content($data){
 			$tag_url=str_replace('?','%3F',$tag);
 			$tag_url=str_replace('/','%2F',$tag_url);
 			$tag_url=str_replace('%','%25',$tag_url);
-			$tags_list[]='<a href="/tags/'.htmlspecialchars($tag_url).'/">'.htmlspecialchars($tag).'</a>';
+			$tags_list[]='<a href="/media/tags/'.htmlspecialchars($tag_url).'/">'.htmlspecialchars($tag).'</a>';
 		}
 	}
 	if($tags_list){
@@ -1200,16 +1200,16 @@ function preview_content($data){
 		}
 	}
 	$result.='<div class="info clearfix">
-		<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a>';
+		<div class="author"><a href="/media/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/media/@'.$author_login.'/">'.$author_nickname.'</a>';
 	if($custom_nickname){
-		$result.='<span class="account-login"><a href="/@'.$author_login.'/">@'.$author_login.'</a></span>';
+		$result.='<span class="account-login"><a href="/media/@'.$author_login.'/">@'.$author_login.'</a></span>';
 	}
 	$result.='</div>
 		<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
 		<div class="right">
 			<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы проголосовали с силой '.($vote_weight/100).'%"':'').'></a>
 			<div class="votes_count"><span>'.$votes_count.'</span> голосов</div>
-			<div class="comments"><span>'.$comments_count.'</span><a href="/@'.$author_login.'/'.$data['permlink_href'].'/#comments" class="icon"><i class="far fa-comment"></i></a></div>
+			<div class="comments"><span>'.$comments_count.'</span><a href="/media/@'.$author_login.'/'.$data['permlink_href'].'/#comments" class="icon"><i class="far fa-comment"></i></a></div>
 		</div>
 	</div>';
 
@@ -1240,9 +1240,9 @@ function view_content($data){
 	$result.='<h1>'.htmlspecialchars($data['title']).'</h1>';
 	$result.='
 	<div class="info">
-		<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a>';
+		<div class="author"><a href="/media/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/media/@'.$author_login.'/">'.$author_nickname.'</a>';
 	if($custom_nickname){
-		$result.='<span class="account-login"><a href="/@'.$author_login.'/">@'.$author_login.'</a></span>';
+		$result.='<span class="account-login"><a href="/media/@'.$author_login.'/">@'.$author_login.'</a></span>';
 	}
 	$result.='</div>
 		<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
@@ -1261,7 +1261,7 @@ function view_content($data){
 			$tag_url=str_replace('?','%3F',$tag);
 			$tag_url=str_replace('/','%2F',$tag_url);
 			$tag_url=str_replace('%','%25',$tag_url);
-			$tags_list[]='<a href="/tags/'.htmlspecialchars($tag_url).'/">'.htmlspecialchars($tag).'</a>';
+			$tags_list[]='<a href="/media/tags/'.htmlspecialchars($tag_url).'/">'.htmlspecialchars($tag).'</a>';
 		}
 	}
 	if($tags_list){
@@ -1283,7 +1283,7 @@ function view_content($data){
 	}
 	if($auth && $data['author']==$user_arr['_id']){
 		$result.='<hr><div class="content-actions">';
-		$result.='<a href="/@'.$author_login.'/'.$data['permlink_href'].'/edit/">Редактировать</a>';
+		$result.='<a href="/media/@'.$author_login.'/'.$data['permlink_href'].'/edit/">Редактировать</a>';
 		$result.='</div>';
 	}
 	$result.='<hr>
@@ -1330,9 +1330,9 @@ function view_subcontent($data){
 	}
 	$ret.='<div class="comment" id="'.$author_login.'/'.htmlspecialchars($data['permlink']).'" data-author="'.$author_login.'" data-permlink="'.htmlspecialchars($data['permlink']).'" data-level="'.$level.'" data-id="'.$data['_id'].'" data-parent="'.$data['parent'].'" data-sort="'.$data['sort'].'">
 		<div class="info">
-			<div class="author"><a href="/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/@'.$author_login.'/">'.$author_nickname.'</a>';
+			<div class="author"><a href="/media/@'.$author_login.'/" class="avatar"'.($author_avatar?' style="background-image:url(https://i.goldvoice.club/32x32/'.htmlspecialchars($author_avatar).');"':'').'></a><a href="/media/@'.$author_login.'/">'.$author_nickname.'</a>';
 			if($custom_nickname){
-				$ret.='<span class="account-login"><a href="/@'.$author_login.'/">@'.$author_login.'</a></span>';
+				$ret.='<span class="account-login"><a href="/media/@'.$author_login.'/">@'.$author_login.'</a></span>';
 			}
 			$ret.='</div>
 			<div class="anchor"><a href="#'.$author_login.'/'.htmlspecialchars($data['permlink']).'">#</a></div>
@@ -1363,7 +1363,7 @@ if(isset($_COOKIE['session_id'])){
 		if($user_arr['login']){
 			$auth=true;
 			if($user_arr['avatar']){
-				$replace['menu'].='<a href="/@'.$user_arr['login'].'/" class="avatar"'.($user_arr['avatar']?' style="background-image:url(https://i.goldvoice.club/0x0/'.htmlspecialchars($user_arr['avatar']).');"':'').' title="Перейти в свой аккаунт"></a><hr>';
+				$replace['menu'].='<a href="/media/@'.$user_arr['login'].'/" class="avatar"'.($user_arr['avatar']?' style="background-image:url(https://i.goldvoice.club/0x0/'.htmlspecialchars($user_arr['avatar']).');"':'').' title="Перейти в свой аккаунт"></a>';
 			}
 			$redis->zadd('users_action_time',time(),$user_arr['login']);
 			$redis->hset('session:'.$session_arr['id'],'action_time',time());
