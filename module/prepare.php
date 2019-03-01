@@ -417,7 +417,7 @@ function str_replace_first($search,$replace,$subject){
 function clear_html_tags($text){
 	$allowed_attr_arr=array('href','target','src','alt','width','height','style','id','class','colspan','rowspan');
 	$allowed_style_arr=array('text-align','float','text-indent','clear','margin-left','margin-right','margin-top','padding-left','margin-bottom','display','list-style-type','text-decoration','color','font-style','font-size');
-	$allowed_class_arr=array('spoiler','pull-left','pull-right','language-markup','language-javascript','language-css','language-php','language-ruby','language-python','language-java','language-c','language-csharp','language-cpp','text-justify');
+	$allowed_class_arr=array('spoiler','pull-left','pull-right','language-markup','language-javascript','language-css','language-php','language-ruby','language-python','language-java','language-c','language-csharp','language-cpp','text-justify','table-scroll');
 	$denied_tags=array('script','style');
 	$denied_href_arr=array('javascript:');
 	preg_match_all('~<(.[^>]*)>~iUs',$text,$matches);

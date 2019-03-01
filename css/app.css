@@ -1152,7 +1152,10 @@ input.wide{
 	text-align:center;
 	font-family:Arial,sans-serif;
 }
-
+section.table-scroll{
+	overflow:auto;
+	max-width:100%;
+}
 .page table{
 	border:1px solid #ddd;
 	border-right:0;
