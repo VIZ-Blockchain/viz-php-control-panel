@@ -1031,7 +1031,7 @@ function invite_create(private_key,public_key,amount){
 	let fixed_amount=''+amount.toFixed(3)+' VIZ';
 
 	let invite_success=function(result){
-		download('viz-invite.txt','VIZ.World Invite code with amount: '+fixed_amount+'\r\nPublic key (for check): '+public_key+'\r\nPrivate key (for activation): '+private_key+'\r\nYou can check code and claim or use it on https://viz.world/tools/invites/');
+		download('viz-invite.txt','VIZ Blockchain invite code with balance: '+fixed_amount+'\r\nPublic key (for check): '+public_key+'\r\nPrivate key (for activation): '+private_key+'\r\n\r\nYou can check code on https://viz.world/tools/invites/\r\n\r\nRegister new VIZ account using invite-code balance: https://viz.world/tools/invites/register/\r\nClaim invite-code balance to existed VIZ account: https://viz.world/tools/invites/claim/');
 		add_notify('Инвайт код создан успешно');
 	}
 	let invite_failure=function(err){
