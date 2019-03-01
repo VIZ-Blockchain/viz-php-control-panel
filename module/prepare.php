@@ -335,7 +335,7 @@ function user_badge($account_arr){
 		<div class="descr">
 			<p>'.$account_about.'</p>';
 			if(isset($account_arr['content_count'])){
-				$ret.='<p>Контента: '.$account_arr['content_count'].', Голосов: '.$account_arr['vote_count'].'</p>';
+				$ret.='<p>Контента: '.$account_arr['content_count'].', Наградил: '.$account_arr['vote_count'].'</p>';
 			}
 			$ret.='<p>Баланс: '.($account_arr['balance']/1000).' VIZ, ';
 			if($account_arr['effective_shares'] && ($account_arr['effective_shares']!=$account_arr['shares'])){
@@ -1207,8 +1207,8 @@ function preview_content($data){
 	$result.='</div>
 		<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
 		<div class="right">
-			<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы проголосовали с силой '.($vote_weight/100).'%"':'').'></a>
-			<div class="votes_count"><span>'.$votes_count.'</span> голосов</div>
+			<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы наградили '.($vote_weight/100).'% энергии"':'').'></a>
+			<div class="votes_count"><span>'.$votes_count.'</span> наград</div>
 			<div class="comments"><span>'.$comments_count.'</span><a href="/media/@'.$author_login.'/'.$data['permlink_href'].'/#comments" class="icon"><i class="far fa-comment"></i></a></div>
 		</div>
 	</div>';
@@ -1289,8 +1289,8 @@ function view_content($data){
 	$result.='<hr>
 	<div class="addon">
 		<div class="right"><div class="comments"><span>'.$comments_count.'</span><a href="#comments" class="icon"><i class="far fa-comment"></i></a></div></div>
-		<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы проголосовали с силой '.($vote_weight/100).'%"':'').'></a>
-		<div class="votes_count"><span>'.$votes_count.'</span> голосов</div>';
+		<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы наградили '.($vote_weight/100).'% энергии"':'').'></a>
+		<div class="votes_count"><span>'.$votes_count.'</span> наград</div>';
 	if($reward_amount){
 		$result.='
 		<div class="reward_amount"><i class="far fa-fw fa-gem"></i> <span>'.$reward_amount.'</span></div>';
