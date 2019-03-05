@@ -30,6 +30,7 @@ if('tools'==$path_array[1]){
 			print '<p>Количество в базе данных (курсор): '.mongo_count('blocks').'</p>';
 			print '<p>Количество пользователей в бд: '.mongo_count('users').'</p>';
 			print '<h3>Глобальная переменная</h3>';
+			print '<p>Коэффициент конвертации total_vesting_fund/total_vesting_shares на блоке '.$dgp['head_block_number'].' равен '.(floatval($dgp['total_vesting_fund'])/floatval($dgp['total_vesting_shares'])).'</p>';
 			print '<pre class="view_block">';
 			$view_dgp=print_r($dgp,true);
 			$view_dgp=preg_replace('~\[(.[^\]]*)\] =\> (.*)\n~iUs','[<span style="color:red">$1</span>] => <span style="color:#1b72fa">$2</span>'.PHP_EOL,$view_dgp);
