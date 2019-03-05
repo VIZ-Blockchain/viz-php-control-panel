@@ -2594,7 +2594,7 @@ function post_content(target){
 				if(''!=account){
 					let weight=parseInt(parseFloat($(el).find('input[name=weight]').val().replace(',','.'))*100);
 					if(0<weight){
-						if(beneficiaries_summary_weight+weight<10000){
+						if(beneficiaries_summary_weight+weight<=10000){
 							beneficiaries_list.push({account,weight})
 							beneficiaries_summary_weight+=weight;
 						}
