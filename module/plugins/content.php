@@ -25,6 +25,7 @@ class viz_plugin_content extends viz_plugin{
 						if(!$user_status){
 							$user_status=0;
 						}
+						$beneficiaries=false;
 
 						$data_arr=array(
 							'title'=>mongo_prepare($data['title']),
@@ -39,6 +40,16 @@ class viz_plugin_content extends viz_plugin{
 						}
 						if(isset($metadata['foreword'])){
 							$data_arr['foreword']=mongo_prepare($metadata['foreword']);
+						}
+
+						if(isset($data['beneficiaries'])){
+							if(count($data['beneficiaries'])>0){
+								$beneficiaries=json_encode($data['beneficiaries']);
+							}
+						}
+
+						if($beneficiaries){
+							$data_arr['beneficiaries']=mongo_prepare($beneficiaries);
 						}
 
 						$find_content=mongo_find_id('content',array('author'=>(int)$user_id,'permlink'=>$permlink));

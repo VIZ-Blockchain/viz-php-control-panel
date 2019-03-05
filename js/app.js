@@ -104,6 +104,13 @@ function check_json(text){
 		return false;
 	}
 }
+function compare_account_name(a,b) {
+	if (a.account < b.account)
+		return -1;
+	if (a.account > b.account)
+		return 1;
+	return 0;
+}
 function del_notify(id){
 	$('.notify-list .notify[rel="'+id+'"]').remove();
 }
@@ -1112,6 +1119,14 @@ function escape_html(text){
 		return '';
 	}
 }
+function unescape_html(text){
+	text=text.replace(/&#039;/g,'\'');
+	text=text.replace(/&quot;/g,'"');
+	text=text.replace(/&gt;/g,'>');
+	text=text.replace(/&lt;/g,'<');
+	text=text.replace(/&amp;/g,'&');
+	return text;
+}
 function wallet_transfer(recipient,amount,memo){
 	$('.wallet-control .wallet-transfer-action').addClass('disabled');
 	let login=recipient.toLowerCase();
@@ -1430,7 +1445,7 @@ function unvote_content(author,permlink,target){
 		});
 	}
 }
-function award_content(author,permlink,target){
+function award_content(author,permlink,beneficiaries,target){
 	let weight=10000/10/5;
 	if($('.header-menu-el.energy').hasClass('powerup')){
 		weight=10000/5;
@@ -1450,11 +1465,15 @@ function award_content(author,permlink,target){
 		}
 	}
 	let memo=author+'/'+permlink;
+	let beneficiaries_list=[];
+	if(typeof beneficiaries !== 'undefined'){
+		beneficiaries_list=JSON.parse(unescape_html(beneficiaries));
+	}
 	if(users[current_user].shield){
-		shield_action(current_user,'award',{receiver:author,memo:memo,energy:weight,beneficiaries:[]},award_success,award_failure);
+		shield_action(current_user,'award',{receiver:author,memo:memo,energy:weight,beneficiaries:beneficiaries_list},award_success,award_failure);
 	}
 	else{
-		gate.broadcast.award(users[current_user].posting_key,current_user,author,weight,0,memo,[],function(err,result){
+		gate.broadcast.award(users[current_user].posting_key,current_user,author,weight,0,memo,beneficiaries_list,function(err,result){
 			if(!err){
 				award_success(result);
 			}
@@ -2565,6 +2584,26 @@ function post_content(target){
 		else{
 			tags_arr=tags.split(' ');
 		}
+
+		var beneficiaries_list=[];
+		var beneficiaries_summary_weight=0;
+
+		$('.add-beneficiaries-item').each(function(i,el){
+			if(beneficiaries_summary_weight<10000){
+				let account=$(el).find('input[name=account]').val();
+				if(''!=account){
+					let weight=parseInt(parseFloat($(el).find('input[name=weight]').val().replace(',','.'))*100);
+					if(0<weight){
+						if(beneficiaries_summary_weight+weight<10000){
+							beneficiaries_list.push({account,weight})
+							beneficiaries_summary_weight+=weight;
+						}
+					}
+				}
+			}
+		});
+		beneficiaries_list.sort(compare_account_name);
+
 		var json_object={'tags':tags_arr,'cover':cover,'foreword':foreword};
 		var json=JSON.stringify(json_object);
 		var parent_permlink='';
@@ -2592,7 +2631,7 @@ function post_content(target){
 							target.html('Сохранить изменения');
 							console.log(err);
 						}
-						var custom_json=['content',{parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:content,metadata:json_object}];
+						var custom_json=['content',{parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:content,beneficiaries:beneficiaries_list,metadata:json_object}];
 						if(users[current_user].shield){
 							shield_action(current_user,'custom',{id:'media',required_auths:[],required_posting_auths:[current_user],json:JSON.stringify(custom_json)},edit_success,edit_failure);
 						}
@@ -2621,7 +2660,7 @@ function post_content(target){
 						console.log(err);
 					}
 
-					var custom_json=['content',{parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:content,metadata:json_object}];
+					var custom_json=['content',{parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:content,beneficiaries:beneficiaries_list,metadata:json_object}];
 					if(users[current_user].shield){
 						shield_action(current_user,'custom',{id:'media',required_auths:[],required_posting_auths:[current_user],json:JSON.stringify(custom_json)},content_success,content_failure);
 					}
@@ -2889,6 +2928,20 @@ function app_mouse(e){
 		});
 		$('#upload-file').click();
 	}
+	if($(target).hasClass('beneficiaries-action') || $(target).parent().hasClass('beneficiaries-action')){
+		e.preventDefault();
+		if('none'==$('.add-beneficiaries').css('display')){
+			$('.add-beneficiaries').css('display','block');
+		}
+		else{
+			$('.add-beneficiaries').css('display','none');
+		}
+	}
+	if($(target).hasClass('add-beneficiaries-action') || $(target).parent().hasClass('add-beneficiaries-action')){
+		e.preventDefault();
+		let item=$('.add-beneficiaries').find('.add-beneficiaries-item')[0].outerHTML;
+		$('.add-beneficiaries').find('.add-beneficiaries-button').before(item);
+	}
 	if($(target).hasClass('wysiwyg-action') || $(target).parent().hasClass('wysiwyg-action')){
 		e.preventDefault();
 		var proper_target=$(target);
@@ -2933,7 +2986,7 @@ function app_mouse(e){
 				add_notify('Вы уже награждали данный контент');
 			}
 			else{
-				award_content(proper_target.attr('data-content-author'),proper_target.attr('data-content-permlink'),proper_target);
+				award_content(proper_target.attr('data-content-author'),proper_target.attr('data-content-permlink'),proper_target.attr('data-beneficiaries'),proper_target);
 			}
 		}
 	}
@@ -2945,7 +2998,7 @@ function app_mouse(e){
 				add_notify('Вы уже награждали данный контент');
 			}
 			else{
-				award_content(proper_target.attr('data-author'),proper_target.attr('data-permlink'),proper_target);
+				award_content(proper_target.attr('data-author'),proper_target.attr('data-permlink'),proper_target.attr('data-beneficiaries'),proper_target);
 			}
 		}
 	}

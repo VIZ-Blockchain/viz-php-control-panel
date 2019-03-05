@@ -1407,6 +1407,9 @@ html.modal-open{
     content: '\2022';
     padding: 0 7px;
 }
+.add-beneficiaries{
+	display:none;
+}
 
 @-webkit-keyframes SymbolGradient {
 	0% {

@@ -1094,6 +1094,11 @@ function preview_content($data){
 		$data=get_content_by_id($data['parent']);
 	}
 
+	$beneficiaries=false;
+	if(isset($data['beneficiaries'])){
+		$beneficiaries=htmlspecialchars(stripcslashes($data['beneficiaries']));
+	}
+
 	$data['title']=stripcslashes($data['title']);
 	$data['body']=stripcslashes($data['body']);
 	$data['permlink']=stripcslashes($data['permlink']);
@@ -1115,7 +1120,7 @@ function preview_content($data){
 		$author_nickname='@'.$author_login;
 	}
 
-	$result.='<div class="page preview" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'"'.($repost?' data-repost-id="'.$repost_id.'"':'').'>';
+	$result.='<div class="page preview" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'"'.($repost?' data-repost-id="'.$repost_id.'"':'').($beneficiaries?' data-beneficiaries="'.$beneficiaries.'"':'').'>';
 
 	if($repost){
 		$result.='<div class="repost-info"><div class="repost-date timestamp" data-timestamp="'.$repost_time.'">'.date('d.m.Y H:i',$repost_time).'</div><i class="fas fa-fw fa-retweet"></i> <span>Репост от</span> @'.$repost_user.''.($repost_comment?'<div class="repost-comment">'.htmlspecialchars($repost_comment).'</div>':'').'</div>';
@@ -1227,6 +1232,11 @@ function view_content($data){
 	$data['permlink_href']=str_replace('/','%2F',$data['permlink_href']);
 	$data['permlink_href']=str_replace('%','%25',$data['permlink_href']);
 
+	$beneficiaries=false;
+	if(isset($data['beneficiaries'])){
+		$beneficiaries=htmlspecialchars(stripcslashes($data['beneficiaries']));
+	}
+
 	$author_login=get_user_login($data['author']);
 	$author_nickname=mongo_find_attr('users','nickname',['_id'=>(int)$data['author']]);
 	$custom_nickname=true;
@@ -1236,7 +1246,7 @@ function view_content($data){
 	}
 	$author_avatar=mongo_find_attr('users','avatar',['_id'=>(int)$data['author']]);
 
-	$result.='<div class="page content" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'">';
+	$result.='<div class="page content" data-content-id="'.$data['_id'].'" data-content-author="'.$author_login.'" data-content-permlink="'.htmlspecialchars($data['permlink']).'"'.($beneficiaries?' data-beneficiaries="'.$beneficiaries.'"':'').'>';
 	$result.='<h1>'.htmlspecialchars($data['title']).'</h1>';
 	$result.='
 	<div class="info">

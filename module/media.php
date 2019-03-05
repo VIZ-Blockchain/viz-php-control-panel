@@ -80,7 +80,22 @@ if('@'==mb_substr($path_array[2],0,1)){
 						print '<p><input type="text" name="foreword" class="round wide" placeholder="Предисловие (превью для текста)" value="'.htmlspecialchars(stripcslashes($data['foreword'])).'"></p>';
 						print '<p><input type="text" name="cover" class="round wide" placeholder="Ссылка на обложку (миниатюра для превью)" value="'.htmlspecialchars(stripcslashes($data['cover'])).'"></p>';
 						print '<p><textarea name="content" rows="20" class="round wide" placeholder="Содержимое контента">'.htmlspecialchars(stripcslashes($data['body'])).'</textarea></p>';
-						print '<p><input id="upload-file" type="file"><a class="upload-image-action action-button"><i class="fas fa-fw fa-file-image"></i> Загрузить изображение</a> <a class="wysiwyg-action action-button"><i class="fas fa-fw fa-pen-square"></i> WYSIWYG</a></p>';
+						print '<p><input id="upload-file" type="file"><a class="upload-image-action action-button"><i class="fas fa-fw fa-file-image"></i> Загрузить изображение</a> <a class="wysiwyg-action action-button"><i class="fas fa-fw fa-pen-square"></i> WYSIWYG</a> <a class="beneficiaries-action action-button unselectable"><i class="fas fa-fw fa-money-bill-wave"></i> Бенефициары</a></p>';
+
+						print '<div class="add-beneficiaries">
+						<h4>Бенефициары</h4>
+						<p>Вы можете указать нескольких пользователей VIZ, которые будут получать часть вашей награды:</p>';
+						if($data['beneficiaries']){
+							$beneficiaries=json_decode($data['beneficiaries'],true);
+							foreach($beneficiaries as $item){
+								print '<p class="add-beneficiaries-item"><input type="text" name="account" class="round" placeholder="Логин" value="'.$item['account'].'"> <input type="text" name="weight" class="round" placeholder="Процент от награды" value="'.($item['weight']/100).'"></p>';
+							}
+						}
+						else{
+							print '<p class="add-beneficiaries-item"><input type="text" name="account" class="round" placeholder="Логин"> <input type="text" name="weight" class="round" placeholder="Процент от награды"></p>';
+						}
+						print '<p class="add-beneficiaries-button"><a class="add-beneficiaries-action action-button"><i class="fas fa-fw fa-plus-circle"></i> Добавить</a></p></div>';
+
 						$tags_list=array();
 						$tags=$mongo->executeQuery($config['db_prefix'].'.content_tags',new MongoDB\Driver\Query(['content'=>(int)$data['_id']],['sort'=>array('_id'=>1),'limit'=>(int)100]));
 						$tags->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
@@ -91,7 +106,7 @@ if('@'==mb_substr($path_array[2],0,1)){
 							}
 						}
 
-						print '<p><input type="text" name="tags" class="round wide" placeholder="Тэги через запятую (ключевые термины для поиска контента)" value="'.implode(',',$tags_list).'"></p>';
+						print '<hr><p><input type="text" name="tags" class="round wide" placeholder="Тэги через запятую (ключевые термины для поиска контента)" value="'.implode(',',$tags_list).'"></p>';
 						print '<p><a class="post-content-action button">Сохранить изменения</a></p>';
 						print '</div></div>';
 					}
@@ -197,9 +212,15 @@ if('publication'==$path_array[2]){
 	print '<p><input type="text" name="foreword" class="round wide" placeholder="Предисловие (превью для текста)"></p>';
 	print '<p><input type="text" name="cover" class="round wide" placeholder="Ссылка на обложку (миниатюра для превью)"></p>';
 	print '<p><textarea name="content" rows="20" class="round wide" placeholder="Содержимое контента"></textarea></p>';
-	print '<p><input id="upload-file" type="file"><a class="upload-image-action action-button"><i class="fas fa-fw fa-file-image"></i> Загрузить изображение</a> <a class="wysiwyg-action action-button"><i class="fas fa-fw fa-pen-square"></i> WYSIWYG</a></p>';
-	print '<p><input type="text" name="tags" class="round wide" placeholder="Тэги через запятую (ключевые термины для поиска контента)"></p>';
+	print '<p><input id="upload-file" type="file"><a class="upload-image-action action-button unselectable"><i class="fas fa-fw fa-file-image"></i> Загрузить изображение</a> <a class="wysiwyg-action action-button unselectable"><i class="fas fa-fw fa-pen-square"></i> WYSIWYG</a> <a class="beneficiaries-action action-button unselectable"><i class="fas fa-fw fa-money-bill-wave"></i> Бенефициары</a></p>';
+	print '<div class="add-beneficiaries">
+	<h4>Бенефициары</h4>
+	<p>Вы можете указать нескольких пользователей VIZ, которые будут получать часть вашей награды:</p>
+	<p class="add-beneficiaries-item"><input type="text" name="account" class="round" placeholder="Логин"> <input type="text" name="weight" class="round" placeholder="Процент от награды"></p>
+	<p class="add-beneficiaries-button"><a class="add-beneficiaries-action action-button"><i class="fas fa-fw fa-plus-circle"></i> Добавить</a></p></div>';
+	print '<hr><p><input type="text" name="tags" class="round wide" placeholder="Тэги через запятую (ключевые термины для поиска контента)"></p>';
 	print '<p><a class="post-content-action button">Опубликовать</a></p>';
+	print '<p><i class="fas fa-exclamation-circle"></i> Внимание! <em>Кто угодно сможет использовать публикуемую информацию без вашего разрешения, так как она будет сохранена в публичной блокчейн-системе. Информацию невозможно будет удалить.</em></p>';
 	print '</div></div>';
 }
 else
