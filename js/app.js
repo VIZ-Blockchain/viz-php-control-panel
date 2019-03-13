@@ -225,22 +225,22 @@ function wait_session(){
 		if(users[current_user].session_attempts>20){
 			users[current_user].session_attempts=0;
 			if(users[current_user].shield){
-				$('.shield-auth-error').html('Ошибка при инициализации сессии, попробуйте авторизоваться повторно позже');
+				$('.shield-auth-error').html(l10n.sessions.auth_error);
 				$('.shield-auth-action').removeClass('disabled');
 			}
 			else{
-				$('.auth-error').html('Ошибка при инициализации сессии, попробуйте авторизоваться повторно позже');
+				$('.auth-error').html(l10n.sessions.auth_error);
 				$('.auth-action').removeClass('disabled');
 			}
-			$('.header .account').html('<a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
+			$('.header .account').html('<a href="/login/" class="icon" title="'+l10n.global.auth+'"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
 		}
 		else{
-			$('.header .account').html('<i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;');
+			$('.header .account').html('<i class="fa fw-fw fa-spinner fa-spin"></i> '+l10n.global.loading+'&hellip;');
 			if(users[current_user].shield){
-				$('.shield-auth-error').html('Инициализируем сессию, подождите (попытка '+users[current_user].session_attempts+')');
+				$('.shield-auth-error').html(l10n.sessions.init_session+' ('+l10n.global.attempt+' '+users[current_user].session_attempts+')');
 			}
 			else{
-				$('.auth-error').html('Вы успешно авторизованы, инициализируем сессию, подождите (попытка '+users[current_user].session_attempts+')');
+				$('.auth-error').html(l10n.sessions.init_session+' ('+l10n.global.attempt+' '+users[current_user].session_attempts+')');
 			}
 			$.ajax({
 				type:'POST',
@@ -251,7 +251,7 @@ function wait_session(){
 					if(typeof data_obj.error !== 'undefined'){
 						console.log(''+new Date().getTime()+': '+data_obj.error+' - '+data_obj.error_str);
 						if('time'==data_obj.error){
-							add_notify('Ошибка синхронизации, проверьте ваше системное время (включите NTP)',true);
+							add_notify(l10n.sessions.time_error,true);
 						}
 						if('rebuild_session'==data_obj.error){
 							session_generate();
@@ -266,11 +266,11 @@ function wait_session(){
 						users[current_user].session_verify=1;
 						save_session();
 						if(users[current_user].shield){
-							$('.shield-auth-error').html('Вы успешно авторизованы, сессия инициализирована');
+							$('.shield-auth-error').html(l10n.sessions.success);
 							$('.shield-auth-action').removeClass('disabled');
 						}
 						else{
-							$('.auth-error').html('Вы успешно авторизованы, сессия инициализирована');
+							$('.auth-error').html(l10n.sessions.success);
 							$('.auth-action').removeClass('disabled');
 						}
 						//initialize user_session_status (feed status, notifications)
@@ -298,11 +298,11 @@ function follow_user(user,proper_target){
 		let json=JSON.stringify(['follow',{follower:current_user,following:user,what:['blog']}]);
 
 		let follow_success=function(result){
-			add_notify('Вы успешно подписались на '+user);
+			add_notify(l10n.media.follow_success+' '+user);
 			proper_target.html('<div class="unfollow unfollow-action">Отписаться</div>');
 		}
 		let follow_failure=function(err){
-			add_notify('Не удается отправить операцию подписки на '+user,true);
+			add_notify(l10n.media.follow_failure+' '+user,true);
 			console.log(err);
 		}
 		if(users[current_user].shield){
@@ -325,11 +325,11 @@ function unfollow_user(user,proper_target){
 		let json=JSON.stringify(['follow',{follower:current_user,following:user,what:[]}]);
 
 		let unfollow_success=function(result){
-			add_notify('Вы стали соблюдать нейтралитет с '+user);
-			proper_target.html('<div class="follow follow-action">Подписаться</div><br><div class="ignore ignore-action">Игнорировать</div>');
+			add_notify(l10n.media.unfollow_success+' '+user);
+			proper_target.html('<div class="follow follow-action">'+l10n.media.follow+'</div><br><div class="ignore ignore-action">'+l10n.media.ignore+'</div>');
 		}
 		let unfollow_failure=function(err){
-			add_notify('Не удается отправить операцию нейтралитета с '+user,true);
+			add_notify(l10n.media.unfollow_success+' '+user,true);
 			console.log(err);
 		}
 		if(users[current_user].shield){
@@ -352,11 +352,11 @@ function ignore_user(user,proper_target){
 		let json=JSON.stringify(['follow',{follower:current_user,following:user,what:['ignore']}]);
 
 		let ignore_success=function(result){
-			add_notify('Вы успешно начали игнорировать '+user);
+			add_notify(l10n.media.ignore_success+' '+user);
 			proper_target.html('<div class="unfollow unfollow-action">Перестать игнорировать</div>');
 		}
 		let ignore_failure=function(err){
-			add_notify('Не удается отправить операцию игнорирования '+user,true);
+			add_notify(l10n.media.ignore_failure+' '+user,true);
 			console.log(err);
 		}
 		if(users[current_user].shield){
@@ -402,7 +402,7 @@ function session_generate(){
 					users[current_user].session_id=null;
 					users[current_user].session_verify=0;
 					users[current_user].session_attempts=0;
-					$('.header .account').html('<a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
+					$('.header .account').html('<a href="/login/" class="icon" title="'+l10n.global.auth+'"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
 					console.log(err);
 				}
 				if(users[current_user].shield){
@@ -642,7 +642,7 @@ function view_session(){
 		view_energy();
 	}
 	else{
-		$('.header .account').html('<a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
+		$('.header .account').html('<a href="/login/" class="icon" title="'+l10n.global.auth+'"><i class="fas fa-fw fa-sign-in-alt"></i></a>');
 	}
 }
 function view_energy(){
@@ -1549,7 +1549,7 @@ function witness_control(){
 			let view=$('.witness-votes');
 			let result='';
 			result+='<h3>Ваши голоса</h3>';
-			view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+			view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> '+l10n.global.loading+'&hellip;</p>');
 			gate.api.getAccounts([current_user],function(err,response){
 				result+='<p>';
 				for(vote_id in response[0].witness_votes){
@@ -1566,7 +1566,7 @@ function witness_control(){
 			let view=$(this);
 			let result='';
 			result+='<h3>Голосование за делегата '+witness_login+'</h3>';
-			view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+			view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> '+l10n.global.loading+'&hellip;</p>');
 			if(''==users[current_user].active_key){
 				result+='Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.';
 				view.html(result);
@@ -1593,7 +1593,7 @@ function witness_control(){
 				let view=$(this);
 				let result='';
 				result+='<h3>Управление делегатом '+witness_login+'</h3>';
-				view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+				view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> '+l10n.global.loading+'&hellip;</p>');
 				if(''==users[current_user].active_key){
 					result+='Вам необходимо <a href="/login/">авторизоваться</a> с Active ключом.';
 					view.html(result);
@@ -1684,7 +1684,7 @@ function reset_account_control(){
 	if(0!=$('.control .reset-account-control').length){
 		let view=$('.reset-account-control');
 		let result='';
-		view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+		view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> '+l10n.global.loading+'&hellip;</p>');
 		result+='<p><label class="input-descr">Логин:<br><input type="text" name="account_login" class="round" value="'+current_user+'"></label></p>';
 		result+='<p><label class="input-descr">Приватный ключ владельца (owner):<br><input type="text" name="owner_key" class="round wide"></label></p>';
 		result+='<p class="input-descr">Главный пароль (<i class="fas fa-fw fa-random"></i> <a class="generate-general-action unselectable">сгенерировать новый</a>):<br><input type="text" name="general_key" class="generate-general round wide"></p>';
@@ -1703,7 +1703,7 @@ function create_account_control(){
 		}
 		else{
 			result+='<p>Для того чтобы создать аккаунт заполните количество токенов (которые вы передадите новому аккаунту), количество доли (которую делегируете аккаунту) и сгенерируйте главный пароль (приватные ключи будут сформированы автоматически).</p>';
-			view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+			view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> '+l10n.global.loading+'&hellip;</p>');
 			gate.api.getChainProperties(function(err,response){
 				let props=response;
 				gate.api.getAccounts([current_user],function(err,response){
@@ -1833,7 +1833,7 @@ function invite_control(){
 			invite_control.html(result);
 		}
 		else{
-			invite_control.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+			invite_control.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> '+l10n.global.loading+'&hellip;</p>');
 			gate.api.getAccounts([current_user],function(err,response){
 				if(typeof response[0] !== 'undefined'){
 					result+='<p>Баланс: <span class="token" data-symbol="VIZ"><span class="amount">'+parseFloat(response[0]['balance'])+'</span> VIZ</span></p>';
@@ -1893,7 +1893,7 @@ function delegation_control(){
 			delegation_control.html(result);
 		}
 		else{
-			delegation_control.html('<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+			delegation_control.html('<p><i class="fa fw-fw fa-spinner fa-spin"></i> '+l10n.global.loading+'&hellip;</p>');
 			gate.api.getAccounts([current_user],function(err,response){
 				if(typeof response[0] !== 'undefined'){
 					result+='<p>Доля сети: <span class="token" data-symbol="SHARES"><span class="amount">'+parseFloat(response[0]['vesting_shares'])+'</span> SHARES</span></p>';
@@ -1977,7 +1977,7 @@ function delegation_control(){
 }
 function update_wallet_history(){
 	if(0<$('.wallet-history').length){
-		$('.wallet-history tbody').html('<tr><td colspan="6"><center><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i> Загрузка&hellip;</center></td></tr>');
+		$('.wallet-history tbody').html('<tr><td colspan="6"><center><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i> '+l10n.global.loading+'&hellip;</center></td></tr>');
 		setTimeout(function(){
 			$.ajax({
 				type:'POST',
@@ -2125,7 +2125,7 @@ function wallet_control(update=false){
 			wallet_control.html(result);
 		}
 		else{
-			wallet_control.html('<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+			wallet_control.html('<p><i class="fa fw-fw fa-spinner fa-spin"></i> '+l10n.global.loading+'&hellip;</p>');
 			gate.api.getDynamicGlobalProperties(function(err,dgp){
 				gate.api.getAccounts([current_user],function(err,response){
 					if(typeof response[0] !== 'undefined'){
@@ -2210,7 +2210,7 @@ function committee_control(){
 			view.html(result);
 		}
 		else{
-			view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+			view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> '+l10n.global.loading+'&hellip;</p>');
 			result+='<p><label>URL заявки:<input type="text" name="url" class="round wide"></label></p>';
 			result+='<p><label>Аккаунт-воркер: <input type="text" name="worker" class="round" value="'+current_user+'"></label></p>';
 			result+='<p><label>Минимальная сумма токенов: <input type="text" name="min_amount" class="round" value="0.000 VIZ"></label></p>';
@@ -2308,7 +2308,7 @@ function try_auth_signature(login,posting_key,active_key=''){
 					current_user=login;
 					save_session();
 					set_session_cookie();
-					$('.auth-error').html('Вы успешно авторизованы, сессия инициализирована');
+					$('.auth-error').html(l10n.sessions.success);
 					if('/'==document.location.pathname){
 						document.location='https://'+domain+'/media/';
 					}
@@ -2329,7 +2329,7 @@ function try_auth_signature(login,posting_key,active_key=''){
 		});
 	}
 	else{
-		$('.auth-error').html('Пользователь не указан');
+		$('.auth-error').html(l10n.errors.user_not_provided);
 		$('.auth-action').removeClass('disabled');
 		return;
 	}
@@ -2392,14 +2392,14 @@ function try_auth(login,posting_key,active_key){
 				session_generate();
 			}
 			else{
-				$('.auth-error').html('Пользователь не найден');
+				$('.auth-error').html(l10n.errors.user_not_found);
 				$('.auth-custom-action').removeClass('disabled');
 				return;
 			}
 		});
 	}
 	else{
-		$('.auth-error').html('Пользователь не указан');
+		$('.auth-error').html(l10n.errors.user_not_provided);
 		$('.auth-custom-action').removeClass('disabled');
 		return;
 	}

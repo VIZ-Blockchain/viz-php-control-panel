@@ -9,6 +9,7 @@ include($site_root.'/class/parsedown/parsedownextra.php');
 include($site_root.'/class/comments_tree.php');
 include($site_root.'/class/viz_plugins.php');
 include($site_root.'/class/viz_keys.php');
+include($site_root.'/class/l10n.php');
 
 $parsedown = new Parsedown();
 $parsedownextra = new ParsedownExtra();

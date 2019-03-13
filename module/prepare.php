@@ -23,6 +23,8 @@ $currencies_id_arr=array(
 	2=>'VIZ'
 );
 
+set_l10n($l10n_default);
+
 $tags_arr=array();
 function get_tag($id){
 	global $tags_arr,$mongo,$config;
@@ -1384,3 +1386,6 @@ if(isset($_COOKIE['session_id'])){
 		}
 	}
 }
+$replace['head_addon'].='<script>';
+$replace['head_addon'].='var l10n='.json_encode($l10n['js']).';';
+$replace['head_addon'].='</script>';

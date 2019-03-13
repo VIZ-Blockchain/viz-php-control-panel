@@ -51,6 +51,18 @@ if($content){
 			$t->assign($name,$value,'index');
 		}
 	}
+	foreach($l10n as $cat=>$arr){
+		foreach($arr as $name=>$value){
+			if(is_array($value)){
+				foreach($value as $subname=>$subvalue){
+					$t->assign('l10n_'.$cat.'_'.$name.'_'.$subname,$subvalue,'index');
+				}
+			}
+			else{
+				$t->assign('l10n_'.$cat.'_'.$name,$value,'index');
+			}
+		}
+	}
 	$result=$t->get('index');
 	if(false!==strpos(@$_SERVER['HTTP_ACCEPT_ENCODING'],'gzip')){
 		header('Content-Encoding: gzip');

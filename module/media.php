@@ -195,7 +195,7 @@ if('@'==mb_substr($path_array[2],0,1)){
 				foreach($rows as $row){
 					print preview_content($row);
 				}
-				print '<div class="page content load-more" data-action="user-content" data-user-login="'.$account_arr['login'].'"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> Загрузка&hellip;</div></div>';
+				print '<div class="page content load-more" data-action="user-content" data-user-login="'.$account_arr['login'].'"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> '.$l10n['template']['loading'].'&hellip;</div></div>';
 			}
 		}
 	}
@@ -272,7 +272,7 @@ if('tags'==$path_array[2]){
 			foreach($rows as $row){
 				print preview_content_by_id($row['content']);
 			}
-			print '<div class="page content load-more" data-action="tag-content" data-tag="'.htmlspecialchars($tag).'"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> Загрузка&hellip;</div></div>';
+			print '<div class="page content load-more" data-action="tag-content" data-tag="'.htmlspecialchars($tag).'"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> '.$l10n['template']['loading'].'&hellip;</div></div>';
 		}
 	}
 }
@@ -294,7 +294,7 @@ if('feed'==$path_array[2]){
 			foreach($rows as $row){
 				print preview_content_by_id($row);
 			}
-			print '<div class="page content load-more" data-action="feed-content" data-user-login="'.$user_arr['login'].'"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> Загрузка&hellip;</div></div>';
+			print '<div class="page content load-more" data-action="feed-content" data-user-login="'.$user_arr['login'].'"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> '.$l10n['template']['loading'].'&hellip;</div></div>';
 		}
 		print '</div>';
 	}
@@ -363,7 +363,7 @@ if(''==$path_array[2]){
 	foreach($rows as $row){
 		print preview_content($row);
 	}
-	print '<div class="page content load-more" data-action="new-content"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> Загрузка&hellip;</div></div>';
+	print '<div class="page content load-more" data-action="new-content"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> '.$l10n['template']['loading'].'&hellip;</div></div>';
 }
 $content=ob_get_contents();
 ob_end_clean();

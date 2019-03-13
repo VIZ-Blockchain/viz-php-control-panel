@@ -51,24 +51,24 @@
 {menu}
 		<div class="menu-el"><i class="fab fa-fw fa-fort-awesome"></i><a href="/">VIZ World</a></div>
 		<hr>
-		<div class="menu-el"><i class="fas fa-fw fa-home"></i><a href="/media/">Медиа платформа</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-newspaper"></i><a href="/media/feed/">Лента контента</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-users"></i><a href="/media/users/">Пользователи</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-user-circle"></i><a href="/media/profile/">Профиль</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-user-friends"></i><a href="#/media/social/">Социальные связи</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-bell"></i><a href="#/media/notifications/">Уведомления</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-home"></i><a href="/media/">{l10n_menu_media}</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-newspaper"></i><a href="/media/feed/">{l10n_menu_media_feed}</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-users"></i><a href="/media/users/">{l10n_menu_media_users}</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-user-circle"></i><a href="/media/profile/">{l10n_menu_media_profile}</a></div>
+		<div class="menu-el inactive"><i class="fas fa-fw fa-user-friends"></i><a href="#/media/social/">{l10n_menu_media_social}</a></div>
+		<div class="menu-el inactive"><i class="fas fa-fw fa-bell"></i><a href="#/media/notifications/">{l10n_menu_media_notifications}</a></div>
 		<hr>
-		<div class="menu-el"><i class="fas fa-fw fa-plus-circle"></i><a href="/media/publication/">Опубликовать контент</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-plus-circle"></i><a href="/media/publication/">{l10n_menu_media_publication}</a></div>
 		<hr>
-		<div class="menu-el"><i class="fas fa-fw fa-wallet"></i><a href="/wallet/">Кошелек</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-user-cog"></i><a href="/accounts/">Аккаунты</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-wallet"></i><a href="/wallet/">{l10n_menu_wallet}</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-user-cog"></i><a href="/accounts/">{l10n_menu_accounts}</a></div>
 		<hr>
-		<div class="menu-el"><i class="fas fa-fw fa-university"></i><a href="/committee/">Комитет</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-user-shield"></i><a href="/witnesses/">Делегаты</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-toolbox"></i><a href="/tools/">Инструменты</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-book"></i><a href="#/documentation/">Документация</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-cloud"></i><a href="#/services/">Сервисы</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-cogs"></i><a href="#/settings/">Настройки</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-university"></i><a href="/committee/">{l10n_menu_committee}</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-user-shield"></i><a href="/witnesses/">{l10n_menu_witnesses}</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-toolbox"></i><a href="/tools/">{l10n_menu_tools}</a></div>
+		<div class="menu-el inactive"><i class="fas fa-fw fa-book"></i><a href="#/documentation/">{l10n_menu_documentation}</a></div>
+		<div class="menu-el inactive"><i class="fas fa-fw fa-cloud"></i><a href="#/services/">{l10n_menu_services}</a></div>
+		<div class="menu-el inactive"><i class="fas fa-fw fa-cogs"></i><a href="#/settings/">{l10n_menu_settings}</a></div>
 	</div>
 </div>
 {pages}

@@ -376,10 +376,10 @@ if(''==$path_array[1]){
 	<div class="description-bubble">
 		<h1>VIZ Blockchain</h1>
 		<ul>
-			<li>— ДАО (Децентрализованное Автономное Общество)</li>
-			<li>— Комитет общественных работ и инициатив</li>
-			<li>— Награждение достойных</li>
-			<li>— Справедливое участие</li>
+			<li>— '.$l10n['landing']['descriptions_dao'].'</li>
+			<li>— '.$l10n['landing']['descriptions_committee'].'</li>
+			<li>— '.$l10n['landing']['descriptions_award'].'</li>
+			<li>— '.$l10n['landing']['descriptions_participation'].'</li>
 		</ul>
 	</div>
 </div>';

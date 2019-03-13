@@ -44,8 +44,8 @@
 	<div class="right">
 		{header_menu}
 		<div class="header-menu-el social-links"><a href="https://github.com/VIZ-Blockchain" target="_blank" class="icon" title="Github"><i class="fab fa-fw fa-github"></i></a><a href="https://discord.gg/nEu4MqR" target="_blank" class="icon" title="Discord"><i class="fab fa-fw fa-discord"></i></a><a href="https://t.me/viz_world" target="_blank" class="icon" title="Telegram"><i class="fas fa-fw fa-paper-plane"></i></a></div>
-		<div class="header-menu-el energy" title="Состояние энергии аккаунта">&hellip;</div>
-		<div class="header-menu-el account"><a href="/login/" class="icon" title="Авторизация"><i class="fas fa-fw fa-sign-in-alt"></i></a></div>
+		<div class="header-menu-el energy" title="{l10n_template_energy_status}">&hellip;</div>
+		<div class="header-menu-el account"><a href="/login/" class="icon" title="{l10n_template_auth}"><i class="fas fa-fw fa-sign-in-alt"></i></a></div>
 	</div>
 
 </div>
@@ -54,24 +54,24 @@
 {menu}
 		<div class="menu-el"><i class="fab fa-fw fa-fort-awesome"></i><a href="/">VIZ World</a></div>
 		<hr>
-		<div class="menu-el"><i class="fas fa-fw fa-home"></i><a href="/media/">Медиа платформа</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-newspaper"></i><a href="/media/feed/">Лента контента</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-users"></i><a href="/media/users/">Пользователи</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-user-circle"></i><a href="/media/profile/">Профиль</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-user-friends"></i><a href="#/media/social/">Социальные связи</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-bell"></i><a href="#/media/notifications/">Уведомления</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-home"></i><a href="/media/">{l10n_menu_media}</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-newspaper"></i><a href="/media/feed/">{l10n_menu_media_feed}</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-users"></i><a href="/media/users/">{l10n_menu_media_users}</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-user-circle"></i><a href="/media/profile/">{l10n_menu_media_profile}</a></div>
+		<div class="menu-el inactive"><i class="fas fa-fw fa-user-friends"></i><a href="#/media/social/">{l10n_menu_media_social}</a></div>
+		<div class="menu-el inactive"><i class="fas fa-fw fa-bell"></i><a href="#/media/notifications/">{l10n_menu_media_notifications}</a></div>
 		<hr>
-		<div class="menu-el"><i class="fas fa-fw fa-plus-circle"></i><a href="/media/publication/">Опубликовать контент</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-plus-circle"></i><a href="/media/publication/">{l10n_menu_media_publication}</a></div>
 		<hr>
-		<div class="menu-el"><i class="fas fa-fw fa-wallet"></i><a href="/wallet/">Кошелек</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-user-cog"></i><a href="/accounts/">Аккаунты</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-wallet"></i><a href="/wallet/">{l10n_menu_wallet}</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-user-cog"></i><a href="/accounts/">{l10n_menu_accounts}</a></div>
 		<hr>
-		<div class="menu-el"><i class="fas fa-fw fa-university"></i><a href="/committee/">Комитет</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-user-shield"></i><a href="/witnesses/">Делегаты</a></div>
-		<div class="menu-el"><i class="fas fa-fw fa-toolbox"></i><a href="/tools/">Инструменты</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-book"></i><a href="#/documentation/">Документация</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-cloud"></i><a href="#/services/">Сервисы</a></div>
-		<div class="menu-el inactive"><i class="fas fa-fw fa-cogs"></i><a href="#/settings/">Настройки</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-university"></i><a href="/committee/">{l10n_menu_committee}</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-user-shield"></i><a href="/witnesses/">{l10n_menu_witnesses}</a></div>
+		<div class="menu-el"><i class="fas fa-fw fa-toolbox"></i><a href="/tools/">{l10n_menu_tools}</a></div>
+		<div class="menu-el inactive"><i class="fas fa-fw fa-book"></i><a href="#/documentation/">{l10n_menu_documentation}</a></div>
+		<div class="menu-el inactive"><i class="fas fa-fw fa-cloud"></i><a href="#/services/">{l10n_menu_services}</a></div>
+		<div class="menu-el inactive"><i class="fas fa-fw fa-cogs"></i><a href="#/settings/">{l10n_menu_settings}</a></div>
 	</div>
 </div>
 <div class="main">
@@ -80,6 +80,6 @@
 </div>
 <div class="notify-list"></div>
 <div class="modal-overlay"></div>
-<div class="modal drop-file"><i class="fas fa-fw fa-file-upload"></i> Drop file here&hellip;</div>
+<div class="modal drop-file"><i class="fas fa-fw fa-file-upload"></i> {l10n_template_drop_file}&hellip;</div>
 </body>
 </html>
