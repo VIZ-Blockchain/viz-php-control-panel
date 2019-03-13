@@ -250,6 +250,9 @@ function wait_session(){
 					data_obj=JSON.parse(data_json);
 					if(typeof data_obj.error !== 'undefined'){
 						console.log(''+new Date().getTime()+': '+data_obj.error+' - '+data_obj.error_str);
+						if('time'==data_obj.error){
+							add_notify('Ошибка синхронизации, проверьте ваше системное время (включите NTP)',true);
+						}
 						if('rebuild_session'==data_obj.error){
 							session_generate();
 						}
@@ -272,11 +275,11 @@ function wait_session(){
 						}
 						//initialize user_session_status (feed status, notifications)
 						if('/'==document.location.pathname){
-							document.location='https://'+domain+'/feed/';
+							document.location='https://'+domain+'/media/';
 						}
 						else
 						if('/login/'==document.location.pathname){
-							document.location='https://'+domain+'/feed/';
+							document.location='https://'+domain+'/media/';
 						}
 						else{
 							document.location=document.location;
@@ -448,16 +451,16 @@ function load_session(){
 	if(current_user){
 		view_session();
 		session_control();
-		witness_control();
-		wallet_control();
-		committee_control();
-		delegation_control();
 		wait_session();
-		profile_control();
 		if(users[current_user].shield){
 			shield_check(()=>{},()=>{$('.start-shield-action').removeClass('hide');});
 		}
 	}
+	wallet_control();
+	witness_control();
+	committee_control();
+	delegation_control();
+	profile_control();
 	create_account_control();
 	reset_account_control();
 	invite_control();
@@ -1542,18 +1545,20 @@ function vote_witness(witness_login,value){
 }
 function witness_control(){
 	if(0!=$('.witness-votes').length){
-		let view=$('.witness-votes');
-		let result='';
-		result+='<h3>Ваши голоса</h3>';
-		view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
-		gate.api.getAccounts([current_user],function(err,response){
-			result+='<p>';
-			for(vote_id in response[0].witness_votes){
-				result+=(0==vote_id?'':', ')+'<a href="/witnesses/'+response[0].witness_votes[vote_id]+'/">'+response[0].witness_votes[vote_id]+'</a>';
-			}
-			result+='</p>';
-			view.html(result);
-		});
+		if(''!==current_user){
+			let view=$('.witness-votes');
+			let result='';
+			result+='<h3>Ваши голоса</h3>';
+			view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> Загрузка&hellip;</p>');
+			gate.api.getAccounts([current_user],function(err,response){
+				result+='<p>';
+				for(vote_id in response[0].witness_votes){
+					result+=(0==vote_id?'':', ')+'<a href="/witnesses/'+response[0].witness_votes[vote_id]+'/">'+response[0].witness_votes[vote_id]+'</a>';
+				}
+				result+='</p>';
+				view.html(result);
+			});
+		}
 	}
 	if(0!=$('.control .witness-vote').length){
 		$('.witness-vote').each(function(){
@@ -2305,11 +2310,11 @@ function try_auth_signature(login,posting_key,active_key=''){
 					set_session_cookie();
 					$('.auth-error').html('Вы успешно авторизованы, сессия инициализирована');
 					if('/'==document.location.pathname){
-						document.location='https://'+domain+'/feed/';
+						document.location='https://'+domain+'/media/';
 					}
 					else
 					if('/login/'==document.location.pathname){
-						document.location='https://'+domain+'/feed/';
+						document.location='https://'+domain+'/media/';
 					}
 					else{
 						document.location=document.location;
@@ -2514,7 +2519,7 @@ function post_subcontent(target){
 			let subcontent_success=function(result){
 				$(target).parent().remove();
 				set_update_comments_list();
-				add_notify('Комментарий отправлен',5000);
+				add_notify('Комментарий отправлен');
 			}
 			let subcontent_failure=function(err){
 				window.setTimeout(function(){set_update_comments_list(false)},100);
@@ -2625,7 +2630,7 @@ function post_content(target){
 							setTimeout(function(){wait_content(current_user,permlink)},6000);
 						}
 						let edit_failure=function(err){
-							add_notify('Ошибка при  получении публикации',true);
+							add_notify('Ошибка при получении публикации',true);
 							$('input[name=permlink]').removeAttr('disabled');
 							target.removeClass('disabled');
 							target.html('Сохранить изменения');
@@ -2645,6 +2650,11 @@ function post_content(target){
 								}
 							});
 						}
+					}
+					else{
+						$('input[name=permlink]').removeAttr('disabled');
+						target.removeClass('disabled');
+						target.html('Сохранить изменения');
 					}
 				}
 				else{
@@ -3667,6 +3677,20 @@ function check_load_more(){
 		}
 	});
 }
+function activate_parallax(){
+	document.onmousemove=function(e){
+		let x=e.clientX;
+		let y=e.clientY;
+		let max_x=$(window).width();
+		let max_y=$(window).height();
+		let rotate_vertical=((x-(max_x/2))/max_x)*30;
+		let rotate_horizontal=((y-(max_y/2))/max_y)*30;
+		$('.parallax-active').css('transform','rotateY('+rotate_vertical+'deg) rotateX('+rotate_horizontal+'deg) rotateZ(0deg) scale(1)');
+		let move_vertical=-1*((x-(max_x/2))/max_x)*120;
+		let move_horizontal=-1*((y-(max_y/2))/max_y)*120;
+		$('.parralax-glare').css('transform','translate('+move_vertical+'%,'+move_horizontal+'%)');
+	}
+}
 $(document).ready(function(){
 	load_session();
 	var hash_load=window.location.hash;
@@ -3704,4 +3728,19 @@ $(document).ready(function(){
 			$('.main').addClass('menu-expand');
 		}
 	});
+	if(0<$('.parallax-active').length){
+		activate_parallax();
+	}
+	if(0<$('body.landing .info-bubbles a.item').length){
+		$('body.landing .info-bubbles a.item').bind('click',function(){
+			$('body.landing .info-bubbles a.item').removeClass('active');
+			$(this).addClass('active');
+			$('body.landing .info-block.bubble-item').css('display','none');
+			$('body.landing .info-block.bubble-item[id='+$(this).attr('rel')+']').css('display','block');
+			if(780>=$(window).width()){
+				$('body,html').animate({scrollTop:$('#'+$(this).attr('rel')).offset().top},1500);
+				window.location.hash=$(this).attr('rel');
+			}
+		});
+	}
 });
