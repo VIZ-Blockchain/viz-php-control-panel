@@ -268,6 +268,40 @@ class viz_keys{
 		}
 		return false;
 	}
+	function verify_compact($data,$signature){
+		if(!function_exists('secp256k1_context_create')){
+			return false;
+		}
+		$context=secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+
+		$signature_bin=hex2bin($signature);
+		$signature_point=null;
+		$recid=substr($signature_bin,0,1);
+		$recid=bin2hex($recid);
+		$recid=hexdec($recid);
+		$recid-=4;
+		$recid-=27;
+		$signature_bin=substr($signature_bin,1);
+		if(1 !== secp256k1_ecdsa_recoverable_signature_parse_compact($context,$signature_point,$signature_bin,$recid)){
+			return false;
+		}
+
+		$data_hash=hash('sha256',$data,true);
+		$recovered_public_key_point=null;
+		if(1 !== secp256k1_ecdsa_recover($context,$recovered_public_key_point,$signature_point,$data_hash)){
+			return false;
+		}
+
+		$serialized = '';
+		if (1 !== secp256k1_ec_pubkey_serialize($context,$serialized,$recovered_public_key_point,SECP256K1_EC_COMPRESSED)) {
+			return false;
+		}
+
+		if($this->bin == $serialized){//public key equal recovered
+			return true;
+		}
+		return false;
+	}
 }
 /*
 Example:

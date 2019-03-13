@@ -6,7 +6,6 @@ if(in_array('content',$config['plugins'])){
 		$signature=$_POST['signature'];
 		$data_arr=explode(':',$data);
 		if($signature){
-			$signature=ec_compact2der($signature);//js post signature in compact format
 			if('viz.world'==$data_arr[0]){
 				if('auth'==$data_arr[1]){
 					if('posting'==$data_arr[3]){
@@ -26,9 +25,14 @@ if(in_array('content',$config['plugins'])){
 							$summary_weight=0;
 							foreach($account['posting']['key_auths'] as $authority){
 								$key=new viz_keys();
-								$key->import_public($authority[0]);
-								if($key->verify($data,$signature)){
-									$summary_weight+=(int)$authority[1];
+								if($key->import_public($authority[0])){
+									if($key->verify_compact($data,$signature)){
+										$summary_weight+=(int)$authority[1];
+									}
+								}
+								else{
+									print '{"error":"key","error_str":"Provided public key invalid"}';
+									exit;
 								}
 							}
 							if($summary_weight>=$weight_threshold){
