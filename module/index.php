@@ -41,7 +41,7 @@ if('accounts'==$path_array[1]){
 	print '<div class="page content">
 	<h1><i class="fas fa-fw fa-user-cog"></i> Аккаунты</h1>
 	<div class="article control">';
-	print '<p>Внимание! Пройти аутентификацию дополнительныи аккаунтом вы можете <a href="/login/">по этой ссылке</a>. Выход из аккаунта значит выход из сессии конкретным аккаунтом.<br>Для очистки сессии отключите все аккаунты.<br>';
+	print '<p>Внимание! Пройти аутентификацию аккаунтом вы можете <a href="/login/">по этой ссылке</a>. Выход из аккаунта значит выход из сессии конкретным аккаунтом.<br>Для очистки сессии отключите все аккаунты.<br>';
 	print '<div class="session-control"></div>';
 	print '</div></div>';
 }
@@ -359,16 +359,122 @@ if('mongo'==$path_array[1] && $admin){
 }
 
 if(''==$path_array[1]){
-	$find=array('status'=>0,'parent'=>['$exists'=>false]);
-	$perpage=50;
-	$offset=0;
-	$sort=array('_id'=>-1);
-	$rows=$mongo->executeQuery($config['db_prefix'].'.content',new MongoDB\Driver\Query($find,['sort'=>$sort,'limit'=>(int)$perpage,'skip'=>(int)$offset]));
-	$rows->setTypeMap(['root'=>'array','document'=>'array','array'=>'array']);
-	foreach($rows as $row){
-		print preview_content($row);
-	}
-	print '<div class="page content load-more" data-action="new-content"><i class="fa fw-fw fa-spinner" aria-hidden="true"></i> Загрузка&hellip;</div></div>';
+	$t->open('landing.tpl','index');
+	$replace['description']='VIZ Blockchain — Decentralized Autonomous Society (DAS) with powerful award mechanic from emission';
+	$replace['head_addon'].='
+	<meta property="og:url" content="https://viz.world/" />
+	<meta name="og:title" content="VIZ Blockchain" />
+	<meta name="twitter:title" content="VIZ Blockchain" />
+	<link rel="image_src" href="https://viz.world/landing-meta.png?v2" />
+	<meta property="og:image" content="https://viz.world/landing-meta.png?v2" />
+	<meta name="twitter:image" content="https://viz.world/landing-meta.png?v2" />
+	<meta name="twitter:card" content="summary_large_image" />';
+
+	print '
+<div class="topbox">
+	<div class="logo-symbol parallax-active"><div class="parralax-glare"></div><img src="/logo-symbol-anim.svg" style="width:100%" class="symbol" alt="VIZ Symbol"></div>
+	<div class="description-bubble">
+		<h1>VIZ Blockchain</h1>
+		<ul>
+			<li>— ДАО (Децентрализованное Автономное Общество)</li>
+			<li>— Комитет общественных работ и инициатив</li>
+			<li>— Награждение достойных</li>
+			<li>— Справедливое участие</li>
+		</ul>
+	</div>
+</div>';
+	print '
+<div class="info-bubbles">
+	<a class="item color1" rel="award"><i class="icon fas fa-gem"></i><span class="title">Награждай</span><p>Стимулируйте экспансию ДАО в любом направлении, награждайте полезное.</p><span class="color">Узнать больше <i class="fas fa-angle-double-right"></i></span></a>
+	<a class="item color2" rel="create"><i class="icon fas fa-hat-wizard"></i><span class="title">Создавай</span><p>Участвуйте в совместных проектах, созидайте, общайтесь.</p><span class="color">Узнать больше <i class="fas fa-angle-double-right"></i></span></a>
+	<a class="item color3" rel="manage"><i class="icon fas fa-globe-africa"></i><span class="title">Управляй</span><p>Участники ДАО управляют всем блокчейном VIZ. Присоединяйтесь!</p><span class="color">Узнать больше <i class="fas fa-angle-double-right"></i></span></a>
+</div>';
+	print '
+<div class="info-block bubble-item" id="award">
+	<div class="text color1">
+		<p>Каждый участник может награждать других пользователей из фонда наград, пополняемого эмиссией. Чем выше доля участника в ДАО, тем большую долю эмиссии он может раздать в виде наград. Награждение происходит мгновенно.<br>Также награда может быть <a href="https://viz.world/media/@on1x/viz-control-panel-beneficiaries/" target="_blank">разделена между несколькими получателями</a>.</p>
+		<p><strong>Осознанное участие</strong> в ДАО VIZ логически сводится к награждению полезных действий для ДАО или лично для пользователя.</p>
+		<p>Таким образом, награда стимулирует полезные действия, порождая цепную реакцию и увеличивая ценность ДАО VIZ.</p>
+		<p>Кто-то написал полезный сервис и достоин награды? <strong>Просто наградите его.</strong> Это вернётся сторицей.</p>
+		<p>Кто-то написал интересную статью, записал видеоролик, посадил дерево, написал отчёт по волонтерской работе, нарисовал картину или сделал общественно значимое дело? Просто наградите его. <strong>Награждение стимулирует паттерн поведения.</strong> <a href="https://viz.world/media/@on1x/viz-real-life-usage/" target="_blank">Хорошее притягивает хорошее</a>.</p>
+		<p>Энергия восстанавливается линейно на 20% за 24 часа, что позволяет планировать и контролировать её использование.</p>
+		<p><em>Ограничений на использование энергии нет, аккаунт может использовать для награждения все 100% своего потенциала.</em></p>
+	</div>
+</div>';
+	print '
+<div class="info-block bubble-item" id="create">
+	<div class="text color2">
+		<p>Кем бы вы ни были, чем бы ни занимались, <strong>инициативным</strong> всегда найдётся место в ДАО VIZ:</p>
+		<p>1. Пользователи могут просто использовать сайт (интегрированный с VIZ)  по назначению и получать награды от других.</p>
+		<p>2. Владельцы сайтов и сообществ могут подключить VIZ, <strong>стимулировать полезные действия внутри своего сообщества</strong> и формировать рейтинг или репутацию пользователей. Это могут быть любые сайты: творческие группы, сборник научных публикаций, рассказы для детей, блоги про видеоигры или портал волонтеров для сбора пожертвований.</p>
+		<p>3. Исследователям будет интересно разобраться в тонкостях механики блокчейн-системы, визионерам — принимать участие в просвещении новичков, расширении локальных сообществ.</p>
+		<p>4. Для разработчиков игр, приложений и сервисов — <strong>интеграция VIZ</strong> для награждения своих пользователей. Сервис платных подписок позволяет организовать процессинг переводов токенов для любого вида приложений. Механика награждений из эмиссии также позволяет создать замкнутую систему с собственным распределением фонда наград приложения.</p>
+		<p>Вы можете делать, что пожелаете — в одиночку или с командой единомышленников. Всё зависит от вас самих.</p>
+	</div>
+</div>';
+	print '
+<div class="info-block bubble-item" id="manage">
+	<div class="text color3">
+		<p>Управление происходит на добровольной основе. Принцип ДАО VIZ — свобода выбора и истинная долевая демократия. Если кто-то не пользуется своим правом управления согласно своей доле, то управлять будут инициативные участники ДАО.</p>
+		<p>Каждый участник может конвертировать токены (VIZ) в долю ДАО VIZ (SHARES). Именно благодаря долевому участию и происходит управление ДАО VIZ:</p>
+		<p>1. <strong>Управление фондом наград</strong> — каждый участник может использовать энергию (возобновляемый со временем потенциал доли в ДАО VIZ), чтобы на конкурентной основе распоряжаться частью фонда наград. Награждение происходит мгновенно.</p>
+		<p>2. <strong>Управление фондом комитета поддержки инициатив</strong> — каждый участник может проголосовать за заявку в комитете, повлияв на сумму, которую получит исполнитель в случае удовлетворения заявки. Потенциал влияния линейно зависит от доли в ДАО VIZ.</p>
+		<p>3. <strong>Голосование за делегатов</strong> — каждый участник может проголосовать за любое количество делегатов, которые поддерживают инфраструктуру сети и участвуют в <a href="https://viz.world/media/@on1x/viz-quorum-calc-median-chain-properties/" target="_blank">голосовании за параметры блокчейн-системы</a>. Вес от доли в ДАО VIZ будет поровну распределён между выбранными делегатами.</p>
+	</div>
+</div>';
+	print '
+<div class="info-block">
+	<h2>Особенности и возможности</h2>
+	<div class="text">
+		<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/viz-technical-documentation/" target="_blank">ДАО VIZ</a> — только сообщество участников VIZ решает, как будет развиваться экосистема. Никаких начальников или официального сайта! Видите возможность? Просто беритесь за неё и реализуйте!</p>
+		<p><img src="/check.svg" alt=""> Очень быстрый — 3 секунды между блоками, блокчейн VIZ относится к Graphene экосистеме.</p>
+		<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/viz-quorum-calc-median-chain-properties/" target="_blank">Консенсус управления блокчейн-системой</a> — уникальная система чередования делегатов.</p>
+		<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/fair-dpos/" target="_blank">Справедливый DPoS</a> — участник может проголосовать за любое количество делегатов, при этом вес его доли разделится между ними поровну.</p>
+		<p><img src="/check.svg" alt=""> Награждение полезного происходит из фонда наград, пополняемого эмиссией. Каждый участник, таким образом, может управлять своим «потоком эмиссии», согласно своей доле ДАО VIZ.</p>
+		<p><img src="/check.svg" alt=""> Комитет поддержки инициатив — помогайте развивать ДАО VIZ и получайте за это токены от комитета. Участвуйте в работе комитета, голосуя за награждение других участников сообщества.</p>
+		<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/paid-subscriptions-processing/" target="_blank">Система платных подписок</a> — процессинг периодических переводов на блокчейне.</p>
+		<p><img src="/check.svg" alt=""> Система ваучеров (они же инвайт-коды) и <a href="https://viz.world/media/@on1x/anonymous-account/" target="_blank">анонимная регистрация</a> — две дополнительных механики для процессинга создания аккаунтов.</p>
+		<p><img src="/check.svg" alt=""> Возможность экспансии — механизм награждения уникален: он мгновенный, <a href="https://viz.world/media/@on1x/viz-control-panel-beneficiaries/" target="_blank">гибкий</a>, самовозобновляемый, стремится к справедливой долевой конкуренции за фонд наград. В совокупности с <a href="https://viz.world/media/@on1x/viz-gates/" target="_blank">социальными шлюзами</a> позволяет привлекать без регистрации инициативных и созидающих людей со всего интернета!</p>
+	</div>
+</div>';
+	print '
+<div class="info-block">
+	<h2>Код и библиотеки</h2>
+	<div class="text">
+		<p>Все основные разработки открыты (<a href="https://github.com/VIZ-Blockchain" target="_blank">ссылка на GitHub</a>) и большинство из них доступны по свободной MIT лицензии:
+			<ul class="disc">
+				<li><a href="https://github.com/VIZ-Blockchain/viz-cpp-node" target="_blank">Блокчейн-нода VIZ на C++</a> — актуальная версия в ветке master, MIT лицензия.</li>
+				<li><a href="https://github.com/VIZ-Blockchain/viz-php-control-panel" target="_blank">Контрольная панель на PHP</a> — поддерживает актуальную версию VIZ, MIT лицензия, система плагинов, содержит медиа-платформу в виде плагина (<a href="https://viz.world/media/" target="_blank">рабочий пример расположен на VIZ.world</a>).</li>
+				<li><a href="https://github.com/VIZ-Blockchain/viz-js-lib" target="_blank">JS библиотека</a> — поддерживает актуальную версию VIZ, MIT лицензия, <a href="https://github.com/VIZ-Blockchain/viz-js-lib/tree/master/doc" target="_blank">доступна документация</a>.</li>
+				<li><a href="https://github.com/VIZ-Blockchain/viz-go-lib" target="_blank">GO библиотека</a> — поддерживает актуальную версию VIZ, MIT лицензия, <a href="https://viz.world/media/@asuleymanov/viz-gov2/" target="_blank">публикация автора</a>.</li>
+				<li><a href="https://github.com/t3ran13/php-graphene-node-client" target="_blank">PHP библиотека</a> — поддерживает актуальную версию VIZ, MIT лицензия, <a href="https://viz.world/media/@php-node-client/update-of-php-graphene-node-client-v5-1-2-v5-2-0/" target="_blank">публикация автора</a>.</li>
+				<li><a href="https://github.com/VIZ-Blockchain/viz-python-lib" target="_blank">Python библиотека</a> — в разработке, MIT лицензия.</li>
+			</ul>
+		</p>
+	</div>
+</div>';
+	print '
+<div class="info-block">
+	<h2>Сервисы от разработчиков</h2>
+	<div class="text">
+		<p>Среди участников ДАО VIZ есть разработчики (программисты), которые создали или имплементировали разные приложения или сервисы:
+			<ul class="disc">
+				<li><a href="https://viz-doc.rtfd.io/" target="_blank">VIZ.doc</a> — документация и описание механизмов VIZ, <a href="https://viz.world/media/@viz.report/viz-doc-2-0/" target="_blank">публикация автора</a>.</li>
+				<li><a href="https://viz.world/media/" target="_blank">VIZ.World</a> — один из первых сайтов про VIZ (на нём вы сейчас и находитесь), выступает в роли медиа-платформы про VIZ и контрольной панели.</li>
+				<li><a href="https://viz.world/media/@viz-social-bot/social-viz-gateway-for-telegram/" target="_blank">Социальный бот VIZ для Telegram</a> — простой сервис-бот, после добавления в любой чат позволяет награждать других участников.</li>
+				<li><a href="https://viz.sale/" target="_blank">Магазин инвайтов VIZ</a> — магазин с инвайт-кодами, <a href="https://viz.world/media/@solox/invites/" target="_blank">публикация автора</a>.</li>
+				<li><a href="https://viz.world/media/@xchng/%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B-%D0%B0%D0%B2%D1%82%D0%BE%D0%BC%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B3%D0%BE-%D1%88%D0%BB%D1%8E%D0%B7%D0%B0-xchngviz/" target="_blank">BitShares шлюз от XCHNG</a> — позволяет торговать тикером <a href="http://cryptofresh.com/a/XCHNG.VIZ" target="_blank">XCHNG.VIZ</a> в DEX блокчейн-системе BitShares.</li>
+				<li><a href="https://github.com/denis-skripnik/viz-exchange" target="_blank">Код сервиса для частного обменника</a> — позволяет обменивать в автоматическом режиме токены между Graphene блокчейн-системами, <a href="https://viz.world/media/@denis-skripnik/viz-exchange-1/" target="_blank">публикация автора</a>.</li>
+				<li><a href="https://t.me/viz_awards_bot" target="_blank">Телеграм бот уведомлений о наградах в VIZ</a> — <a href="https://viz.world/media/@denis-skripnik/viz-awards-notify/" target="_blank">публикация автора</a>.</li>
+				<li><a href="https://t.me/viz_committee_bot" target="_blank">Телеграм бот уведомлений о заявках в комитет VIZ</a> — <a href="https://viz.world/media/@denis-skripnik/viz-committee-bot/" target="_blank">публикация автора</a>.</li>
+				<li><a href="https://t.me/thallid_pom_bot" target="_blank">Thallid POM бот для VIZ</a> — бот для награждения участников Телеграм чата, <a href="https://viz.world/media/@ksantoprotein/thallid-intro/" target="_blank">публикация автора</a>.</li>
+				<li><a href="https://t.me/viz_props_bot" target="_blank">Телеграм бот уведомлений о смене голосуемых параметров VIZ</a> — <a href="https://viz.world/media/@denis-skripnik/" target="_blank">автор</a>.</li>
+				<li><a href="https://t.me/vizwatchdogbot" target="_blank">Телеграм бот Watchdog</a> — следит и уведомляет об активности (или неактивности) делегатов, <a href="https://viz.world/media/@ropox/viz-watchdog-1539462587/" target="_blank">публикация автора</a>.</li>
+				<li><a href="https://dpos.space/profiles/" target="_blank">Dpos.space</a> — сайт со множеством сервисов для VIZ (просмотр истории аккаунта), <a href="https://viz.world/media/@denis-skripnik/dpos.space/" target="_blank">публикация автора</a>.</li>
+			</ul>
+		</p>
+	</div>
+</div>';
 }
 $content=ob_get_contents();
 ob_end_clean();
