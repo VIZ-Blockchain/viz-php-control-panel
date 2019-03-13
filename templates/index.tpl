@@ -30,7 +30,7 @@
 
 	{head_addon}
 
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 	<link rel="stylesheet" href="/css/app.css?{css_change_time}">
 
 	<script type="text/javascript" src="/js/viz.min.js"></script>
@@ -40,7 +40,7 @@
 <body>
 <div class="header shadow unselectable">
 	<div class="actions"><a class="menu-expand icon"><i class="fas fa-bars"></i></a></div>
-	<div class="logo"><a href="/" class="logo"><img src="/logo-symbol-anim.svg" class="symbol"><span class="text"><img src="/logo-text.svg"></span></a></div>
+	<div class="logo"><a href="/media/" class="logo"><img src="/logo-symbol-anim.svg" class="symbol"><span class="text"><img src="/logo-text.svg"></span></a></div>
 	<div class="right">
 		{header_menu}
 		<div class="header-menu-el social-links"><a href="https://github.com/VIZ-Blockchain" target="_blank" class="icon" title="Github"><i class="fab fa-fw fa-github"></i></a><a href="https://discord.gg/nEu4MqR" target="_blank" class="icon" title="Discord"><i class="fab fa-fw fa-discord"></i></a><a href="https://t.me/viz_world" target="_blank" class="icon" title="Telegram"><i class="fas fa-fw fa-paper-plane"></i></a></div>
