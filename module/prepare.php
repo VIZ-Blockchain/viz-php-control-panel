@@ -23,7 +23,40 @@ $currencies_id_arr=array(
 	2=>'VIZ'
 );
 
-set_l10n($l10n_default);
+if(isset($_GET['change_localization'])){
+	$preferred_lang=$_GET['change_localization'];
+	if(set_l10n($preferred_lang)){
+		@setcookie('l10n',$preferred_lang,31536000+time(),'/');
+	}
+	header('location:'.$path);
+	exit;
+}
+if(isset($_COOKIE['l10n'])){
+	set_l10n($_COOKIE['l10n']);
+}
+else{
+	$preferred_lang=$l10n_default;
+	$preferred_langs_arr=['ru-RU'=>'ru','ru'=>'ru','en-US'=>'en','en'=>'en'];
+	if(isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])){
+		$lang_max=0.0;
+		$user_langs=explode(",", $_SERVER["HTTP_ACCEPT_LANGUAGE"]);
+		foreach($user_langs as $user_lang){
+			$user_lang=explode(';',$user_lang);
+			$q=isset($user_lang[1])?(float)$user_lang[1]:1.0;
+			if($q>$lang_max){
+				$lang_max=$q;
+				$preferred_lang=$user_lang[0];
+			}
+		}
+		$preferred_lang=trim($preferred_lang);
+		if($preferred_langs_arr[$preferred_lang]){
+			$preferred_lang=$preferred_langs_arr[$preferred_lang];
+		}
+	}
+	if(set_l10n($preferred_lang)){
+		@setcookie('l10n',$preferred_lang,31536000+time(),'/');
+	}
+}
 
 $tags_arr=array();
 function get_tag($id){
@@ -1105,9 +1138,9 @@ function preview_content($data){
 	$data['body']=stripcslashes($data['body']);
 	$data['permlink']=stripcslashes($data['permlink']);
 	$data['permlink_href']=htmlspecialchars($data['permlink']);
+	$data['permlink_href']=str_replace('%','%25',$data['permlink_href']);
 	$data['permlink_href']=str_replace('?','%3F',$data['permlink_href']);
 	$data['permlink_href']=str_replace('/','%2F',$data['permlink_href']);
-	$data['permlink_href']=str_replace('%','%25',$data['permlink_href']);
 
 	$cover=false;
 	if(isset($data['cover'])){
@@ -1186,9 +1219,9 @@ function preview_content($data){
 	foreach($tags as $tag_id){
 		$tag=get_tag($tag_id['tag']);
 		if($tag){
+			$tag_url=str_replace('%','%25',$tag_url);
 			$tag_url=str_replace('?','%3F',$tag);
 			$tag_url=str_replace('/','%2F',$tag_url);
-			$tag_url=str_replace('%','%25',$tag_url);
 			$tags_list[]='<a href="/media/tags/'.htmlspecialchars($tag_url).'/">'.htmlspecialchars($tag).'</a>';
 		}
 	}
@@ -1230,9 +1263,9 @@ function view_content($data){
 	$data['body']=stripcslashes($data['body']);
 	$data['permlink']=stripcslashes($data['permlink']);
 	$data['permlink_href']=htmlspecialchars($data['permlink']);
+	$data['permlink_href']=str_replace('%','%25',$data['permlink_href']);
 	$data['permlink_href']=str_replace('?','%3F',$data['permlink_href']);
 	$data['permlink_href']=str_replace('/','%2F',$data['permlink_href']);
-	$data['permlink_href']=str_replace('%','%25',$data['permlink_href']);
 
 	$beneficiaries=false;
 	if(isset($data['beneficiaries'])){
@@ -1270,9 +1303,9 @@ function view_content($data){
 	foreach($tags as $tag_id){
 		$tag=get_tag($tag_id['tag']);
 		if($tag){
+			$tag_url=str_replace('%','%25',$tag_url);
 			$tag_url=str_replace('?','%3F',$tag);
 			$tag_url=str_replace('/','%2F',$tag_url);
-			$tag_url=str_replace('%','%25',$tag_url);
 			$tags_list[]='<a href="/media/tags/'.htmlspecialchars($tag_url).'/">'.htmlspecialchars($tag).'</a>';
 		}
 	}
