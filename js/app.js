@@ -93,7 +93,7 @@ var update_comments_list_timer=0;
 var update_comments_list_timeout=3500;
 
 function check_json(text){
-	if(typeof text!=="string"){
+	if(typeof text!=='string'){
 		return false;
 	}
 	try{
@@ -766,7 +766,7 @@ function download(filename, text) {
 		link.click();
 	}
 }
-function invite_register(secret_key,receiver,private_key){
+function invite_registration(secret_key,receiver,private_key){
 	public_key=gate.auth.wifToPublic(private_key);
 
 	let invite_success=function(result){
@@ -887,27 +887,27 @@ function invite_claim(secret_key,receiver){
 	}
 }
 function reset_account_with_general_key(account_login,owner_key,general_key){
-	let auth_types = ['posting','active','owner','memo'];
+	let auth_types = ['regular','active','master','memo'];
 	let keys=gate.auth.getPrivateKeys(account_login,general_key,auth_types);
 	let owner = {
-		"weight_threshold": 1,
-		"account_auths": [],
-		"key_auths": [
-			[keys.ownerPubkey, 1]
+		'weight_threshold': 1,
+		'account_auths': [],
+		'key_auths': [
+			[keys.masterPubkey, 1]
 		]
 	};
 	let active = {
-		"weight_threshold": 1,
-		"account_auths": [],
-		"key_auths": [
+		'weight_threshold': 1,
+		'account_auths': [],
+		'key_auths': [
 			[keys.activePubkey, 1]
 		]
 	};
 	let posting = {
-		"weight_threshold": 1,
-		"account_auths": [],
-		"key_auths": [
-			[keys.postingPubkey, 1]
+		'weight_threshold': 1,
+		'account_auths': [],
+		'key_auths': [
+			[keys.regularPubkey, 1]
 		]
 	};
 	let memo_key=keys.memoPubkey;
@@ -919,11 +919,11 @@ function reset_account_with_general_key(account_login,owner_key,general_key){
 			let json_metadata=response[0].json_metadata;
 
 			let account_success=function(result){
-				add_notify('Данные аккаунта успешно обновлены');
-				download('viz-reset-account.txt','VIZ.World Account: '+account_login+'\r\nGeneral key (for private keys): '+general_key+'\r\nPrivate owner key: '+keys.owner+'\r\nPrivate active key: '+keys.active+'\r\nPrivate posting key: '+keys.posting+'\r\nPrivate memo key: '+keys.memo+'');
+				add_notify(l10n.reset_account.success);
+				download('viz-reset-account.txt','VIZ.World Account: '+account_login+'\r\nGeneral key (for private keys): '+general_key+'\r\nPrivate master key: '+keys.master+'\r\nPrivate active key: '+keys.active+'\r\nPrivate regular key: '+keys.regular+'\r\nPrivate memo key: '+keys.memo+'');
 				if(typeof users[account_login] !== 'undefined'){
 					if(''!=users[account_login].posting_key){
-						users[account_login].posting_key=keys.posting;
+						users[account_login].posting_key=keys.regular;
 					}
 					if(''!=users[account_login].active_key){
 						users[account_login].active_key=keys.active;
@@ -931,7 +931,7 @@ function reset_account_with_general_key(account_login,owner_key,general_key){
 				}
 			}
 			let account_failure=function(err){
-				add_notify('Ошибка при обновлении аккаунта',true);
+				add_notify(l10n.reset_account.error,true);
 				if(typeof err.message !== 'undefined'){
 					add_notify(err.message,true);
 				}
@@ -973,19 +973,19 @@ function create_account_with_general_key(account_login,token_amount,shares_amoun
 	if(''==shares_amount){
 		fixed_shares_amount='0.000000 SHARES';
 	}
-	let auth_types = ['posting','active','owner','memo'];
+	let auth_types = ['regular','active','master','memo'];
 	let keys=gate.auth.getPrivateKeys(account_login,general_key,auth_types);
 	let owner = {
-		"weight_threshold": 1,
-		"account_auths": [],
-		"key_auths": [
-			[keys.ownerPubkey, 1]
+		'weight_threshold': 1,
+		'account_auths': [],
+		'key_auths': [
+			[keys.masterPubkey, 1]
 		]
 	};
 	let active = {
-		"weight_threshold": 1,
-		"account_auths": [],
-		"key_auths": [
+		'weight_threshold': 1,
+		'account_auths': [],
+		'key_auths': [
 			[keys.activePubkey, 1]
 		]
 	};
@@ -993,7 +993,7 @@ function create_account_with_general_key(account_login,token_amount,shares_amoun
 		"weight_threshold": 1,
 		"account_auths": [],
 		"key_auths": [
-			[keys.postingPubkey, 1]
+			[keys.regularPubkey, 1]
 		]
 	};
 	let memo_key=keys.memoPubkey;
@@ -1001,8 +1001,8 @@ function create_account_with_general_key(account_login,token_amount,shares_amoun
 	let referrer='';
 
 	let account_success=function(result){
-		add_notify('Аккаунт успешно создан');
-		download('viz-account.txt','VIZ.World Account: '+account_login+'\r\nGeneral key (for private keys): '+general_key+'\r\nPrivate owner key: '+keys.owner+'\r\nPrivate active key: '+keys.active+'\r\nPrivate posting key: '+keys.posting+'\r\nPrivate memo key: '+keys.memo+'');
+		add_notify(l10n.create_account.success);
+		download('viz-account.txt','VIZ.World Account: '+account_login+'\r\nGeneral key (for private keys): '+general_key+'\r\nPrivate master key: '+keys.master+'\r\nPrivate active key: '+keys.active+'\r\nPrivate regular key: '+keys.regular+'\r\nPrivate memo key: '+keys.memo+'');
 		gate.api.getAccounts([current_user],function(err,response){
 			if(!err){
 				$('.control .create-account-control .token[data-symbol=VIZ] .amount').html(parseFloat(response[0]['balance']));
@@ -1011,10 +1011,10 @@ function create_account_with_general_key(account_login,token_amount,shares_amoun
 		});
 	}
 	let account_failure=function(err){
-		add_notify('Ошибка при создании аккаунта',true);
+		add_notify(l10n.create_account.error,true);
 		gate.api.getAccounts([account_login],function(err,response){
 			if(!err){
-				add_notify('Логин '+account_login+' недоступен',true);
+				add_notify(l10n.create_account.login_is_not_available,true);
 			}
 		});
 		if(typeof err.payload !== 'undefined'){
@@ -1040,7 +1040,7 @@ function invite_create(private_key,public_key,amount){
 	let fixed_amount=''+amount.toFixed(3)+' VIZ';
 
 	let invite_success=function(result){
-		download('viz-invite.txt','VIZ Blockchain invite code with balance: '+fixed_amount+'\r\nPublic key (for check): '+public_key+'\r\nPrivate key (for activation): '+private_key+'\r\n\r\nYou can check code on https://viz.world/tools/invites/\r\n\r\nRegister new VIZ account using invite-code balance: https://viz.world/tools/invites/register/\r\nClaim invite-code balance to existed VIZ account: https://viz.world/tools/invites/claim/');
+		download('viz-invite.txt','VIZ Blockchain invite code with balance: '+fixed_amount+'\r\nPublic key (for check): '+public_key+'\r\nPrivate key (for activation): '+private_key+'\r\n\r\nYou can check code on https://viz.world/tools/invites/\r\n\r\nRegistration new VIZ account using invite-code balance: https://viz.world/tools/invites/registration/\r\nClaim invite-code balance to existed VIZ account: https://viz.world/tools/invites/claim/');
 		add_notify(l10n.invite.create_success);
 	}
 	let invite_failure=function(err){
@@ -1149,7 +1149,7 @@ function wallet_transfer(recipient,amount,memo){
 					$('.wallet-control .wallet-transfer-action').removeClass('disabled');
 				}
 				let transfer_failure=function(err){
-					add_notify('Ошибка в переводе',true);
+					add_notify(l10n.wallet.transfer_failure,true);
 					$('.wallet-control .wallet-transfer-action').removeClass('disabled');
 					if(typeof err.payload !== 'undefined'){
 						add_notify(err.payload.error.data.stack[0].format,true);
@@ -1368,10 +1368,10 @@ function award_content(author,permlink,beneficiaries,target){
 		$('.header-menu-el.energy').removeClass('powerup');
 	}
 	let award_success=function(result){
-		target.find('.award-action').addClass('active').attr('title','Вы потратили энергии '+(weight/100)+'%');
+		target.find('.award-action').addClass('active').attr('title',l10n.global.spend_energy+': '+(weight/100)+'%');
 		let votes_count=target.find('.votes_count span');
 		votes_count.html(1+parseInt(votes_count.html()));
-		add_notify('Вы успешно наградили автора');
+		add_notify(l10n.success.award_author);
 		view_energy();
 	}
 	let award_failure=function(err){
@@ -1456,10 +1456,10 @@ function witness_control(){
 				gate.api.getAccounts([current_user],function(err,response){
 					if(typeof response[0] !== 'undefined'){
 						if(response[0].witness_votes.includes(witness_login)){
-							result+='<input type="button" class="witness-vote-action button negative" data-value="false" value="Снять голос с делегата">';
+							result+='<input type="button" class="witness-vote-action button negative" data-value="false" value="'+l10n.witness.unvote_action+'">';
 						}
 						else{
-							result+='<input type="button" class="witness-vote-action button" data-value="true" value="Отдать голос за делегата">';
+							result+='<input type="button" class="witness-vote-action button" data-value="true" value="'+l10n.witness.vote_action+'">';
 						}
 						view.html(result);
 					}
@@ -1482,19 +1482,20 @@ function witness_control(){
 				else{
 					gate.api.getWitnessByAccount(witness_login,function(err,response){
 						if(!err){
-							result+='<label class="input-descr">URL заявления о намерениях:<input type="text" name="url" class="round wide" value="'+response.url+'"></label>';
-							result+='<label class="input-descr">Публичный ключ подписи:<input type="text" name="signing_key" class="round wide" value="'+response.signing_key+'" placeholder="'+empty_signing_key+'"></label>';
-							result+='<input type="button" class="witness-update-action button" value="Сохранить">';
-							result+='<h4>Параметры сети</h4>';
-							result+='<label class="input-descr">Передаваемая комиссия при создании аккаунта:<input type="text" name="account_creation_fee" class="witness-chain-properties round wide" value="'+response.props.account_creation_fee+'"></label>';
-							result+='<label class="input-descr">Коэффициент делегирования при создании аккаунта:<input type="text" name="create_account_delegation_ratio" class="witness-chain-properties round wide" value="'+response.props.create_account_delegation_ratio+'"></label>';
-							result+='<label class="input-descr">Время делегирования при создании аккаунта (секунд):<input type="text" name="create_account_delegation_time" class="witness-chain-properties round wide" value="'+response.props.create_account_delegation_time+'"></label>';
-							result+='<label class="input-descr">Доля сети, выделяемая для резервной пропускной способности (процент):<input type="text" name="bandwidth_reserve_percent" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_percent/100+'"></label>';
-							result+='<label class="input-descr">Резервная пропускная способность действует для аккаунтов с долей сети до порога:<input type="text" name="bandwidth_reserve_below" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_below+'"></label>';
-							result+='<label class="input-descr">Минимальный процент доли сети голосующих необходимый для принятия решения по заявке в комитете:<input type="text" name="committee_request_approve_min_percent" class="witness-chain-properties round wide" value="'+response.props.committee_request_approve_min_percent/100+'"></label>';
-							result+='<label class="input-descr">Минимальное количество токенов при делегировании:<input type="text" name="min_delegation" class="witness-chain-properties round wide" value="'+response.props.min_delegation+'"></label>';
-							result+='<label class="input-descr">Минимальный вес голоса для учета при голосовании за контент (rshares):<input type="text" name="vote_accounting_min_rshares" class="witness-chain-properties round wide" value="'+response.props.vote_accounting_min_rshares+'"></label>';
-							result+='<label class="input-descr">Максимальный размер блока в сети (байт):<input type="text" name="maximum_block_size" class="witness-chain-properties round wide" value="'+response.props.maximum_block_size+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.manage_url+':<input type="text" name="url" class="round wide" value="'+response.url+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.manage_public_key+':<input type="text" name="signing_key" class="round wide" value="'+response.signing_key+'" placeholder="'+empty_signing_key+'"></label>';
+							result+='<input type="button" class="witness-update-action button" value="'+l10n.witness.manage_action+'">';
+
+							result+='<h4>'+l10n.witness.params_caption+'</h4>';
+							result+='<label class="input-descr">'+l10n.witness.params_account_creation_fee+':<input type="text" name="account_creation_fee" class="witness-chain-properties round wide" value="'+response.props.account_creation_fee+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.params_create_account_delegation_ratio+':<input type="text" name="create_account_delegation_ratio" class="witness-chain-properties round wide" value="'+response.props.create_account_delegation_ratio+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.params_create_account_delegation_time+':<input type="text" name="create_account_delegation_time" class="witness-chain-properties round wide" value="'+response.props.create_account_delegation_time+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.params_bandwidth_reserve_percent+':<input type="text" name="bandwidth_reserve_percent" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_percent/100+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.params_bandwidth_reserve_below+':<input type="text" name="bandwidth_reserve_below" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_below+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.params_committee_request_approve_min_percent+':<input type="text" name="committee_request_approve_min_percent" class="witness-chain-properties round wide" value="'+response.props.committee_request_approve_min_percent/100+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.params_min_delegation+':<input type="text" name="min_delegation" class="witness-chain-properties round wide" value="'+response.props.min_delegation+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.params_vote_accounting_min_rshares+':<input type="text" name="vote_accounting_min_rshares" class="witness-chain-properties round wide" value="'+response.props.vote_accounting_min_rshares+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.params_maximum_block_size+':<input type="text" name="maximum_block_size" class="witness-chain-properties round wide" value="'+response.props.maximum_block_size+'"></label>';
 							result+='<hr>';
 							if(typeof response.props.inflation_witness_percent == 'undefined'){
 								response.props.inflation_witness_percent=2000;
@@ -1505,14 +1506,14 @@ function witness_control(){
 							if(typeof response.props.inflation_recalc_period == 'undefined'){
 								response.props.inflation_recalc_period=806400;
 							}
-							result+='<label class="input-descr">Доля инфляции для награды делегатам (процент):<input type="text" name="inflation_witness_percent" class="witness-chain-properties round wide" value="'+response.props.inflation_witness_percent/100+'"></label>';
-							result+='<label class="input-descr">Соотношение разделения остатка инфляции между комитетом и фондом наград (процент):<input type="text" name="inflation_ratio_committee_vs_reward_fund" class="witness-chain-properties round wide" value="'+response.props.inflation_ratio_committee_vs_reward_fund/100+'"></label>';
-							result+='<label class="input-descr">Количество блоков между пересчетом инфляционной модели:<input type="text" name="inflation_recalc_period" class="witness-chain-properties round wide" value="'+response.props.inflation_recalc_period+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.params_inflation_witness_percent+':<input type="text" name="inflation_witness_percent" class="witness-chain-properties round wide" value="'+response.props.inflation_witness_percent/100+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.params_inflation_ratio_committee_vs_reward_fund+':<input type="text" name="inflation_ratio_committee_vs_reward_fund" class="witness-chain-properties round wide" value="'+response.props.inflation_ratio_committee_vs_reward_fund/100+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.params_inflation_recalc_period+':<input type="text" name="inflation_recalc_period" class="witness-chain-properties round wide" value="'+response.props.inflation_recalc_period+'"></label>';
 							result+='<hr>';
-							result+='<label class="input-descr" style="opacity:0.4">(Устаревшее) Минимально-допустимый процент кураторской награды:<input type="text" name="min_curation_percent" class="witness-chain-properties round wide" value="'+response.props.min_curation_percent/100+'"></label>';
-							result+='<label class="input-descr" style="opacity:0.4">(Устаревшее) Максимально-допустимый процент кураторской награды:<input type="text" name="max_curation_percent" class="witness-chain-properties round wide" value="'+response.props.max_curation_percent/100+'"></label>';
-							result+='<label class="input-descr" style="opacity:0.4">(Устаревшее) Дополнительная трата энергии на флаг (процент):<input type="text" name="flag_energy_additional_cost" class="witness-chain-properties round wide" value="'+response.props.flag_energy_additional_cost/100+'"></label>';
-							result+='<input type="button" class="witness-chain-properties-update-action button" value="Установить параметры сети делегата">';
+							result+='<label class="input-descr" style="opacity:0.4">'+l10n.witness.params_min_curation_percent+':<input type="text" name="min_curation_percent" class="witness-chain-properties round wide" value="'+response.props.min_curation_percent/100+'"></label>';
+							result+='<label class="input-descr" style="opacity:0.4">'+l10n.witness.params_max_curation_percent+':<input type="text" name="max_curation_percent" class="witness-chain-properties round wide" value="'+response.props.max_curation_percent/100+'"></label>';
+							result+='<label class="input-descr" style="opacity:0.4">'+l10n.witness.params_flag_energy_additional_cost+':<input type="text" name="flag_energy_additional_cost" class="witness-chain-properties round wide" value="'+response.props.flag_energy_additional_cost/100+'"></label>';
+							result+='<input type="button" class="witness-chain-properties-update-action button" value="'+l10n.witness.params_action+'">';
 							view.html(result);
 						}
 					});
@@ -1566,10 +1567,10 @@ function reset_account_control(){
 		let view=$('.reset-account-control');
 		let result='';
 		view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> '+l10n.global.loading+'&hellip;</p>');
-		result+='<p><label class="input-descr">Логин:<br><input type="text" name="account_login" class="round" value="'+current_user+'"></label></p>';
-		result+='<p><label class="input-descr">Приватный ключ владельца (owner):<br><input type="text" name="owner_key" class="round wide"></label></p>';
-		result+='<p class="input-descr">Главный пароль (<i class="fas fa-fw fa-random"></i> <a class="generate-general-action unselectable">сгенерировать новый</a>):<br><input type="text" name="general_key" class="generate-general round wide"></p>';
-		result+='<p><a class="reset-account-action button">Установить новый доступ</a>';
+		result+='<p><label class="input-descr">'+l10n.reset_account.login+':<br><input type="text" name="account_login" class="round" value="'+current_user+'"></label></p>';
+		result+='<p><label class="input-descr">'+l10n.reset_account.master_key+':<br><input type="text" name="owner_key" class="round wide"></label></p>';
+		result+='<p class="input-descr">'+l10n.reset_account.global_password+' (<i class="fas fa-fw fa-random"></i> <a class="generate-general-action unselectable">'+l10n.global.generate_new+'</a>):<br><input type="text" name="general_key" class="generate-general round wide"></p>';
+		result+='<p><a class="reset-account-action button">'+l10n.reset_account.action+'</a>';
 		view.html(result);
 		generate_general_key();
 	}
@@ -1583,7 +1584,7 @@ function create_account_control(){
 			view.html(result);
 		}
 		else{
-			result+='<p>Для того чтобы создать аккаунт заполните количество токенов (которые вы передадите новому аккаунту), количество доли (которую делегируете аккаунту) и сгенерируйте главный пароль (приватные ключи будут сформированы автоматически).</p>';
+			result+='<p>'+l10n.create_account.descr+'</p>';
 			view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> '+l10n.global.loading+'&hellip;</p>');
 			gate.api.getChainProperties(function(err,response){
 				let props=response;
@@ -1595,11 +1596,11 @@ function create_account_control(){
 							result+='<p>'+l10n.global.need_auth_with_active_key+'</p>';
 						}
 						else{
-							result+='<p><label class="input-descr">Логин:<br><input type="text" name="account_login" class="round"></label></p>';
-							result+='<p><label class="input-descr">Количество передаваемых VIZ:<br><input type="text" name="token_amount" class="round" placeholder="'+props.account_creation_fee+'" value="'+props.account_creation_fee+'"></label></p>';
-							result+='<p><label class="input-descr">Количество SHARES для делегирования:<br><input type="text" name="shares_amount" class="round" placeholder="'+(parseFloat(props.account_creation_fee)*props.create_account_delegation_ratio).toFixed(6)+' SHARES"></label></p>';
-							result+='<p class="input-descr">Главный пароль (<i class="fas fa-fw fa-random"></i> <a class="generate-general-action unselectable">сгенерировать новый</a>):<br><input type="text" name="general_key" class="generate-general round wide"></p>';
-							result+='<p><a class="create-account-action button"><i class="fas fa-fw fa-plus-circle"></i> Создать аккаунт</a>';
+							result+='<p><label class="input-descr">'+l10n.create_account.login+':<br><input type="text" name="account_login" class="round"></label></p>';
+							result+='<p><label class="input-descr">'+l10n.create_account.tokens+':<br><input type="text" name="token_amount" class="round" placeholder="'+props.account_creation_fee+'" value="'+props.account_creation_fee+'"></label></p>';
+							result+='<p><label class="input-descr">'+l10n.create_account.shares+':<br><input type="text" name="shares_amount" class="round" placeholder="'+(parseFloat(props.account_creation_fee)*props.create_account_delegation_ratio).toFixed(6)+' SHARES"></label></p>';
+							result+='<p class="input-descr">'+l10n.create_account.global_password+' (<i class="fas fa-fw fa-random"></i> <a class="generate-general-action unselectable">'+l10n.global.generate_new+'</a>):<br><input type="text" name="general_key" class="generate-general round wide"></p>';
+							result+='<p><a class="create-account-action button"><i class="fas fa-fw fa-plus-circle"></i> '+l10n.create_account.action+'</a>';
 						}
 						view.html(result);
 						generate_general_key();
@@ -1675,31 +1676,31 @@ function paid_subscriptions_control(){
 	if(0!=$('.control .paid-subscriptions-options').length){
 		let control=$('.paid-subscriptions-options');
 		let result='';
-		result+='<h3>Условия соглашения платной подписки</h3>';
-		result+='<p>Введите логин создателя соглашения, чтобы посмотреть условия соглашения платной подписки.</p>';
-		result+='<p><label class="input-descr">Логин:<br><input type="text" name="lookup-login" class="round wide"></label></p>';
-		result+='<p><a class="paid-subscriptions-options-action button"><i class="fas fa-fw fa-search"></i> Запросить информацию</a>';
+		result+='<h3>'+l10n.ps.options_caption+'</h3>';
+		result+='<p>'+l10n.ps.options_descr+'</p>';
+		result+='<p><label class="input-descr">'+l10n.ps.options_login+':<br><input type="text" name="lookup-login" class="round wide"></label></p>';
+		result+='<p><a class="paid-subscriptions-options-action button"><i class="fas fa-fw fa-search"></i> '+l10n.ps.options_action+'</a>';
 		result+='<div class="options-result"></div><hr>';
 		control.html(result);
 	}
 	if(0!=$('.control .paid-subscriptions-lookup').length){
 		let control=$('.paid-subscriptions-lookup');
 		let result='';
-		result+='<h3>Список соглашений на платные подписки</h3>';
-		result+='<p>Введите логин подписчика, чтобы посмотреть связанные с ним соглашения на платные подписки.</p>';
-		result+='<p><label class="input-descr">Логин:<br><input type="text" name="lookup-login" class="round wide"></label></p>';
-		result+='<p><a class="paid-subscriptions-lookup-action button"><i class="fas fa-fw fa-search"></i> Выполнить поиск</a>';
+		result+='<h3>'+l10n.ps.lookup_subscriptions_caption+'</h3>';
+		result+='<p>'+l10n.ps.lookup_subscriptions_descr+'</p>';
+		result+='<p><label class="input-descr">'+l10n.ps.lookup_subscriptions_login+':<br><input type="text" name="lookup-login" class="round wide"></label></p>';
+		result+='<p><a class="paid-subscriptions-lookup-action button"><i class="fas fa-fw fa-search"></i> '+l10n.ps.lookup_subscriptions_action+'</a>';
 		result+='<div class="lookup-result"></div><hr>';
 		control.html(result);
 	}
 	if(0!=$('.control .paid-subscription-lookup').length){
 		let control=$('.paid-subscription-lookup');
 		let result='';
-		result+='<h3>Информация о соглашении</h3>';
-		result+='<p>Введите логин подписчика, логин создателя соглашения, чтобы посмотреть текущий статус соглашения и информацию по нему.</p>';
-		result+='<p><label class="input-descr">Логин подписчика:<br><input type="text" name="lookup-login" class="round wide"></label></p>';
-		result+='<p><label class="input-descr">Логин создателя соглашения:<br><input type="text" name="lookup-creator" class="round wide"></label></p>';
-		result+='<p><a class="paid-subscription-lookup-action button"><i class="fas fa-fw fa-search"></i> Запросить информацию о соглашении</a>';
+		result+='<h3>'+l10n.ps.lookup_contract_caption+'</h3>';
+		result+='<p>'+l10n.ps.lookup_contract_descr+'</p>';
+		result+='<p><label class="input-descr">'+l10n.ps.lookup_contract_subscriber+':<br><input type="text" name="lookup-login" class="round wide"></label></p>';
+		result+='<p><label class="input-descr">'+l10n.ps.lookup_contract_creator+':<br><input type="text" name="lookup-creator" class="round wide"></label></p>';
+		result+='<p><a class="paid-subscription-lookup-action button"><i class="fas fa-fw fa-search"></i> '+l10n.ps.lookup_contract_action+'</a>';
 		result+='<div class="lookup-result"></div><hr>';
 		control.html(result);
 	}
@@ -1708,7 +1709,7 @@ function invite_control(){
 	if(0!=$('.control .invite-control').length){
 		let invite_control=$('.invite-control');
 		let result='';
-		result+='<h3>Создание нового инвайт кода</h3>';
+		result+='<h3>'+l10n.invite.create_caption+'</h3>';
 		if(''==current_user){
 			result+='<p>'+l10n.global.need_auth_with_active_key+'</p>';
 			invite_control.html(result);
@@ -1722,11 +1723,11 @@ function invite_control(){
 						result+='<p>'+l10n.global.need_auth_with_active_key+'</p>';
 					}
 					else{
-						result+='<p>Для того чтобы создать инвайт код заполните количество токенов которые вы потратите и сгенерируйте пару ключей (приватный для передачи другому пользователю, публичный для проверки кода).</p>';
-						result+='<p class="input-descr">Приватный ключ (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">сгенерировать новый</a>):<br><input type="text" name="private" class="generate-private round wide"></p>';
-						result+='<p class="input-descr">Публичный ключ (для проверки):<br><input type="text" name="public" class="generate-public round wide"></p>';
-						result+='<p><label class="input-descr">Количество VIZ:<br><input type="text" name="amount" class="round"></label></p>';
-						result+='<p><a class="invite-action button"><i class="fas fa-fw fa-plus-circle"></i> Создать код</a>';
+						result+='<p>'+l10n.invite.create_descr+'</p>';
+						result+='<p class="input-descr">'+l10n.invite.create_private_key+' (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">'+l10n.global.generate_new+'</a>):<br><input type="text" name="private" class="generate-private round wide"></p>';
+						result+='<p class="input-descr">'+l10n.invite.create_public_key+':<br><input type="text" name="public" class="generate-public round wide"></p>';
+						result+='<p><label class="input-descr">'+l10n.invite.create_amount+':<br><input type="text" name="amount" class="round"></label></p>';
+						result+='<p><a class="invite-action button"><i class="fas fa-fw fa-plus-circle"></i> '+l10n.invite.create_action+'</a>';
 					}
 					invite_control.html(result);
 					generate_key();
@@ -1737,30 +1738,30 @@ function invite_control(){
 	if(0!=$('.control .invite-lookup').length){
 		let invite_control=$('.invite-lookup');
 		let result='';
-		result+='<h3>Проверка инвайт кода</h3>';
-		result+='<p>Введите публичный код для проверки:</p>';
+		result+='<h3>'+l10n.invite.lookup_caption+'</h3>';
+		result+='<p>'+l10n.invite.lookup_public_key+'</p>';
 		result+='<p class="input-descr"><input type="text" name="public" class="round wide"></p>';
-		result+='<p><a class="invite-lookup-action button"><i class="fas fa-fw fa-search"></i> Поиск и проверка кода</a>';
+		result+='<p><a class="invite-lookup-action button"><i class="fas fa-fw fa-search"></i> '+l10n.invite.lookup_action+'</a>';
 		result+='<div class="search-result"></div>';
 		invite_control.html(result);
 	}
 	if(0!=$('.control .invite-claim').length){
 		let invite_control=$('.invite-claim');
 		let result='';
-		result+='<p>Введите инвайт-код (приватный ключ) и имя аккаунта, куда перевести баланс кода:</p>';
-		result+='<p><label class="input-descr">Инвайт-код (приватный ключ):<br><input type="text" name="secret" class="round wide"></label></p>';
-		result+='<p><label class="input-descr">Получатель:<br><input type="text" name="receiver" class="round" value="'+current_user+'"></label></p>';
-		result+='<p><a class="invite-claim-action button"><i class="fas fa-fw fa-file-invoice-dollar"></i> Активировать код</a>';
+		result+='<p>'+l10n.invite.claim_descr+'</p>';
+		result+='<p><label class="input-descr">'+l10n.invite.claim_private_key+':<br><input type="text" name="secret" class="round wide"></label></p>';
+		result+='<p><label class="input-descr">'+l10n.invite.claim_receiver+':<br><input type="text" name="receiver" class="round" value="'+current_user+'"></label></p>';
+		result+='<p><a class="invite-claim-action button"><i class="fas fa-fw fa-file-invoice-dollar"></i> '+l10n.invite.claim_action+'</a>';
 		invite_control.html(result);
 	}
-	if(0!=$('.control .invite-register').length){
-		let invite_control=$('.invite-register');
+	if(0!=$('.control .invite-registration').length){
+		let invite_control=$('.invite-registration');
 		let result='';
-		result+='<p>Введите инвайт-код (приватный ключ), имя аккаунта и приватный ключ для него (сформирован автоматически):</p>';
-		result+='<p><label class="input-descr">Инвайт-код (приватный ключ):<br><input type="text" name="secret" class="round wide"></label></p>';
-		result+='<p><label class="input-descr">Имя аккаунта:<br><input type="text" name="receiver" class="round wide"></label></p>';
-		result+='<p class="input-descr">Приватный ключ для аккаунта (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">сгенерировать новый</a>):<br><input type="text" name="private" class="generate-private round wide"></p>';
-		result+='<p><a class="invite-register-action button"><i class="fas fa-fw fa-file-invoice-dollar"></i> Активировать код</a>';
+		result+='<p>'+l10n.invite.registration_descr+'</p>';
+		result+='<p><label class="input-descr">'+l10n.invite.registration_private_key+':<br><input type="text" name="secret" class="round wide"></label></p>';
+		result+='<p><label class="input-descr">'+l10n.invite.registration_account+':<br><input type="text" name="receiver" class="round wide"></label></p>';
+		result+='<p class="input-descr">'+l10n.invite.registration_account_private_key+' (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">'+l10n.global.generate_new+'</a>):<br><input type="text" name="private" class="generate-private round wide"></p>';
+		result+='<p><a class="invite-registration-action button"><i class="fas fa-fw fa-file-invoice-dollar"></i> '+l10n.invite.registration_action+'</a>';
 		invite_control.html(result);
 		generate_key();
 	}
@@ -1931,9 +1932,9 @@ function profile_control(){
 		else{
 			gate.api.getAccounts([current_user],function(err,response){
 				if(typeof response[0] !== 'undefined'){
-					result+='<p>Вы можете изменить публичный профиль в блокчейне заполнив форму ниже.</p>';
-					result+='<p><b>Внимание!</b> После внесенных и сохраненных изменений никто не сможет удалить эти данные из интернета.</p>';
-					result+='<p>Активный аккаунт: <a href="/@'+current_user+'/">'+current_user+'</a></p>';
+					result+='<p>'+l10n.profile.edit_descr+'</p>';
+					result+='<p>'+l10n.profile.edit_warning+'</p>';
+					result+='<p>'+l10n.profile.current_account+': <a href="/@'+current_user+'/">'+current_user+'</a></p>';
 					console.log(response[0].json_metadata);
 					let metadata;
 					if(''==response[0].json_metadata){
@@ -1945,15 +1946,15 @@ function profile_control(){
 					if(typeof metadata.profile == 'undefined'){
 						metadata.profile={};
 					}
-					result+='<p>Псевдоним (nickname):<br><input type="text" class="profile-input round wide" name="nickname" data-category="profile" value="'+(typeof metadata.profile.nickname !== 'undefined'?metadata.profile.nickname:'')+'"></p>';
-					result+='<p>Про аккаунт (about):<br><input type="text" class="profile-input round wide" name="about" data-category="profile" value="'+(typeof metadata.profile.about !== 'undefined'?metadata.profile.about:'')+'"></p>';
-					result+='<p>Аватар (ссылка, avatar):<br><input type="text" class="profile-input round wide" name="avatar" data-category="profile" value="'+(typeof metadata.profile.avatar !== 'undefined'?metadata.profile.avatar:'')+'"></p>';
-					result+='<p>Пол/тип аккаунта (gender):<br><select class="profile-select round" name="gender" data-category="profile">'
-					+'<option value=""'+(typeof metadata.profile.gender !== 'undefined'?((''==metadata.profile.gender)?' selected':''):'')+'>Не указан</option>'
-					+'<option value="male"'+(typeof metadata.profile.gender !== 'undefined'?(('male'==metadata.profile.gender)?' selected':''):'')+'>Мужской</option>'
-					+'<option value="female"'+(typeof metadata.profile.gender !== 'undefined'?(('female'==metadata.profile.gender)?' selected':''):'')+'>Женский</option>'
+					result+='<p>'+l10n.profile.nickname+':<br><input type="text" class="profile-input round wide" name="nickname" data-category="profile" value="'+(typeof metadata.profile.nickname !== 'undefined'?metadata.profile.nickname:'')+'"></p>';
+					result+='<p>'+l10n.profile.about+':<br><input type="text" class="profile-input round wide" name="about" data-category="profile" value="'+(typeof metadata.profile.about !== 'undefined'?metadata.profile.about:'')+'"></p>';
+					result+='<p>'+l10n.profile.avatar+':<br><input type="text" class="profile-input round wide" name="avatar" data-category="profile" value="'+(typeof metadata.profile.avatar !== 'undefined'?metadata.profile.avatar:'')+'"></p>';
+					result+='<p>'+l10n.profile.gender+':<br><select class="profile-select round" name="gender" data-category="profile">'
+					+'<option value=""'+(typeof metadata.profile.gender !== 'undefined'?((''==metadata.profile.gender)?' selected':''):'')+'>'+l10n.profile.gender_none+'</option>'
+					+'<option value="male"'+(typeof metadata.profile.gender !== 'undefined'?(('male'==metadata.profile.gender)?' selected':''):'')+'>'+l10n.profile.gender_male+'</option>'
+					+'<option value="female"'+(typeof metadata.profile.gender !== 'undefined'?(('female'==metadata.profile.gender)?' selected':''):'')+'>'+l10n.profile.gender_female+'</option>'
 					+'</select></p>';
-					result+='<p><input type="button" class="profile-action button" data-value="true" value="Сохранить профиль"></p>';
+					result+='<p><input type="button" class="profile-action button" data-value="true" value="'+l10n.profile.edit_action+'"></p>';
 					control.html(result);
 				}
 				else{
@@ -2150,13 +2151,13 @@ function try_auth_signature(login,posting_key,active_key=''){
 	login=login.trim();
 	if(login){
 		if(!gate.auth.isWif(posting_key)){
-			$('.auth-error').html('Posting key не валидный');
+			$('.auth-error').html(l10n.errors.invalid_regular_key);
 			$('.auth-action').removeClass('disabled');
 			return;
 		}
 		if(''!=active_key){
 			if(!gate.auth.isWif(active_key)){
-				$('.auth-error').html('Active key не валидный');
+				$('.auth-error').html(l10n.errors.invalid_active_key);
 				$('.auth-action').removeClass('disabled');
 				return;
 			}
@@ -2235,14 +2236,14 @@ function try_auth(login,posting_key,active_key){
 							}
 						}
 						catch(e){
-							$('.auth-error').html('Posting ключ не валидный');
+							$('.auth-error').html(l10n.errors.invalid_regular_key);
 							$('.auth-custom-action').removeClass('disabled');
 							return;
 						}
 					}
 				}
 				if(!posting_valid){
-					$('.auth-error').html('Posting ключ не подходит');
+					$('.auth-error').html(l10n.errors.failure_regular_key);
 					$('.auth-custom-action').removeClass('disabled');
 					return;
 				}
@@ -2256,14 +2257,14 @@ function try_auth(login,posting_key,active_key){
 								}
 							}
 							catch(e){
-								$('.auth-error').html('Active ключ не валидный');
+								$('.auth-error').html(l10n.errors.invalid_active_key);
 								$('.auth-custom-action').removeClass('disabled');
 								return;
 							}
 						}
 					}
 					if(!active_valid){
-						$('.auth-error').html('Active ключ не подходит');
+						$('.auth-error').html(l10n.errors.failure_active_key);
 						$('.auth-custom-action').removeClass('disabled');
 						return;
 					}
@@ -2400,11 +2401,11 @@ function post_subcontent(target){
 			let subcontent_success=function(result){
 				$(target).parent().remove();
 				set_update_comments_list();
-				add_notify('Комментарий отправлен');
+				add_notify(l10n.media.comment_success);
 			}
 			let subcontent_failure=function(err){
 				window.setTimeout(function(){set_update_comments_list(false)},100);
-				add_notify('Ошибка при отправке комментария',true);
+				add_notify(l10n.media.comment_failure,true);
 				target.removeClass('disabled');
 				console.log(err);
 			}
@@ -2497,7 +2498,7 @@ function post_content(target){
 			parent_permlink=$('input[name=parent_permlink]').val();
 		}
 		$('input[name=permlink]').attr('disabled','disabled');
-		$(target).html('Отправка&hellip;');
+		$(target).html(l10n.media.posting_status+'&hellip;');
 		$.ajax({
 			type:'POST',
 			url:'/ajax/check_content/',
@@ -2505,16 +2506,16 @@ function post_content(target){
 			success:function(data_json){
 				data_obj=JSON.parse(data_json);
 				if('ok'==data_obj.status){//content already exist
-					if(confirm('Контент с таким URL уже существует, вы хотите заменить его?')){
+					if(confirm(l10n.media.content_rewrite)){
 						let edit_success=function(result){
-							add_notify('Публикация успешно изменена, переадресация через 6 секунд&hellip;');
+							add_notify(l10n.media.content_rewrite_success);
 							setTimeout(function(){wait_content(current_user,permlink)},6000);
 						}
 						let edit_failure=function(err){
-							add_notify('Ошибка при получении публикации',true);
+							add_notify(l10n.global.error,true);
 							$('input[name=permlink]').removeAttr('disabled');
 							target.removeClass('disabled');
-							target.html('Сохранить изменения');
+							target.html(l10n.media.save_changes);
 							console.log(err);
 						}
 						var custom_json=['content',{parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:content,beneficiaries:beneficiaries_list,metadata:json_object}];
@@ -2535,19 +2536,19 @@ function post_content(target){
 					else{
 						$('input[name=permlink]').removeAttr('disabled');
 						target.removeClass('disabled');
-						target.html('Сохранить изменения');
+						target.html(l10n.media.save_changes);
 					}
 				}
 				else{
 					let content_success=function(result){
-						add_notify('Публикация прошла успешно, переадресация&hellip;');
+						add_notify(l10n.media.content_success);
 						setTimeout(function(){wait_content(current_user,permlink)},3500);
 					}
 					let content_failure=function(err){
-						add_notify('Ошибка при публикации',true);
+						add_notify(l10n.media.content_error,true);
 						$('input[name=permlink]').removeAttr('disabled');
 						target.removeClass('disabled');
-						target.html('Опубликовать');
+						target.html(l10n.media.content_publication);
 						console.log(err);
 					}
 
@@ -2605,7 +2606,7 @@ function save_profile(target){
 					}
 				});
 				let metadata_success=function(result){
-					add_notify('Профиль успешно сохранен');
+					add_notify(l10n.profile.edit_success);
 					target.removeClass('disabled');
 				}
 				let metadata_failure=function(err){
@@ -2654,12 +2655,12 @@ function wysiwyg_activation(){
 		language : "ru",
 		language_url : "/js/tinymce_ru.js",
 		style_formats: [
-			{title: "Центрирование", block: "center"},
-			{title: 'Спойлер', inline : 'span', classes : 'spoiler'},
-			{title: "Заголовок 1", block: "h1"},
-			{title: "Заголовок 2", block: "h2"},
-			{title: "Заголовок 3", block: "h3"},
-			{title: "Заголовок 4", block: "h4"},
+			{title: l10n.wysiwyg.center, block: 'center'},
+			{title: l10n.wysiwyg.spoiler, inline : 'span', classes : 'spoiler'},
+			{title: l10n.wysiwyg.header+' 1', block: 'h1'},
+			{title: l10n.wysiwyg.header+' 2', block: 'h2'},
+			{title: l10n.wysiwyg.header+' 3', block: 'h3'},
+			{title: l10n.wysiwyg.header+' 4', block: 'h4'},
 		],
 		content_css : "/css/wysiwyg.css?" + new Date().getTime(),
 	});
@@ -2991,13 +2992,13 @@ function app_mouse(e){
 			committee_cancel_request(request_id);
 		}
 	}
-	if($(target).hasClass('invite-register-action') || $(target).parent().hasClass('invite-register-action')){
+	if($(target).hasClass('invite-registration-action') || $(target).parent().hasClass('invite-registration-action')){
 		e.preventDefault();
 		if($(target).closest('.control').length){
-			let secret_key=$('.invite-register input[name=secret]').val();
-			let receiver=$('.invite-register input[name=receiver]').val();
-			let private_key=$('.invite-register input[name=private]').val();
-			invite_register(secret_key,receiver,private_key);
+			let secret_key=$('.invite-registration input[name=secret]').val();
+			let receiver=$('.invite-registration input[name=receiver]').val();
+			let private_key=$('.invite-registration input[name=private]').val();
+			invite_registration(secret_key,receiver,private_key);
 		}
 	}
 	if($(target).hasClass('invite-claim-action') || $(target).parent().hasClass('invite-claim-action')){
@@ -3054,33 +3055,33 @@ function app_mouse(e){
 				let result='';
 				if(!err){
 					let update_time=Date.parse(response.update_time);
-					result+='<p>Создатель соглашения: <a href="/@'+response.creator+'" target="_blank">'+response.creator+'</a></p>';
+					result+='<p>'+l10n.ps.sign_offer_creator+': <a href="/@'+response.creator+'" target="_blank">'+response.creator+'</a></p>';
 					result+='<input type="hidden" name="account" value="'+response.creator+'">';
 					if(0<response.url.length){
-						result+='<p>Ссылка с информацией: <a href="'+encodeURI(response.url)+'" target="_blank">'+response.url+'</a></p>';
+						result+='<p>'+l10n.ps.sign_offer_url+': <a href="'+encodeURI(response.url)+'" target="_blank">'+response.url+'</a></p>';
 					}
-					result+='<p>Дата последнего изменения условий соглашения: '+date_str(update_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+					result+='<p>'+l10n.ps.sign_offer_update_date+': '+date_str(update_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
 					if(0==response.levels){
-						result+='<p><b>Новые соглашения и продление старых приостановлено</b></p>';
+						result+='<p><b>'+l10n.ps.sign_offer_closed+'</b></p>';
 					}
-					result+='<p>Количество уровней подписки: '+response.levels+'</p>';
-					result+='<p>Количество токенов за каждый уровень: '+(response.amount/1000)+' VIZ</p>';
+					result+='<p>'+l10n.ps.sign_offer_levels+': '+response.levels+'</p>';
+					result+='<p>'+l10n.ps.sign_offer_amount_per_level+': '+(response.amount/1000)+' VIZ</p>';
 					result+='<input type="hidden" name="amount" value="'+response.amount+'">';
-					result+='<p>Длительность подписки (количество дней): '+response.period+'</p>';
+					result+='<p>'+l10n.ps.sign_offer_period+': '+response.period+'</p>';
 					result+='<input type="hidden" name="period" value="'+response.period+'">';
 					if(0<response.levels){
-						result+='<hr><p>Если вы согласны с условиями соглашения, выберите уровень подписки, установите при необходимости автоматическое продление соглашения:</p>';
-						result+='<p>Уровень платной подписки: <select name="level" class="round">';
+						result+='<hr><p>'+l10n.ps.sign_offer_approve+'</p>';
+						result+='<p>'+l10n.ps.sign_offer_level+': <select name="level" class="round">';
 						for(let i=1;i<=response.levels;i++){
-							result+='<option value="'+i+'"'+(1==i?' selected':'')+'>'+i+' (итоговая стоимость подписки '+((i*response.amount)/1000)+' VIZ)</option>';
+							result+='<option value="'+i+'"'+(1==i?' selected':'')+'>'+i+' ('+l10n.ps.sign_offer_cost+' '+((i*response.amount)/1000)+' VIZ)</option>';
 						}
 						result+='</select></p>';
-						result+='<p><label><input type="checkbox" name="auto_renewal"> &mdash; Включить автоматическую оплату</label></p>';
-						result+='<p><a class="set-paid-subscribe-action button"><i class="fas fa-fw fa-file-signature"></i> Подписать соглашение по платной подписке</a>';
+						result+='<p><label><input type="checkbox" name="auto_renewal"> &mdash; '+l10n.ps.sign_offer_auto_renewal+'</label></p>';
+						result+='<p><a class="set-paid-subscribe-action button"><i class="fas fa-fw fa-file-signature"></i> '+l10n.ps.sign_offer_action+'</a>';
 					}
 				}
 				else{
-					result='<p>Условий соглашения не найдено</p>';
+					result='<p>'+l10n.ps.sign_offer_none+'</p>';
 				}
 				$('.set-paid-subscribe .set-paid-subscribe-agreement').html(result);
 			});
@@ -3095,29 +3096,29 @@ function app_mouse(e){
 				let result='';
 				if(!err){
 					let update_time=Date.parse(response.update_time);
-					result+='<p>Создатель соглашения: <a href="/@'+response.creator+'" target="_blank">'+response.creator+'</a></p>';
+					result+='<p>'+l10n.ps.view_offer_creator+': <a href="/@'+response.creator+'" target="_blank">'+response.creator+'</a></p>';
 					if(0<response.url.length){
-						result+='<p>Ссылка с информацией: <a href="'+encodeURI(response.url)+'" target="_blank">'+response.url+'</a></p>';
+						result+='<p>'+l10n.ps.view_offer_url+': <a href="'+encodeURI(response.url)+'" target="_blank">'+response.url+'</a></p>';
 					}
-					result+='<p>Дата последнего изменения условий соглашения: '+date_str(update_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+					result+='<p>'+l10n.ps.view_offer_update+': '+date_str(update_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
 					if(0==response.levels){
-						result+='<p><b>Новые соглашения и продление старых приостановлено</b></p>';
+						result+='<p><b>'+l10n.ps.view_offer_closed+'</b></p>';
 					}
-					result+='<p>Количество уровней подписки: '+response.levels+'</p>';
-					result+='<p>Количество токенов за каждый уровень: '+(response.amount/1000)+' VIZ</p>';
-					result+='<p>Длительность подписки (количество дней): '+response.period+'</p>';
+					result+='<p>'+l10n.ps.view_offer_levels+': '+response.levels+'</p>';
+					result+='<p>'+l10n.ps.view_offer_amount_per_level+': '+(response.amount/1000)+' VIZ</p>';
+					result+='<p>'+l10n.ps.view_offer_period+': '+response.period+'</p>';
 					if(0<response.active_subscribers_count){
-						result+='<h3>Дополнительная информация</h3>';
+						result+='<h3>'+l10n.ps.view_offer_addon_caption+'</h3>';
 						if(0<response.active_subscribers_with_auto_renewal_count){
-							result+='<p>Активные соглашения с автопродлением: '+response.active_subscribers_with_auto_renewal_count+'</p>';
-							result+='<p>Активные соглашения с автопродлением на сумму: '+(response.active_subscribers_with_auto_renewal_summary_amount/1000)+' VIZ</p>';
+							result+='<p>'+l10n.ps.view_offer_active_auto_renewal+': '+response.active_subscribers_with_auto_renewal_count+'</p>';
+							result+='<p>'+l10n.ps.view_offer_active_auto_renewal_summary_amount+': '+(response.active_subscribers_with_auto_renewal_summary_amount/1000)+' VIZ</p>';
 						}
-						result+='<p>Активные соглашения: '+response.active_subscribers_count+'</p>';
-						result+='<p>Активные соглашения на сумму: '+(response.active_subscribers_summary_amount/1000)+' VIZ</p>';
+						result+='<p>'+l10n.ps.view_offer_active+': '+response.active_subscribers_count+'</p>';
+						result+='<p>'+l10n.ps.view_offer_active_summary_amount+': '+(response.active_subscribers_summary_amount/1000)+' VIZ</p>';
 					}
 				}
 				else{
-					result='<p>Условий соглашения не найдено</p>';
+					result='<p>'+l10n.ps.view_offer_none+'</p>';
 				}
 				$('.paid-subscriptions-options .options-result').html(result);
 			});
@@ -3130,22 +3131,22 @@ function app_mouse(e){
 			$('.paid-subscriptions-lookup .lookup-result').html('');
 			gate.api.getActivePaidSubscriptions(login,function(err, response){
 				if(!err){
-					let result='<h3>Активные соглашения</h3>';
+					let result='<h3>'+l10n.ps.contracts_caption+'</h3>';
 					for(let i in response){
-						result+='<p><a class="paid-subscription-lookup-action link" data-login="'+login+'" data-creator="'+response[i]+'">Соглашение с '+response[i]+'</span></p>';
+						result+='<p><a class="paid-subscription-lookup-action link" data-login="'+login+'" data-creator="'+response[i]+'">'+l10n.ps.contracts_with_creator+' '+response[i]+'</span></p>';
 					}
 					if(0==response.length){
-						result+='<p>У аккаунта <a href="/@'+login+'/" target="_blank">'+login+'</a> отсутствуют активные платные подписки.</p>';
+						result+='<p>'+l10n.ps.account_prepand+' <a href="/@'+login+'/" target="_blank">'+login+'</a> '+l10n.ps.contracts_none+'</p>';
 					}
 					$('.paid-subscriptions-lookup .lookup-result').html($('.paid-subscriptions-lookup .lookup-result').html()+result);
 					gate.api.getInactivePaidSubscriptions(login,function(err, response){
 						if(!err){
-							let result='<h3>Неактивные соглашения</h3>';
+							let result='<h3>'+l10n.ps.inactive_contracts_caption+'</h3>';
 							for(let i in response){
-								result+='<p><a class="paid-subscription-lookup-action link" data-login="'+login+'" data-creator="'+response[i]+'">Соглашение с '+response[i]+'</span></p>';
+								result+='<p><a class="paid-subscription-lookup-action link" data-login="'+login+'" data-creator="'+response[i]+'">'+l10n.ps.contracts_with_creator+' '+response[i]+'</span></p>';
 							}
 							if(0==response.length){
-								result+='<p>У аккаунта <a href="/@'+login+'/" target="_blank">'+login+'</a> отсутствуют неактивные платные подписки.</p>';
+								result+='<p>'+l10n.ps.account_prepand+' <a href="/@'+login+'/" target="_blank">'+login+'</a> '+l10n.ps.inactive_contracts_none+'</p>';
 							}
 							$('.paid-subscriptions-lookup .lookup-result').html($('.paid-subscriptions-lookup .lookup-result').html()+result);
 						}
@@ -3170,25 +3171,25 @@ function app_mouse(e){
 				let result='';
 				if(!err){
 					result+='<input type="hidden" name="account" value="'+response.creator+'">';
-					result+='<p>Статус соглашения: '+(response.active?'Активное':'<span class="red">Неактивное</span>')+'</p>';
-					result+='<p>Автопродление: '+(response.auto_renewal?'Включено':'<span class="red">Отключено</span>')+'</p>';
-					result+='<p>Уровень подписки: '+response.level+'</p>';
+					result+='<p>'+l10n.ps.manage_status+': '+(response.active?l10n.ps.manage_status_active:'<span class="red">'+l10n.ps.manage_status_inactive+'</span>')+'</p>';
+					result+='<p>'+l10n.ps.manage_auto_renewal+': '+(response.auto_renewal?l10n.ps.manage_auto_renewal_enabled:'<span class="red">'+l10n.ps.manage_auto_renewal_disabled+'</span>')+'</p>';
+					result+='<p>'+l10n.ps.manage_level+': '+response.level+'</p>';
 					result+='<input type="hidden" name="level" value="'+response.level+'">';
-					result+='<p>Количество токенов за каждый уровень: '+(response.amount/1000)+' VIZ</p>';
+					result+='<p>'+l10n.ps.manage_amount_per_level+': '+(response.amount/1000)+' VIZ</p>';
 					result+='<input type="hidden" name="amount" value="'+response.amount+'">';
-					result+='<p>Длительность подписки (количество дней): '+response.period+'</p>';
+					result+='<p>'+l10n.ps.manage_period+': '+response.period+'</p>';
 					result+='<input type="hidden" name="period" value="'+response.period+'">';
 					let start_time=Date.parse(response.start_time);
-					result+='<p>Дата заключения соглашения: '+date_str(start_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+					result+='<p>'+l10n.ps.manage_start_date+': '+date_str(start_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
 					if(response.active){
 						let next_time=Date.parse(response.next_time);
-						result+='<p>Дата следующего обновления действия соглашения: '+date_str(next_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+						result+='<p>'+l10n.ps.manage_next_date+': '+date_str(next_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
 					}
-					result+='<p><label><input type="checkbox" name="auto_renewal"'+(response.auto_renewal?' checked':'')+'> &mdash; Включить автоматическую оплату</label></p>';
-					result+='<p><a class="manage-subscription-update-action button"><i class="fas fa-fw fa-file-signature"></i> Изменить автоматическую оплату</a>';
+					result+='<p><label><input type="checkbox" name="auto_renewal"'+(response.auto_renewal?' checked':'')+'> &mdash; '+l10n.ps.manage_set_auto_renewal+'</label></p>';
+					result+='<p><a class="manage-subscription-update-action button"><i class="fas fa-fw fa-file-signature"></i> '+l10n.ps.manage_action+'</a>';
 				}
 				else{
-					result+='<p>Соглашение не найдено</p>';
+					result+='<p>'+l10n.ps.manage_none+'</p>';
 				}
 				result+='<hr>';
 				$('.manage-subscription-item[data-creator='+creator+'][data-login='+login+']').html(result);
@@ -3212,25 +3213,25 @@ function app_mouse(e){
 			gate.api.getPaidSubscriptionStatus(login,creator,function(err, response){
 				let result='';
 				if(!err){
-					result+='<p>Соглашение между <a href="/@'+login+'/" target="_blank">'+login+'</a> и <a href="/@'+creator+'/" target="_blank">'+creator+'</a></p>';
-					result+='<p>Статус соглашения: '+(response.active?'Активное':'<span class="red">Неактивное</span>')+'</p>';
-					result+='<p>Автопродление: '+(response.auto_renewal?'Включено':'<span class="red">Отключено</span>')+'</p>';
-					result+='<p>Уровень подписки: '+response.level+'</p>';
-					result+='<p>Количество токенов за каждый уровень: '+(response.amount/1000)+' VIZ</p>';
-					result+='<p>Длительность подписки (количество дней): '+response.period+'</p>';
+					result+='<p>'+l10n.ps.contract_between_subscriber+' <a href="/@'+login+'/" target="_blank">'+login+'</a> '+l10n.ps.contract_between_creator+' <a href="/@'+creator+'/" target="_blank">'+creator+'</a></p>';
+					result+='<p>'+l10n.ps.contract_status+': '+(response.active?l10n.ps.contract_status_active:'<span class="red">'+l10n.ps.contract_status_inactive+'</span>')+'</p>';
+					result+='<p>'+l10n.ps.contract_auto_renewal+': '+(response.auto_renewal?l10n.ps.contract_auto_renewal_enabled:'<span class="red">'+l10n.ps.contract_auto_renewal_disabled+'</span>')+'</p>';
+					result+='<p>'+l10n.ps.contract_level+': '+response.level+'</p>';
+					result+='<p>'+l10n.ps.contract_amount_per_level+': '+(response.amount/1000)+' VIZ</p>';
+					result+='<p>'+l10n.ps.contract_period+': '+response.period+'</p>';
 					let start_time=Date.parse(response.start_time);
-					result+='<p>Дата заключения соглашения: '+date_str(start_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+					result+='<p>'+l10n.ps.contract_start_date+': '+date_str(start_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
 					if(response.active){
 						let next_time=Date.parse(response.next_time);
-						result+='<p>Дата следующего обновления действия соглашения: '+date_str(next_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+						result+='<p>'+l10n.ps.contract_next_date+': '+date_str(next_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
 					}
 					else{
 						let end_time=Date.parse(response.end_time);
-						result+='<p>Дата завершения действия соглашения: '+date_str(end_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
+						result+='<p>'+l10n.ps.contract_end_date+': '+date_str(end_time-(new Date().getTimezoneOffset()*60000),true,false,false)+'</p>';
 					}
 				}
 				else{
-					result+='<p>Соглашение не найдено</p>';
+					result+='<p>'+l10n.ps.contract_none+'</p>';
 				}
 				$('.paid-subscription-lookup .lookup-result').html(result);
 			});
@@ -3243,21 +3244,21 @@ function app_mouse(e){
 			gate.api.getInviteByKey(public_key,function(err, response){
 				if(!err){
 					let result='';
-					result+='<p>Создатель: <a href="/@'+response.creator+'/">'+response.creator+'</a></p>';
-					result+='<p>Дата создания: '+response.create_time+'</p>';
-					result+='<p>Баланс кода: '+response.balance+'</p>';
+					result+='<p>'+l10n.invite.lookup_creator+': <a href="/@'+response.creator+'/">'+response.creator+'</a></p>';
+					result+='<p>'+l10n.invite.lookup_create_date+': '+response.create_time+'</p>';
+					result+='<p>'+l10n.invite.lookup_balance+': '+response.balance+'</p>';
 					if(0==response.status){
-						result+='<p>Статус: ожидает активации</p>';
+						result+='<p>'+l10n.invite.lookup_status+': '+l10n.invite.lookup_status_unused+'</p>';
 					}
 					if(1==response.status){
-						result+='<p>Статус: активирован '+response.claim_time+', баланс переведен пользователю '+response.receiver+'</p>';
-						result+='<p>Использованный баланс: '+response.claimed_balance+'</p>';
-						result+='<p>Проверочный приватный ключ: '+response.invite_secret+'</p>';
+						result+='<p>'+l10n.invite.lookup_status+': '+l10n.invite.lookup_status_activated+' '+response.claim_time+', '+l10n.invite.lookup_claimed+' '+response.receiver+'</p>';
+						result+='<p>'+l10n.invite.lookup_claimed_balance+': '+response.claimed_balance+'</p>';
+						result+='<p>'+l10n.invite.lookup_secret_key+': '+response.invite_secret+'</p>';
 					}
 					if(2==response.status){
-						result+='<p>Статус: активирован '+response.claim_time+', зарегистрирован пользователь '+response.receiver+'</p>';
-						result+='<p>Использованный баланс: '+response.claimed_balance+'</p>';
-						result+='<p>Проверочный приватный ключ: '+response.invite_secret+'</p>';
+						result+='<p>'+l10n.invite.lookup_status+': '+l10n.invite.lookup_status_activated+' '+response.claim_time+', '+l10n.invite.lookup_registered+' '+response.receiver+'</p>';
+						result+='<p>'+l10n.invite.lookup_claimed_balance+': '+response.claimed_balance+'</p>';
+						result+='<p>'+l10n.invite.lookup_secret_key+': '+response.invite_secret+'</p>';
 					}
 					$('.invite-lookup .search-result').html(result);
 				}
@@ -3378,7 +3379,7 @@ function app_mouse(e){
 				if(proper_target.hasClass('subcontent-reply')){
 					subcontent_id=parseInt(proper_target.closest('.comment').attr('data-id'));
 				}
-				var comment_form='<div class="reply-form" data-reply-content="'+content_id+'" data-reply-subcontent="'+subcontent_id+'"><textarea name="reply-text" class="round" placeholder="Введите ваш ответ..."></textarea><input type="button" class="button reply-execute" value="Ответить"></div>'
+				var comment_form='<div class="reply-form" data-reply-content="'+content_id+'" data-reply-subcontent="'+subcontent_id+'"><textarea name="reply-text" class="round" placeholder="'+l10n.media.reply_placeholder+'"></textarea><input type="button" class="button reply-execute" value="'+l10n.media.reply_action+'"></div>'
 				if(subcontent_id){
 					if(0==$('.reply-form[data-reply-subcontent='+subcontent_id+']').length){
 						proper_target.closest('.addon').after(comment_form);
