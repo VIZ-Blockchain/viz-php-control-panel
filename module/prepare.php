@@ -23,8 +23,8 @@ $currencies_id_arr=array(
 	2=>'VIZ'
 );
 
-if(isset($_GET['change_localization'])){
-	$preferred_lang=$_GET['change_localization'];
+if(isset($_GET['set_localization'])){
+	$preferred_lang=$_GET['set_localization'];
 	if(set_l10n($preferred_lang)){
 		@setcookie('l10n',$preferred_lang,31536000+time(),'/');
 	}

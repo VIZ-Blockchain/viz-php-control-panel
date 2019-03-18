@@ -120,6 +120,7 @@ function fade_notify(id){
 }
 function add_notify(html,dark=false,fade_time=10000){
 	notify_id++;
+	html=html.trim();
 	var element_html='<div class="notify'+(dark?' notify-dark':'')+'" rel="'+notify_id+'">'+html+'</div>';
 	$('.notify-list').append(element_html);
 	window.setTimeout('fade_notify('+notify_id+')',fade_time);
@@ -325,11 +326,11 @@ function unfollow_user(user,proper_target){
 		let json=JSON.stringify(['follow',{follower:current_user,following:user,what:[]}]);
 
 		let unfollow_success=function(result){
-			add_notify(l10n.media.unfollow_success+' '+user);
+			add_notify(l10n.media.unfollow_success+' '+user+l10n.media.unfollow_success_append);
 			proper_target.html('<div class="follow follow-action">'+l10n.media.follow+'</div><br><div class="ignore ignore-action">'+l10n.media.ignore+'</div>');
 		}
 		let unfollow_failure=function(err){
-			add_notify(l10n.media.unfollow_success+' '+user,true);
+			add_notify(l10n.media.unfollow_failure+' '+user+l10n.media.unfollow_failure_append,true);
 			console.log(err);
 		}
 		if(users[current_user].shield){

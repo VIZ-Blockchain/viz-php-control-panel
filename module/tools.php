@@ -1,44 +1,46 @@
 <?php
 ob_start();
 if('tools'==$path_array[1]){
-	$replace['title']=htmlspecialchars('Инструменты').' - '.$replace['title'];
+	$replace['title']=htmlspecialchars($l10n['tools']['title']).' - '.$replace['title'];
 	if(''==$path_array[2]){
 		print '<div class="page content">
-		<h1><i class="fas fa-fw fa-toolbox"></i> Инструменты</h1>
+		<h1><i class="fas fa-fw fa-toolbox"></i> '.$l10n['tools']['title'].'</h1>
 		<div class="article control">';
-		print '<p><a href="/tools/paid-subscriptions/">Система платных подписок</a></p>';
-		print '<p><a href="/tools/invites/">Система инвайтов</a></p>';
-		print '<p><a href="/tools/create-account/">Создание аккаунта</a></p>';
-		print '<p><a href="/tools/delegation/">Делегирование доли</a></p>';
-		print '<p><a href="/tools/schedule/">Расписание делегатов</a></p>';
-		print '<p><a href="/tools/blocks/">Обзор блоков</a></p>';
-		print '<p><a href="/tools/reset-account/">Смена доступов к аккаунту</a></p>';
-		print '<p><a href="/tools/localization/">Локализация</a></p>';
+		print '<p><a href="/tools/paid-subscriptions/">'.$l10n['tools']['list']['paid-subscriptions'].'</a></p>';
+		print '<p><a href="/tools/invites/">'.$l10n['tools']['list']['invites'].'</a></p>';
+		print '<p><a href="/tools/create-account/">'.$l10n['tools']['list']['create-account'].'</a></p>';
+		print '<p><a href="/tools/delegation/">'.$l10n['tools']['list']['delegation'].'</a></p>';
+		print '<p><a href="/tools/schedule/">'.$l10n['tools']['list']['schedule'].'</a></p>';
+		print '<p><a href="/tools/blocks/">'.$l10n['tools']['list']['blocks'].'</a></p>';
+		print '<p><a href="/tools/reset-account/">'.$l10n['tools']['list']['reset-account'].'</a></p>';
+		print '<p><a href="/tools/localization/">'.$l10n['tools']['list']['localization'].'</a></p>';
 		print '</div></div>';
 	}
 	elseif('blocks'==$path_array[2]){
 		$dgp=$api->execute_method('get_dynamic_global_properties');
 		if(''==$path_array[3]){
-			$replace['title']=htmlspecialchars('Обзор блоков').' - '.$replace['title'];
+			$replace['title']=htmlspecialchars($l10n['tools']['list']['blocks']).' - '.$replace['title'];
 			print '<div class="page content">
-		<h1>Обзор блоков</h1>
+		<h1>'.$l10n['tools']['list']['blocks'].'</h1>
 		<div class="article">';
 			$date=date_parse_from_format('Y-m-d\TH:i:s',$dgp['genesis_time']);
 			$genesis_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
-			print '<p>Время запуска сети: <span class="timestamp" data-timestamp="'.$genesis_time.'">'.date('d.m.Y H:i:s',$genesis_time).'</span></p>';
-			print '<p>Количество блоков: '.$dgp['head_block_number'].' ('.$api->endpoint.')</p>';
-			print '<p>Количество в базе данных (индекс): '.mongo_counter('blocks').'</p>';
-			print '<p>Количество в базе данных (курсор): '.mongo_count('blocks').'</p>';
-			print '<p>Количество пользователей в бд: '.mongo_count('users').'</p>';
-			print '<h3>Глобальная переменная</h3>';
-			print '<p>Коэффициент конвертации total_vesting_fund/total_vesting_shares на блоке '.$dgp['head_block_number'].' равен '.(floatval($dgp['total_vesting_fund'])/floatval($dgp['total_vesting_shares'])).'</p>';
+			print '<p>'.$l10n['tools']['blocks']['genesis'].': <span class="timestamp" data-timestamp="'.$genesis_time.'">'.date('d.m.Y H:i:s',$genesis_time).'</span></p>';
+			print '<p>'.$l10n['tools']['blocks']['api_num'].': '.$dgp['head_block_number'].' ('.$api->endpoint.')</p>';
+			print '<p>'.$l10n['tools']['blocks']['index_num'].': '.mongo_counter('blocks').'</p>';
+			print '<p>'.$l10n['tools']['blocks']['cursor_num'].': '.mongo_count('blocks').'</p>';
+			print '<p>'.$l10n['tools']['blocks']['users_num'].': '.mongo_count('users').'</p>';
+
+			print '<h3>'.$l10n['tools']['blocks']['global_var'].'</h3>';
+			print '<p>'.$l10n['tools']['blocks']['ratio'].' '.$dgp['head_block_number'].' '.$l10n['tools']['blocks']['ratio_equal'].' '.(floatval($dgp['total_vesting_fund'])/floatval($dgp['total_vesting_shares'])).'</p>';
 			print '<pre class="view_block">';
 			$view_dgp=print_r($dgp,true);
 			$view_dgp=preg_replace('~\[(.[^\]]*)\] =\> (.*)\n~iUs','[<span style="color:red">$1</span>] => <span style="color:#1b72fa">$2</span>'.PHP_EOL,$view_dgp);
 			$view_dgp=str_replace('<span style="color:#1b72fa">Array</span>','<span style="color:#069c40">Array</span>',$view_dgp);
 			print $view_dgp;
 			print '</pre>';
-			print '<h3>Голосуемые параметры сети</h3>';
+
+			print '<h3>'.$l10n['tools']['blocks']['chain_properties_caption'].'</h3>';
 			print '<pre class="view_block">';
 			$chain_properties=$api->execute_method('get_chain_properties');
 			$view_props=print_r($chain_properties,true);
@@ -46,7 +48,8 @@ if('tools'==$path_array[1]){
 			$view_props=str_replace('<span style="color:#1b72fa">Array</span>','<span style="color:#069c40">Array</span>',$view_props);
 			print $view_props;
 			print '</pre>';
-			print '<h3>Последние блоки</h3>';
+
+			print '<h3>'.$l10n['tools']['blocks']['last_blocks_caption'].'</h3>';
 			print '<div class="blocks">';
 			$low_corner=max(0,(int)$dgp['head_block_number']-1000);
 			for($i=(int)$dgp['head_block_number'];$i>$low_corner;--$i){
@@ -62,10 +65,10 @@ if('tools'==$path_array[1]){
 			if($id==$path_array[3]){
 				$id_arr=$api->execute_method('get_ops_in_block',array($id,0));
 				if($id_arr[0]){
-					$replace['title']=htmlspecialchars('Обзор блока VIZ '.$id.'').' - '.$replace['title'];
+					$replace['title']=htmlspecialchars($l10n['tools']['blocks']['block_title'].' '.$id.'').' - '.$replace['title'];
 					print '<div class="page content">
-					<a class="right" href="/tools/blocks/">&larr; Вернуться</a>
-					<h1>VIZ блок #'.$id.'</h1>
+					<a class="right" href="/tools/blocks/">&larr; '.$l10n['tools']['return'].'</a>
+					<h1>'.$l10n['tools']['blocks']['block_caption'].$id.'</h1>
 					<div class="article">';
 					print '<pre class="view_block">';
 					function htmlspecialchars_filter(&$value){
@@ -77,7 +80,7 @@ if('tools'==$path_array[1]){
 					$view_block=str_replace('<span style="color:#1b72fa">Array</span>','<span style="color:#069c40">Array</span>',$view_block);
 					print $view_block;
 					print '</pre>';
-					print '<h3>Соседние блоки</h3>';
+					print '<h3>'.$l10n['tools']['blocks']['near_blocks_caption'].'</h3>';
 					print '<div class="blocks">';
 					if($id+1 <= (int)$dgp['head_block_number']){
 						print '<a href="/tools/blocks/'.($id+1).'/">&uarr; '.($id+1).'</a>';
@@ -98,45 +101,45 @@ if('tools'==$path_array[1]){
 	}
 	elseif('paid-subscriptions'==$path_array[2]){
 		if('set-options'==$path_array[3]){
-			$replace['title']=htmlspecialchars('Установка условий платной подписки').' - '.$replace['title'];
+			$replace['title']=htmlspecialchars($l10n['tools']['ps']['set-offer-caption']).' - '.$replace['title'];
 			print '<div class="page content">
-			<a class="right" href="/tools/paid-subscriptions/">&larr; Вернуться</a>
-			<h1><i class="fas fa-fw fa-toolbox"></i> Установка условий платной подписки</h1>
+			<a class="right" href="/tools/paid-subscriptions/">&larr; '.$l10n['tools']['return'].'</a>
+			<h1><i class="fas fa-fw fa-toolbox"></i> '.$l10n['tools']['ps']['set-offer-caption'].'</h1>
 			<div class="article control">';
-			print '<p>Вы можете настроить опции для соглашения с периодическими платежами на ваш аккаунт (платная подписка). Заполните ниже форму и отправьте транзакцию в блокчейн VIZ.</p>';
-			print '<p>Любая сторона с помощью API запросов может проверить статус соглашения, список подписок или подписчиков зафиксированных в публичной блокчейн-системе VIZ.</p>';
+			print '<p>'.$l10n['tools']['ps']['set-offer-descr'].'</p>';
+			print '<p>'.$l10n['tools']['ps']['descr-open'].'</p>';
 			print '<div class="set-paid-subscription"></div>';
 			print '</div></div>';
 		}
 		if('sign-agreement'==$path_array[3]){
-			$replace['title']=htmlspecialchars('Подпись соглашения платной подписки').' - '.$replace['title'];
+			$replace['title']=htmlspecialchars($l10n['tools']['ps']['sign-offer-caption']).' - '.$replace['title'];
 			print '<div class="page content">
-			<a class="right" href="/tools/paid-subscriptions/">&larr; Вернуться</a>
-			<h1><i class="fas fa-fw fa-toolbox"></i> Подпись соглашения платной подписки</h1>
+			<a class="right" href="/tools/paid-subscriptions/">&larr; '.$l10n['tools']['return'].'</a>
+			<h1><i class="fas fa-fw fa-toolbox"></i> '.$l10n['tools']['ps']['sign-offer-caption'].'</h1>
 			<div class="article control">';
-			print '<p>Загрузите условия соглашения с создателем платной подписки. Выберите уровень подписки и подпишите соглашение, отправьте транзакцию в блокчейн VIZ.</p>';
-			print '<p>Любая сторона с помощью API запросов может проверить статус соглашения в публичной блокчейн-системе VIZ.</p>';
+			print '<p>'.$l10n['tools']['ps']['sign-offer-descr'].'</p>';
+			print '<p>'.$l10n['tools']['ps']['sign-offer-descr-open'].'</p>';
 			print '<div class="set-paid-subscribe"></div>';
 			print '</div></div>';
 		}
 		if('manage-subscription'==$path_array[3]){
-			$replace['title']=htmlspecialchars('Управление автоматическими платежами').' - '.$replace['title'];
+			$replace['title']=htmlspecialchars($l10n['tools']['ps']['manage-contracts-caption']).' - '.$replace['title'];
 			print '<div class="page content">
-			<a class="right" href="/tools/paid-subscriptions/">&larr; Вернуться</a>
-			<h1><i class="fas fa-fw fa-toolbox"></i> Управление автоматическими платежами</h1>
+			<a class="right" href="/tools/paid-subscriptions/">&larr; '.$l10n['tools']['return'].'</a>
+			<h1><i class="fas fa-fw fa-toolbox"></i> '.$l10n['tools']['ps']['manage-contracts-caption'].'</h1>
 			<div class="article control">';
-			print '<p>Выберите действующую платную подписку и установите параметр по автоматической оплате.</p>';
+			print '<p>'.$l10n['tools']['ps']['manage-contracts-descr'].'</p>';
 			print '<div class="manage-subscription"></div>';
 			print '</div></div>';
 		}
 		if(''==$path_array[3]){
-			$replace['title']=htmlspecialchars('Система платных подписок').' - '.$replace['title'];
+			$replace['title']=htmlspecialchars($l10n['tools']['list']['paid-subscriptions']).' - '.$replace['title'];
 			print '<div class="page content">
-			<a class="right" href="/tools/">&larr; Инструменты</a>
-			<h1><i class="fas fa-fw fa-toolbox"></i> Система платных подписок</h1>
+			<a class="right" href="/tools/">&larr; '.$l10n['tools']['title'].'</a>
+			<h1><i class="fas fa-fw fa-toolbox"></i> '.$l10n['tools']['list']['paid-subscriptions'].'</h1>
 			<div class="article control">';
-			print '<p>Система платных подписок &mdash; универсальный процессинговый инструмент для оформления периодических платежей VIZ за сервис или услуги. Аккаунт может <a href="/tools/paid-subscriptions/set-options/">настроить опции для соглашения с периодическими платежами</a> в его сторону. Другие пользователи могут <a href="/tools/paid-subscriptions/sign-agreement/">подписать соглашение на периодические платежи (оформить платную подписку)</a>, <a href="/tools/paid-subscriptions/manage-subscription/">управлять автоматическими платежами</a>.</p>';
-			print '<p>Любая сторона с помощью API запросов может проверить статус соглашения, список подписок или подписчиков зафиксированных в публичной блокчейн-системе VIZ.</p>';
+			print '<p>'.$l10n['tools']['ps']['descr'].'</p>';
+			print '<p>'.$l10n['tools']['ps']['descr-open'].'</p>';
 			print '<div class="paid-subscriptions-options"></div>';
 			print '<div class="paid-subscriptions-lookup"></div>';
 			print '<div class="paid-subscription-lookup"></div>';
@@ -144,65 +147,65 @@ if('tools'==$path_array[1]){
 		}
 	}
 	elseif('invites'==$path_array[2]){
+		$replace['title']=htmlspecialchars($l10n['tools']['list']['invites']).' - '.$replace['title'];
 		if('register'==$path_array[3]){
 			header('location:/tools/invites/registration/');
 			exit;
 		}
 		if('claim'==$path_array[3]){
-			$replace['title']=htmlspecialchars('Забрать баланс кода').' - '.$replace['title'];
+			$replace['title']=htmlspecialchars($l10n['tools']['invites']['claim_caption']).' - '.$replace['title'];
 			print '<div class="page content">
-			<a class="right" href="/tools/invites/">&larr; Вернуться к инвайтам</a>
-			<h1><i class="fas fa-fw fa-toolbox"></i> Забрать баланс кода</h1>
+			<a class="right" href="/tools/invites/">&larr; '.$l10n['tools']['return'].'</a>
+			<h1><i class="fas fa-fw fa-toolbox"></i> '.$l10n['tools']['invites']['claim_caption'].'</h1>
 			<div class="article control">';
 			print '<div class="invite-claim"></div>';
 			print '</div></div>';
 		}
 		if('registration'==$path_array[3]){
-			$replace['title']=htmlspecialchars('Регистрация по инвайт-коду').' - '.$replace['title'];
+			$replace['title']=htmlspecialchars($l10n['tools']['invites']['registration_caption']).' - '.$replace['title'];
 			print '<div class="page content">
-			<h1><i class="fas fa-fw fa-toolbox"></i> Регистрация по инвайт-коду</h1>
+			<h1><i class="fas fa-fw fa-toolbox"></i> '.$l10n['tools']['invites']['registration_caption'].'</h1>
 			<div class="article control">';
-			print '<p>Внимание! Вы можете <a href="/tools/invites/">проверить баланс кода до регистрации</a> с помощью публичного ключа. После регистрации весь баланс кода будет переведен в SHARES нового аккаунта. Все ключи аккаунта будут идентичны указанному в форме, при желании вы можете <a href="/tools/reset-account/">разделить ключи для разных типов доступа</a>.</p>';
+			print '<p>'.$l10n['tools']['invites']['registration_descr'].'</p>';
 			print '<div class="invite-registration"></div>';
 			print '</div></div>';
 		}
 		if(''==$path_array[3]){
-			$replace['title']=htmlspecialchars('Система инвайтов').' - '.$replace['title'];
 			print '<div class="page content">
-			<a class="right" href="/tools/">&larr; Инструменты</a>
-			<h1><i class="fas fa-fw fa-toolbox"></i> Система инвайтов</h1>
+			<a class="right" href="/tools/">&larr; '.$l10n['tools']['title'].'</a>
+			<h1><i class="fas fa-fw fa-toolbox"></i> '.$l10n['tools']['list']['invites'].'</h1>
 			<div class="article control">';
-			print '<p>Инвайты (они же ваучеры) &mdash; универсальный инструмент для передачи фиксированного количества токенов VIZ другим людям (или ботам) вне блокчейна. Погасить код можно двумя способами: <a href="/tools/invites/claim/">перевести его баланс себе на аккаунт</a> или <a href="/tools/invites/registration/">зарегистрировать с его помощью новый аккаунт</a>.</p>';
+			print '<p>'.$l10n['tools']['invites']['descr'].'</p>';
 			print '<div class="invite-lookup"></div>';
 			print '<div class="invite-control"></div>';
 			print '</div></div>';
 		}
 	}
 	elseif('create-account'==$path_array[2]){
-		$replace['title']=htmlspecialchars('Создание аккаунта').' - '.$replace['title'];
+		$replace['title']=htmlspecialchars($l10n['tools']['list']['create-account']).' - '.$replace['title'];
 		print '<div class="page content">
-		<a class="right" href="/tools/">&larr; Инструменты</a>
-		<h1><i class="fas fa-fw fa-user-plus"></i> Создание аккаунта</h1>
+		<a class="right" href="/tools/">&larr; '.$l10n['tools']['title'].'</a>
+		<h1><i class="fas fa-fw fa-user-plus"></i> '.$l10n['tools']['list']['create-account'].'</h1>
 		<div class="article control">';
-		print '<p>Внимание! Данная форма создания аккаунта использует механизм главного пароля. С помощью него формируются приватные ключи и из них публичные, которые будут транслированы в блокчейн. Убедитесь, что сохранили дополнительно главный пароль или приватные ключи.</p>';
+		print '<p>'.$l10n['tools']['create-account-descr'].'</p>';
 		print '<div class="create-account-control"></div>';
 		print '</div></div>';
 	}
 	elseif('reset-account'==$path_array[2]){
-		$replace['title']=htmlspecialchars('Смена доступов к аккаунту').' - '.$replace['title'];
+		$replace['title']=htmlspecialchars($l10n['tools']['list']['reset-account']).' - '.$replace['title'];
 		print '<div class="page content">
-		<a class="right" href="/tools/">&larr; Инструменты</a>
-		<h1><i class="fas fa-fw fa-exchange-alt"></i> Смена доступов к аккаунту</h1>
+		<a class="right" href="/tools/">&larr; '.$l10n['tools']['title'].'</a>
+		<h1><i class="fas fa-fw fa-exchange-alt"></i> '.$l10n['tools']['reset-account'].'</h1>
 		<div class="article control">';
-		print '<p>Внимание! Данная форма смена доступов использует механизм главного пароля. С помощью него формируются приватные ключи для каждого типа доступа. Публичные ключи будут транслированы в блокчейн. Убедитесь, что сохранили дополнительно главный пароль, иначе вы рискуете потерять доступ к аккаунту и его токенам навсегда.</p>';
+		print '<p>'.$l10n['tools']['list']['reset-account-descr'].'</p>';
 		print '<div class="reset-account-control"></div>';
 		print '</div></div>';
 	}
 	elseif('delegation'==$path_array[2]){
-		$replace['title']=htmlspecialchars('Делегирование доли').' - '.$replace['title'];
+		$replace['title']=htmlspecialchars($l10n['tools']['list']['delegation']).' - '.$replace['title'];
 		print '<div class="page content">
-		<a class="right" href="/tools/">&larr; Инструменты</a>
-		<h1><i class="fas fa-fw fa-toolbox"></i> Делегирование доли</h1>
+		<a class="right" href="/tools/">&larr; '.$l10n['tools']['title'].'</a>
+		<h1><i class="fas fa-fw fa-toolbox"></i> '.$l10n['tools']['list']['delegation'].'</h1>
 		<div class="article control">';
 		print '<div class="delegation-control"></div>';
 		print '<div class="delegation-returning-shares"></div>';
@@ -211,32 +214,31 @@ if('tools'==$path_array[1]){
 		print '</div></div>';
 	}
 	elseif ('schedule'==$path_array[2]) {
-		$replace['title'] = htmlspecialchars('Расписание делегатов') . ' - ' . $replace['title'];
-		$replace['description']='Расписание делегатов';
+		$replace['title'] = htmlspecialchars($l10n['tools']['list']['schedule']) . ' - ' . $replace['title'];
 		print '
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bignumber.js/2.4.0/bignumber.min.js"></script>
 <script src="/js/schedule.js"></script>
 		<div class="page content">
-		<a class="right" href="/tools/">&larr; Инструменты</a>
-		<h1>Расписание делегатов</h1>
+		<a class="right" href="/tools/">&larr; '.$l10n['tools']['title'].'</a>
+		<h1>'.$l10n['tools']['list']['schedule'].'</h1>
 		<div class="article control">
 			<div class="witness_schedule">&hellip;</div>
-			<h3>Резервные делегаты</h3>
+			<h3>'.$l10n['tools']['schedule_support_caption'].'</h3>
 			<div class="witness_support_queue">&hellip;</div>
 		</div></div>';
 	}
 	elseif('localization'==$path_array[2]){
-		$replace['title']=htmlspecialchars('Локализация').' - '.$replace['title'];
+		$replace['title']=htmlspecialchars($l10n['tools']['localization']['title']).' - '.$replace['title'];
 		if($path_array[3]){
 			$code2=$path_array[3];
 			if($l10n_base[$code2]){
 				$replace['title']=htmlspecialchars($l10n_base[$code2]['name']).' - '.$replace['title'];
 				print '<div class="page content">
-				<a class="right" href="/tools/localization/">&larr; Локализация</a>
+				<a class="right" href="/tools/localization/">&larr; '.$l10n['tools']['localization']['title'].'</a>
 				<h1><i class="fas fa-fw fa-language"></i> '.htmlspecialchars($l10n_base[$code2]['name']).'</h1>
 				<div class="article control">';
-				print '<p>Вы можете <a class="save-localization-action link" rel="'.$code2.'">сохранить файл локализации</a>, отредактировать его и предложить сообществу правки.</p>';
+				print '<p>'.$l10n['tools']['localization']['view_descr1'].' <a class="save-localization-action link" rel="'.$code2.'">'.$l10n['tools']['localization']['view_descr2'].'</a>'.$l10n['tools']['localization']['view_descr3'].'</p>';
 				print '<textarea class="localization" rel="'.$code2.'" style="width:100%;" rows="15">';
 				print htmlspecialchars(var_export_min($l10n_preset[$code2],false,1,'$l10n_preset[\''.$code2.'\']='));
 				print '</textarea>';
@@ -248,13 +250,13 @@ if('tools'==$path_array[1]){
 		}
 		if(''==$path_array[3]){
 			print '<div class="page content">
-			<a class="right" href="/tools/">&larr; Инструменты</a>
-			<h1><i class="fas fa-fw fa-language"></i> Локализация</h1>
+			<a class="right" href="/tools/">&larr; '.$l10n['tools']['title'].'</a>
+			<h1><i class="fas fa-fw fa-language"></i> '.$l10n['tools']['localization']['title'].'</h1>
 			<div class="article control">';
-			print '<p>Список доступных локализаций для контрольной панели.</p>';
+			print '<p>'.$l10n['tools']['localization']['descr'].'</p>';
 			print '<ul>';
 			foreach($l10n_base as $k=>$v){
-				print '<li><a href="/tools/localization/'.$v['code2'].'/">'.$v['name'].'</a> &mdash; '.$v['local-name'].', '.($v['active']?'активна':'неактивна').'</li>';
+				print '<li><a href="/tools/localization/'.$v['code2'].'/">'.$v['name'].'</a> &mdash; '.$v['local-name'].', '.($v['active']?$l10n['tools']['localization']['active'].', '.($l10n_current==$v['code2']?$l10n['tools']['localization']['selected']:'<a href="?set_localization='.$v['code2'].'">'.$l10n['tools']['localization']['select'].'</a>'):$l10n['tools']['localization']['inactive']).'</li>';
 			}
 			print '</ul>';
 			print '</div></div>';
