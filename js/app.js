@@ -1946,10 +1946,10 @@ function profile_control(){
 					if(typeof metadata.profile == 'undefined'){
 						metadata.profile={};
 					}
-					result+='<p>'+l10n.profile.nickname+':<br><input type="text" class="profile-input round wide" name="nickname" data-category="profile" value="'+(typeof metadata.profile.nickname !== 'undefined'?metadata.profile.nickname:'')+'"></p>';
-					result+='<p>'+l10n.profile.about+':<br><input type="text" class="profile-input round wide" name="about" data-category="profile" value="'+(typeof metadata.profile.about !== 'undefined'?metadata.profile.about:'')+'"></p>';
-					result+='<p>'+l10n.profile.avatar+':<br><input type="text" class="profile-input round wide" name="avatar" data-category="profile" value="'+(typeof metadata.profile.avatar !== 'undefined'?metadata.profile.avatar:'')+'"></p>';
-					result+='<p>'+l10n.profile.gender+':<br><select class="profile-select round" name="gender" data-category="profile">'
+					result+='<p>'+l10n.profile.edit_nickname+':<br><input type="text" class="profile-input round wide" name="nickname" data-category="profile" value="'+(typeof metadata.profile.nickname !== 'undefined'?metadata.profile.nickname:'')+'"></p>';
+					result+='<p>'+l10n.profile.edit_about+':<br><input type="text" class="profile-input round wide" name="about" data-category="profile" value="'+(typeof metadata.profile.about !== 'undefined'?metadata.profile.about:'')+'"></p>';
+					result+='<p>'+l10n.profile.edit_avatar+':<br><input type="text" class="profile-input round wide" name="avatar" data-category="profile" value="'+(typeof metadata.profile.avatar !== 'undefined'?metadata.profile.avatar:'')+'"></p>';
+					result+='<p>'+l10n.profile.edit_gender+':<br><select class="profile-select round" name="gender" data-category="profile">'
 					+'<option value=""'+(typeof metadata.profile.gender !== 'undefined'?((''==metadata.profile.gender)?' selected':''):'')+'>'+l10n.profile.gender_none+'</option>'
 					+'<option value="male"'+(typeof metadata.profile.gender !== 'undefined'?(('male'==metadata.profile.gender)?' selected':''):'')+'>'+l10n.profile.gender_male+'</option>'
 					+'<option value="female"'+(typeof metadata.profile.gender !== 'undefined'?(('female'==metadata.profile.gender)?' selected':''):'')+'>'+l10n.profile.gender_female+'</option>'
@@ -2807,6 +2807,13 @@ function app_mouse(e){
 		if(!$(target).hasClass('disabled')){
 			post_content($(target));
 		}
+	}
+	if($(target).hasClass('save-localization-action')){
+		e.preventDefault();
+		let code2=$(target).attr('rel');
+		let data=$('textarea.localization[rel='+code2+']').html();
+		data=data.split("\n").join("\r\n");
+		download('viz-localization-'+code2+'.txt',unescape_html(data));
 	}
 	if($(target).hasClass('upload-image-action')){
 		e.preventDefault();

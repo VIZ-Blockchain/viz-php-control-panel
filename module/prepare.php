@@ -36,7 +36,6 @@ if(isset($_COOKIE['l10n'])){
 }
 else{
 	$preferred_lang=$l10n_default;
-	$preferred_langs_arr=['ru-RU'=>'ru','ru'=>'ru','en-US'=>'en','en'=>'en'];
 	if(isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])){
 		$lang_max=0.0;
 		$user_langs=explode(",", $_SERVER["HTTP_ACCEPT_LANGUAGE"]);
@@ -49,13 +48,18 @@ else{
 			}
 		}
 		$preferred_lang=trim($preferred_lang);
-		if($preferred_langs_arr[$preferred_lang]){
-			$preferred_lang=$preferred_langs_arr[$preferred_lang];
+		if($l10n_presets[$preferred_lang]){
+			$preferred_lang=$l10n_presets[$preferred_lang];
 		}
 	}
 	if(set_l10n($preferred_lang)){
 		@setcookie('l10n',$preferred_lang,31536000+time(),'/');
 	}
+
+}
+if(isset($_GET['lang'])){
+	$preferred_lang=$_GET['lang'];
+	set_l10n($preferred_lang);
 }
 
 $tags_arr=array();

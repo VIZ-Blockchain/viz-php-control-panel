@@ -13,6 +13,7 @@ if('tools'==$path_array[1]){
 		print '<p><a href="/tools/schedule/">Расписание делегатов</a></p>';
 		print '<p><a href="/tools/blocks/">Обзор блоков</a></p>';
 		print '<p><a href="/tools/reset-account/">Смена доступов к аккаунту</a></p>';
+		print '<p><a href="/tools/localization/">Локализация</a></p>';
 		print '</div></div>';
 	}
 	elseif('blocks'==$path_array[2]){
@@ -224,6 +225,40 @@ if('tools'==$path_array[1]){
 			<h3>Резервные делегаты</h3>
 			<div class="witness_support_queue">&hellip;</div>
 		</div></div>';
+	}
+	elseif('localization'==$path_array[2]){
+		$replace['title']=htmlspecialchars('Локализация').' - '.$replace['title'];
+		if($path_array[3]){
+			$code2=$path_array[3];
+			if($l10n_base[$code2]){
+				$replace['title']=htmlspecialchars($l10n_base[$code2]['name']).' - '.$replace['title'];
+				print '<div class="page content">
+				<a class="right" href="/tools/localization/">&larr; Локализация</a>
+				<h1><i class="fas fa-fw fa-language"></i> '.htmlspecialchars($l10n_base[$code2]['name']).'</h1>
+				<div class="article control">';
+				print '<p>Вы можете <a class="save-localization-action link" rel="'.$code2.'">сохранить файл локализации</a>, отредактировать его и предложить сообществу правки.</p>';
+				print '<textarea class="localization" rel="'.$code2.'" style="width:100%;" rows="15">';
+				print htmlspecialchars(var_export_min($l10n_preset[$code2],false,1,'$l10n_preset[\''.$code2.'\']='));
+				print '</textarea>';
+				print '</div></div>';
+			}
+			else{
+				header('location:/tools/localization/');
+			}
+		}
+		if(''==$path_array[3]){
+			print '<div class="page content">
+			<a class="right" href="/tools/">&larr; Инструменты</a>
+			<h1><i class="fas fa-fw fa-language"></i> Локализация</h1>
+			<div class="article control">';
+			print '<p>Список доступных локализаций для контрольной панели.</p>';
+			print '<ul>';
+			foreach($l10n_base as $k=>$v){
+				print '<li><a href="/tools/localization/'.$v['code2'].'/">'.$v['name'].'</a> &mdash; '.$v['local-name'].', '.($v['active']?'активна':'неактивна').'</li>';
+			}
+			print '</ul>';
+			print '</div></div>';
+		}
 	}
 }
 $content=ob_get_contents();
