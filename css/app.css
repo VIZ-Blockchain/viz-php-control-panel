@@ -1663,11 +1663,29 @@ body.landing .info-bubbles a.item.color3 .icon, body.landing .info-bubbles a.ite
 body.landing .info-bubbles a.item.color1.active{
 	box-shadow:0 0 5px rgba(0,0,0,0.1), 0 5px 25px -5px rgba(146, 12, 212, 0.8);
 }
+body.landing .info-bubbles a.item.color1.active span.color{
+	color:#668594;
+}
+body.landing .info-bubbles a.item.color1.active span.color i:before{
+	content:'\f103';
+}
 body.landing .info-bubbles a.item.color2.active{
 	box-shadow:0 0 5px rgba(0,0,0,0.1), 0 5px 25px -5px rgba(216, 19, 54, 0.8);
 }
+body.landing .info-bubbles a.item.color2.active span.color{
+	color:#668594;
+}
+body.landing .info-bubbles a.item.color2.active span.color i:before{
+	content:'\f103';
+}
 body.landing .info-bubbles a.item.color3.active{
 	box-shadow:0 0 5px rgba(0,0,0,0.1), 0 5px 25px -5px rgba(0, 144, 216, 0.8);
+}
+body.landing .info-bubbles a.item.color3.active span.color{
+	color:#668594;
+}
+body.landing .info-bubbles a.item.color3.active span.color i:before{
+	content:'\f103';
 }
 body.landing .header{
 	position:absolute;

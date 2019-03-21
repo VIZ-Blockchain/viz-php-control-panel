@@ -90,12 +90,6 @@ $l10n_base=[
 	],
 ];
 $l10n_preset['ru']=[
-	'template'=>[
-		'auth'=>'Аутентификация',
-		'energy_status'=>'Состояние энергии аккаунта',
-		'drop_file'=>'Перетащите файл сюда (Drop file here)',
-		'loading'=>'Загрузка',
-	],
 	'js'=>[
 		'global'=>[
 			'loading'=>'Загрузка',
@@ -434,10 +428,76 @@ $l10n_preset['ru']=[
 		],
 	],
 	'landing'=>[
-		'descriptions_dao'=>'ДАО (Децентрализованное Автономное Общество)',
-		'descriptions_committee'=>'Комитет общественных инициатив',
-		'descriptions_award'=>'Награждение достойных',
-		'descriptions_participation'=>'Справедливое участие',
+		'seo-title'=>'VIZ Blockchain Worldwide',
+		'seo-description'=>'VIZ Blockchain — Decentralized Autonomous Society (DAS) with powerful award mechanic from emission',
+		'symbol'=>'VIZ Symbol',
+		'descriptions-dao'=>'ДАО (Децентрализованное Автономное Общество)',
+		'descriptions-committee'=>'Комитет общественных инициатив',
+		'descriptions-award'=>'Награждение достойных',
+		'descriptions-participation'=>'Справедливое участие',
+		'learn-more'=>'Узнать больше',
+		'slogan-award'=>'Награждай',
+		'slogan-award-descr'=>'Стимулируйте экспансию ДАО в любом направлении, награждайте полезное.',
+		'slogan-create'=>'Создавай',
+		'slogan-create-descr'=>'Участвуйте в совместных проектах, созидайте, общайтесь.',
+		'slogan-manage'=>'Управляй',
+		'slogan-manage-descr'=>'Участники ДАО управляют всем блокчейном VIZ. Присоединяйтесь!',
+		'award-info'=>'<p>Каждый участник может награждать других пользователей из фонда наград, пополняемого эмиссией. Чем выше доля участника в ДАО, тем большую долю эмиссии он может раздать в виде наград. Награждение происходит мгновенно.<br>Также награда может быть <a href="https://viz.world/media/@on1x/viz-control-panel-beneficiaries/" target="_blank">разделена между несколькими получателями</a>.</p>
+<p><strong>Осознанное участие</strong> в ДАО VIZ логически сводится к награждению полезных действий для ДАО или лично для пользователя.</p>
+<p>Таким образом, награда стимулирует полезные действия, порождая цепную реакцию и увеличивая ценность ДАО VIZ.</p>
+<p>Кто-то написал полезный сервис и достоин награды? <strong>Просто наградите его.</strong> Это вернётся сторицей.</p>
+<p>Кто-то написал интересную статью, записал видеоролик, посадил дерево, написал отчёт по волонтерской работе, нарисовал картину или сделал общественно значимое дело? Просто наградите его. <strong>Награждение стимулирует паттерн поведения.</strong> <a href="https://viz.world/media/@on1x/viz-real-life-usage/" target="_blank">Хорошее притягивает хорошее</a>.</p>
+<p>Энергия восстанавливается линейно на 20% за 24 часа, что позволяет планировать и контролировать её использование.</p>
+<p><em>Ограничений на использование энергии нет, аккаунт может использовать для награждения все 100% своего потенциала.</em></p>',
+		'create-info'=>'<p>Кем бы вы ни были, чем бы ни занимались, <strong>инициативным</strong> всегда найдётся место в ДАО VIZ:</p>
+<p>1. Пользователи могут просто использовать сайт (интегрированный с VIZ)  по назначению и получать награды от других.</p>
+<p>2. Владельцы сайтов и сообществ могут подключить VIZ, <strong>стимулировать полезные действия внутри своего сообщества</strong> и формировать рейтинг или репутацию пользователей. Это могут быть любые сайты: творческие группы, сборник научных публикаций, рассказы для детей, блоги про видеоигры или портал волонтеров для сбора пожертвований.</p>
+<p>3. Исследователям будет интересно разобраться в тонкостях механики блокчейн-системы, визионерам — принимать участие в просвещении новичков, расширении локальных сообществ.</p>
+<p>4. Для разработчиков игр, приложений и сервисов — <strong>интеграция VIZ</strong> для награждения своих пользователей. Сервис платных подписок позволяет организовать процессинг переводов токенов для любого вида приложений. Механика награждений из эмиссии также позволяет создать замкнутую систему с собственным распределением фонда наград приложения.</p>
+<p>Вы можете делать, что пожелаете — в одиночку или с командой единомышленников. Всё зависит от вас самих.</p>',
+		'manage-info'=>'<p>Управление происходит на добровольной основе. Принцип ДАО VIZ — свобода выбора и истинная долевая демократия. Если кто-то не пользуется своим правом управления согласно своей доле, то управлять будут инициативные участники ДАО.</p>
+<p>Каждый участник может конвертировать токены (VIZ) в долю ДАО VIZ (SHARES). Именно благодаря долевому участию и происходит управление ДАО VIZ:</p>
+<p>1. <strong>Управление фондом наград</strong> — каждый участник может использовать энергию (возобновляемый со временем потенциал доли в ДАО VIZ), чтобы на конкурентной основе распоряжаться частью фонда наград. Награждение происходит мгновенно.</p>
+<p>2. <strong>Управление фондом комитета поддержки инициатив</strong> — каждый участник может проголосовать за заявку в комитете, повлияв на сумму, которую получит исполнитель в случае удовлетворения заявки. Потенциал влияния линейно зависит от доли в ДАО VIZ.</p>
+<p>3. <strong>Голосование за делегатов</strong> — каждый участник может проголосовать за любое количество делегатов, которые поддерживают инфраструктуру сети и участвуют в <a href="https://viz.world/media/@on1x/viz-quorum-calc-median-chain-properties/" target="_blank">голосовании за параметры блокчейн-системы</a>. Вес от доли в ДАО VIZ будет поровну распределён между выбранными делегатами.</p>',
+		'features-caption'=>'Особенности и возможности',
+		'features-info'=>'<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/viz-technical-documentation/" target="_blank">ДАО VIZ</a> — только сообщество участников VIZ решает, как будет развиваться экосистема. Никаких начальников или официального сайта! Видите возможность? Просто беритесь за неё и реализуйте!</p>
+<p><img src="/check.svg" alt=""> Очень быстрый — 3 секунды между блоками, блокчейн VIZ относится к Graphene экосистеме.</p>
+<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/viz-quorum-calc-median-chain-properties/" target="_blank">Консенсус управления блокчейн-системой</a> — уникальная система чередования делегатов.</p>
+<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/fair-dpos/" target="_blank">Справедливый DPoS</a> — участник может проголосовать за любое количество делегатов, при этом вес его доли разделится между ними поровну.</p>
+<p><img src="/check.svg" alt=""> Награждение полезного происходит из фонда наград, пополняемого эмиссией. Каждый участник, таким образом, может управлять своим «потоком эмиссии», согласно своей доле ДАО VIZ.</p>
+<p><img src="/check.svg" alt=""> Комитет поддержки инициатив — помогайте развивать ДАО VIZ и получайте за это токены от комитета. Участвуйте в работе комитета, голосуя за награждение других участников сообщества.</p>
+<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/paid-subscriptions-processing/" target="_blank">Система платных подписок</a> — процессинг периодических переводов на блокчейне.</p>
+<p><img src="/check.svg" alt=""> Система ваучеров (они же инвайт-коды) и <a href="https://viz.world/media/@on1x/anonymous-account/" target="_blank">анонимная регистрация</a> — две дополнительных механики для процессинга создания аккаунтов.</p>
+<p><img src="/check.svg" alt=""> Возможность экспансии — механизм награждения уникален: он мгновенный, <a href="https://viz.world/media/@on1x/viz-control-panel-beneficiaries/" target="_blank">гибкий</a>, самовозобновляемый, стремится к справедливой долевой конкуренции за фонд наград. В совокупности с <a href="https://viz.world/media/@on1x/viz-gates/" target="_blank">социальными шлюзами</a> позволяет привлекать без регистрации инициативных и созидающих людей со всего интернета!</p>',
+		'code-caption'=>'Код и библиотеки',
+		'code-info'=>'<p>Все основные разработки открыты (<a href="https://github.com/VIZ-Blockchain" target="_blank">ссылка на GitHub</a>) и большинство из них доступны по свободной MIT лицензии:
+<ul class="disc">
+<li><a href="https://github.com/VIZ-Blockchain/viz-cpp-node" target="_blank">Блокчейн-нода VIZ на C++</a> — актуальная версия в ветке master, MIT лицензия.</li>
+<li><a href="https://github.com/VIZ-Blockchain/viz-php-control-panel" target="_blank">Контрольная панель на PHP</a> — поддерживает актуальную версию VIZ, MIT лицензия, система плагинов, содержит медиа-платформу в виде плагина (<a href="https://viz.world/media/" target="_blank">рабочий пример расположен на VIZ.world</a>).</li>
+<li><a href="https://github.com/VIZ-Blockchain/viz-js-lib" target="_blank">JS библиотека</a> — поддерживает актуальную версию VIZ, MIT лицензия, <a href="https://github.com/VIZ-Blockchain/viz-js-lib/tree/master/doc" target="_blank">доступна документация</a>.</li>
+<li><a href="https://github.com/VIZ-Blockchain/viz-go-lib" target="_blank">GO библиотека</a> — поддерживает актуальную версию VIZ, MIT лицензия, <a href="https://viz.world/media/@asuleymanov/viz-gov2/" target="_blank">публикация автора</a>.</li>
+<li><a href="https://github.com/t3ran13/php-graphene-node-client" target="_blank">PHP библиотека</a> — поддерживает актуальную версию VIZ, MIT лицензия, <a href="https://viz.world/media/@php-node-client/update-of-php-graphene-node-client-v5-1-2-v5-2-0/" target="_blank">публикация автора</a>.</li>
+<li><a href="https://github.com/VIZ-Blockchain/viz-python-lib" target="_blank">Python библиотека</a> — в разработке, MIT лицензия.</li>
+</ul>
+</p>',
+		'services-caption'=>'Сервисы от разработчиков',
+		'services-info'=>'<p>Среди участников ДАО VIZ есть разработчики (программисты), которые создали или имплементировали разные приложения или сервисы:
+<ul class="disc">
+<li><a href="https://viz-doc.rtfd.io/" target="_blank">VIZ.doc</a> — документация и описание механизмов VIZ, <a href="https://viz.world/media/@viz.report/viz-doc-2-0/" target="_blank">публикация автора</a>.</li>
+<li><a href="https://viz.world/media/" target="_blank">VIZ.World</a> — один из первых сайтов про VIZ (на нём вы сейчас и находитесь), выступает в роли медиа-платформы про VIZ и контрольной панели.</li>
+<li><a href="https://viz.world/media/@viz-social-bot/social-viz-gateway-for-telegram/" target="_blank">Социальный бот VIZ для Telegram</a> — простой сервис-бот, после добавления в любой чат позволяет награждать других участников.</li>
+<li><a href="https://viz.sale/" target="_blank">Магазин инвайтов VIZ</a> — магазин с инвайт-кодами, <a href="https://viz.world/media/@solox/invites/" target="_blank">публикация автора</a>.</li>
+<li><a href="https://viz.world/media/@xchng/%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B-%D0%B0%D0%B2%D1%82%D0%BE%D0%BC%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B3%D0%BE-%D1%88%D0%BB%D1%8E%D0%B7%D0%B0-xchngviz/" target="_blank">BitShares шлюз от XCHNG</a> — позволяет торговать тикером <a href="http://cryptofresh.com/a/XCHNG.VIZ" target="_blank">XCHNG.VIZ</a> в DEX блокчейн-системе BitShares.</li>
+<li><a href="https://github.com/denis-skripnik/viz-exchange" target="_blank">Код сервиса для частного обменника</a> — позволяет обменивать в автоматическом режиме токены между Graphene блокчейн-системами, <a href="https://viz.world/media/@denis-skripnik/viz-exchange-1/" target="_blank">публикация автора</a>.</li>
+<li><a href="https://t.me/viz_awards_bot" target="_blank">Телеграм бот уведомлений о наградах в VIZ</a> — <a href="https://viz.world/media/@denis-skripnik/viz-awards-notify/" target="_blank">публикация автора</a>.</li>
+<li><a href="https://t.me/viz_committee_bot" target="_blank">Телеграм бот уведомлений о заявках в комитет VIZ</a> — <a href="https://viz.world/media/@denis-skripnik/viz-committee-bot/" target="_blank">публикация автора</a>.</li>
+<li><a href="https://t.me/thallid_pom_bot" target="_blank">Thallid POM бот для VIZ</a> — бот для награждения участников Телеграм чата, <a href="https://viz.world/media/@ksantoprotein/thallid-intro/" target="_blank">публикация автора</a>.</li>
+<li><a href="https://t.me/viz_props_bot" target="_blank">Телеграм бот уведомлений о смене голосуемых параметров VIZ</a> — <a href="https://viz.world/media/@denis-skripnik/" target="_blank">автор</a>.</li>
+<li><a href="https://t.me/vizwatchdogbot" target="_blank">Телеграм бот Watchdog</a> — следит и уведомляет об активности (или неактивности) делегатов, <a href="https://viz.world/media/@ropox/viz-watchdog-1539462587/" target="_blank">публикация автора</a>.</li>
+<li><a href="https://dpos.space/profiles/" target="_blank">Dpos.space</a> — сайт со множеством сервисов для VIZ (просмотр истории аккаунта), <a href="https://viz.world/media/@denis-skripnik/dpos.space/" target="_blank">публикация автора</a>.</li>
+</ul>
+</p>',
 	],
 	'menu'=>[
 		'media'=>'Медиа платформа',
@@ -455,6 +515,157 @@ $l10n_preset['ru']=[
 		'documentation'=>'Документация',
 		'services'=>'Сервисы',
 		'settings'=>'Настройки',
+	],
+	'template'=>[
+		'auth'=>'Аутентификация',
+		'energy_status'=>'Состояние энергии аккаунта',
+		'drop-file'=>'Перетащите файл сюда (Drop file here)',
+		'loading'=>'Загрузка',
+		'accounts-descr'=>'Внимание! Пройти аутентификацию аккаунтом вы можете <a href="/login/">по этой ссылке</a>. Выход из аккаунта значит выход из сессии конкретным аккаунтом.<br>Для очистки сессии отключите все аккаунты.',
+	],
+	'committee'=>[
+		'return'=>'Вернуться',
+		'caption'=>'Комитет',
+		'status_0'=>'Ожидает рассмотрения',
+		'status_1'=>'Отменена создателем',
+		'status_2'=>'Отказ (недостаток голосов)',
+		'status_3'=>'Отказ (итоговая сумма вне диапазона)',
+		'status_4'=>'Принята (идут выплаты)',
+		'status_5'=>'Завершена',
+		'fund'=>'Фонд комитета',
+		'requests-caption'=>'Заявки в комитет',
+		'request-range'=>'диапазон заявки',
+		'request-end-time'=>'окончание',
+		'create-button'=>'Создать заявку',
+		'create-caption'=>'Создать заявку в комитет',
+		'create-descr'=>'Любой аккаунт может создать заявку для рассмотрения в комитете. Участники сети принимая участие в голосовании сами определяют, на что будет направлен фонд комитета. Это могут быть не только технические новые разработки, но и внутренняя активность в сети (поддержка, конкурсы, работа с новичками), внешний пиар, компенсация за полезные регистрации, поддержка инфраструктуры проектов. Цель комитета &mdash; принести максимальную пользу сети и токену.',
+		'request-num'=>'Заявка #',
+		'request-num-append'=>' в комитет',
+		'request-status'=>'Статус заявки',
+		'request-creator'=>'Создатель заявки',
+		'request-url'=>'Ссылка на описание заявки',
+		'request-worker'=>'Получатель средств с комитета',
+		'request-min-amount'=>'Минимальная сумма токенов для удовлетворения заявки',
+		'request-max-amount'=>'Максимальная сумма токенов заявки',
+		'request-start-time'=>'Время создания заявки',
+		'request-end-time'=>'Время окончания заявки',
+		'request-conclusion-time'=>'Время принятия решения',
+		'request-conclusion-amount'=>'Согласованная сумма',
+		'request-payout-amount'=>'Выплачено',
+		'request-remain-payout-amount'=>'Осталось выплатить',
+		'request-last-payout-time'=>'Время последней выплаты',
+		'request-vote-caption'=>'Голосование',
+		'request-vote'=>'проголосовал за обеспечение заявки в размере',//login [vote] percent
+		'request-votes-count'=>'Количество голосов',
+		'request-votes-percent'=>'доля проголосовавших от всей сети',
+		'request-conclusion-percent'=>'требуется',
+		'request-votes-calculated-payout'=>'расчитанная сумма заявки на текущий момент',
+	],
+	'mongo'=>[
+		'return'=>'Вернуться',
+		'caption'=>'Mongo admin',
+		'rows-count'=>'записей',
+		'current-page'=>'Текущая страница',
+		'prev-page'=>'Предыдущая страница',
+		'next-page'=>'Следующая страница',
+		'indexes-caption'=>'Индексы',
+		'remove-index'=>'Удалить индекс',
+		'index-keys'=>'ключи',
+		'index-keys-weights'=>'вес',
+		'index-keys-sort'=>'сортировать',
+		'add-index-caption'=>'Добавить индекс',
+		'add-index-database'=>'База данных',
+		'add-index-collection'=>'Коллекция',
+		'add-index-attr'=>'Поле для индекса',
+		'add-index-value'=>'Индекс',
+		'add-index-action'=>'Создать индекс',
+	],
+	'login'=>[
+		'caption'=>'Аутентификация',
+		'descr'=>'Внимание! При аутентификации ключ записывается в ваш браузер и не передается на сервер. Если вы очистите кэш браузера или localStorage, то вам нужно будет вновь ввести свои данные для входа.',
+		'form-login-append'=>'логин',
+		'form-regular-key-append'=>'regular ключ',
+		'form-active-key-append'=>'active ключ (по желанию)',
+		'form-action'=>'Сохранить доступ и пройти аутентификацию',
+		'custom-action'=>'Пройти аутентификацию через отправку custom операции в блокчейн',
+		'shield-caption'=>'Аутентификация через VIZ Shield',
+	],
+	'witnesses'=>[
+		'caption'=>'Делегаты',
+		'hf-version'=>'Текущая версия VIZ',
+		'votes'=>'Голосов',
+		'params'=>'параметры',
+		'version'=>'версия',
+		'version-vote'=>'голосует за переход на версию',
+		'version-vote-date'=>'начиная с',
+		'return-link'=>'Вернуться к списку делегатов',
+		'view-caption'=>'Делегат',
+		'view-date'=>'Дата заявления о намерениях',
+		'view-last-block'=>'Последний блок',
+		'view-signing-key'=>'Публичный ключ подписи',
+		'view-props-caption'=>'Голосуемые параметры цепи',
+	],
+	'media'=>[
+		'return'=>'Вернуться',
+		'feed-caption'=>'Лента новостей',
+		'feed-need-auth'=>'Личная лента новостей доступна после аутентификации и подписки на других пользователей.',
+		'feed-none'=>'У вас нет публикаций в ленте.',
+		'tags-title'=>'Тэги',
+		'tags-popular'=>'Популярные тэги',
+		'tags-caption'=>'Тэг: #',
+		'tags-caption-append'=>'',
+		'tags-count'=>'количество отметок',
+		'tags-awards'=>'суммарная награда',
+		'profile-caption'=>'Профиль',
+		'publication-caption'=>'Опубликовать контент',
+		'publication-permlink'=>'URL',
+		'publication-title'=>'Заголовок',
+		'publication-foreword'=>'Предисловие (превью для текста)',
+		'publication-cover'=>'Ссылка на обложку (миниатюра для превью)',
+		'publication-content'=>'Содержимое контента',
+		'publication-upload-image'=>'Загрузить изображение',
+		'publication-wysiwyg'=>'WYSIWYG',
+		'publication-beneficiaries'=>'Бенефициары',
+		'publication-tags'=>'Тэги через запятую (ключевые термины для поиска контента)',
+		'publication-action'=>'Опубликовать',
+		'publication-warning'=>'<i class="fas fa-exclamation-circle"></i> Внимание! <em>Кто угодно сможет использовать публикуемую информацию без вашего разрешения, так как она будет сохранена в публичной блокчейн-системе. Информацию невозможно будет удалить.</em>',
+		'beneficiaries-caption'=>'Бенефициары',
+		'beneficiaries-descr'=>'Вы можете указать нескольких пользователей VIZ, которые будут получать часть вашей награды:',
+		'beneficiaries-account-login'=>'Логин',
+		'beneficiaries-weight'=>'Процент от награды',
+		'beneficiaries-add'=>'Добавить',
+		'users-caption'=>'Пользователи',
+		'users-count'=>'Всего пользователей',
+		'users-current-page'=>'текущая страница',
+		'users-pages-count'=>'всего страниц',
+		'users-descr'=>'<em>Пользователи с нулевым SHARES скрыты.</em>',
+		'users-next-page'=>'Следующая страница',
+		'users-prev-page'=>'Предыдущая страница',
+		'user-manage-caption'=>'Управление пользователем',
+		'user-manage-id'=>'ЙД аккаунта',
+		'user-manage-status'=>'Статус',
+		'user-manage-show'=>'Отображать пользователя',
+		'user-manage-hide'=>'Скрыть пользователя',
+		'user-manage-hide-content'=>'Скрыть контент пользователя',
+		'user-manage-hide-subcontent'=>'Скрыть субконтент пользователя',
+		'edit-caption'=>'Редактирование',
+		'edit-link'=>'Редактировать',
+		'edit-action'=>'Сохранить изменения',
+		'comments-button'=>'Отобразить форму комментирования',
+		'comments-caption'=>'Комментарии',
+		'content-caption'=>'Контент пользователя',
+		'user-follow'=>'Подписаться',
+		'user-unfollow'=>'Отписаться',
+		'user-ignore'=>'Игнорировать',
+		'user-unignore'=>'Перестать игнорировать',
+		'awards-count-append'=>'наград',
+		'awarded-energy'=>'Вы потратили энергии',
+		'award-action'=>'Наградить',
+		'menu-profile-link'=>'Перейти в свой аккаунт',
+		'badge-awards-outcome-count'=>'Наградил',
+		'badge-content-count'=>'Публикаций',
+		'badge-subcontent-count'=>'Комментариев',
+		'badge-balance'=>'Баланс',
 	],
 	'tools'=>[
 		'title'=>'Инструменты',

@@ -80,6 +80,6 @@
 </div>
 <div class="notify-list"></div>
 <div class="modal-overlay"></div>
-<div class="modal drop-file"><i class="fas fa-fw fa-file-upload"></i> {l10n_template_drop_file}&hellip;</div>
+<div class="modal drop-file"><i class="fas fa-fw fa-file-upload"></i> {l10n_template_drop-file}&hellip;</div>
 </body>
 </html>

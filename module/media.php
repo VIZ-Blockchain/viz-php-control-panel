@@ -33,21 +33,21 @@ if('@'==mb_substr($path_array[2],0,1)){
 				header('location:/media/@'.$account_arr['login'].'/?manage_user=1');
 				exit;
 			}
-			$replace['title']='Управление пользователем - @'.$account_arr['login'].' - '.$replace['title'];
+			$replace['title']=$l10n['media']['user-manage-caption'].' - @'.$account_arr['login'].' - '.$replace['title'];
 			print '<div class="page content">
-			<a class="right" href="/media/@'.$account_arr['login'].'/">&larr; Вернуться</a>
-			<h1>Управление пользователем - @'.$account_arr['login'].'</h1>';
-			print '<p>Account id: '.$account_id.'</p>';
-			print '<p>Status: '.$account_arr['status'].'</p>';
+			<a class="right" href="/media/@'.$account_arr['login'].'/">&larr; '.$l10n['media']['return'].'</a>
+			<h1>'.$l10n['media']['user-manage-caption'].' - @'.$account_arr['login'].'</h1>';
+			print '<p>'.$l10n['media']['user-manage-id'].': '.$account_id.'</p>';
+			print '<p>'.$l10n['media']['user-manage-status'].': '.$account_arr['status'].'</p>';
 			print '<form action="?manage_user=1" method="POST">';
 			if(1==$account_arr['status']){
-				print '<input type="submit" class="button" name="show_user" value="Отображать пользователя">';
+				print '<input type="submit" class="button" name="show_user" value="'.$l10n['media']['user-manage-show'].'">';
 			}
 			else{
-				print '<input type="submit" class="button" name="hide_user" value="Скрыть пользователя">';
+				print '<input type="submit" class="button" name="hide_user" value="'.$l10n['media']['user-manage-hide'].'">';
 			}
-			print '<br><input type="submit" class="button" name="hide_user_content" value="Скрыть контент пользователя">';
-			print '<br><input type="submit" class="button" name="hide_user_subcontent" value="Скрыть субконтент пользователя">';
+			print '<br><input type="submit" class="button" name="hide_user_content" value="'.$l10n['media']['user-manage-hide-content'].'">';
+			print '<br><input type="submit" class="button" name="hide_user_subcontent" value="'.$l10n['media']['user-manage-hide-subcontent'].'">';
 			print '</form>';
 			print '</div>';
 		}
@@ -68,33 +68,33 @@ if('@'==mb_substr($path_array[2],0,1)){
 					$replace['title']=htmlspecialchars($content_title).' - '.$replace['title'];
 
 					if(('edit'==$path_array[4])&&($auth)&&(($data['author']==$user_arr['_id'])||$admin)){
-						$replace['title']=htmlspecialchars('Редактирование').' - '.$replace['title'];
+						$replace['title']=htmlspecialchars($l10n['media']['edit-caption']).' - '.$replace['title'];
 						print $config['wysiwyg'];
 						print '<div class="page content">
-						<a class="right" href="/media/@'.$account_arr['login'].'/'.htmlspecialchars(stripcslashes($data['permlink'])).'/">&larr; Вернуться</a>
-						<h1>Редактирование</h1>
+						<a class="right" href="/media/@'.$account_arr['login'].'/'.htmlspecialchars(stripcslashes($data['permlink'])).'/">&larr; '.$l10n['media']['return'].'</a>
+						<h1>'.$l10n['media']['edit-caption'].'</h1>
 						<div class="article post-content control">';
 						print '<p><input type="hidden" name="parent_permlink" value="'.htmlspecialchars(stripcslashes($data['parent_permlink']?$data['parent_permlink']:'')).'"></p>';
-						print '<p><input type="text" name="permlink" class="round wide" placeholder="URL" value="'.htmlspecialchars(stripcslashes($data['permlink'])).'" disabled="disabled"></p>';
-						print '<p><input type="text" name="title" class="round wide" placeholder="Заголовок" value="'.htmlspecialchars(stripcslashes($data['title'])).'"></p>';
-						print '<p><input type="text" name="foreword" class="round wide" placeholder="Предисловие (превью для текста)" value="'.htmlspecialchars(stripcslashes($data['foreword'])).'"></p>';
-						print '<p><input type="text" name="cover" class="round wide" placeholder="Ссылка на обложку (миниатюра для превью)" value="'.htmlspecialchars(stripcslashes($data['cover'])).'"></p>';
-						print '<p><textarea name="content" rows="20" class="round wide" placeholder="Содержимое контента">'.htmlspecialchars(stripcslashes($data['body'])).'</textarea></p>';
-						print '<p><input id="upload-file" type="file"><a class="upload-image-action action-button"><i class="fas fa-fw fa-file-image"></i> Загрузить изображение</a> <a class="wysiwyg-action action-button"><i class="fas fa-fw fa-pen-square"></i> WYSIWYG</a> <a class="beneficiaries-action action-button unselectable"><i class="fas fa-fw fa-money-bill-wave"></i> Бенефициары</a></p>';
+						print '<p><input type="text" name="permlink" class="round wide" placeholder="'.$l10n['media']['publication-caption'].'" value="'.htmlspecialchars(stripcslashes($data['permlink'])).'" disabled="disabled"></p>';
+						print '<p><input type="text" name="title" class="round wide" placeholder="'.$l10n['media']['publication-title'].'" value="'.htmlspecialchars(stripcslashes($data['title'])).'"></p>';
+						print '<p><input type="text" name="foreword" class="round wide" placeholder="'.$l10n['media']['publication-foreword'].'" value="'.htmlspecialchars(stripcslashes($data['foreword'])).'"></p>';
+						print '<p><input type="text" name="cover" class="round wide" placeholder="'.$l10n['media']['publication-cover'].'" value="'.htmlspecialchars(stripcslashes($data['cover'])).'"></p>';
+						print '<p><textarea name="content" rows="20" class="round wide" placeholder="'.$l10n['media']['publication-content'].'">'.htmlspecialchars(stripcslashes($data['body'])).'</textarea></p>';
+						print '<p><input id="upload-file" type="file"><a class="upload-image-action action-button"><i class="fas fa-fw fa-file-image"></i> '.$l10n['media']['publication-upload-image'].'</a> <a class="wysiwyg-action action-button"><i class="fas fa-fw fa-pen-square"></i> '.$l10n['media']['publication-wysiwyg'].'</a> <a class="beneficiaries-action action-button unselectable"><i class="fas fa-fw fa-money-bill-wave"></i> '.$l10n['media']['publication-beneficiaries'].'</a></p>';
 
 						print '<div class="add-beneficiaries">
-						<h4>Бенефициары</h4>
-						<p>Вы можете указать нескольких пользователей VIZ, которые будут получать часть вашей награды:</p>';
+						<h4>'.$l10n['media']['beneficiaries-caption'].'</h4>
+						<p>'.$l10n['media']['beneficiaries-descr'].'</p>';
 						if($data['beneficiaries']){
 							$beneficiaries=json_decode($data['beneficiaries'],true);
 							foreach($beneficiaries as $item){
-								print '<p class="add-beneficiaries-item"><input type="text" name="account" class="round" placeholder="Логин" value="'.$item['account'].'"> <input type="text" name="weight" class="round" placeholder="Процент от награды" value="'.($item['weight']/100).'"></p>';
+								print '<p class="add-beneficiaries-item"><input type="text" name="account" class="round" placeholder="'.$l10n['media']['beneficiaries-account-login'].'" value="'.$item['account'].'"> <input type="text" name="weight" class="round" placeholder="'.$l10n['media']['beneficiaries-weight'].'" value="'.($item['weight']/100).'"></p>';
 							}
 						}
 						else{
-							print '<p class="add-beneficiaries-item"><input type="text" name="account" class="round" placeholder="Логин"> <input type="text" name="weight" class="round" placeholder="Процент от награды"></p>';
+							print '<p class="add-beneficiaries-item"><input type="text" name="account" class="round" placeholder="'.$l10n['media']['beneficiaries-account-login'].'"> <input type="text" name="weight" class="round" placeholder="'.$l10n['media']['beneficiaries-weight'].'"></p>';
 						}
-						print '<p class="add-beneficiaries-button"><a class="add-beneficiaries-action action-button"><i class="fas fa-fw fa-plus-circle"></i> Добавить</a></p></div>';
+						print '<p class="add-beneficiaries-button"><a class="add-beneficiaries-action action-button"><i class="fas fa-fw fa-plus-circle"></i> '.$l10n['media']['beneficiaries-add'].'</a></p></div>';
 
 						$tags_list=array();
 						$tags=$mongo->executeQuery($config['db_prefix'].'.content_tags',new MongoDB\Driver\Query(['content'=>(int)$data['_id']],['sort'=>array('_id'=>1),'limit'=>(int)100]));
@@ -106,8 +106,8 @@ if('@'==mb_substr($path_array[2],0,1)){
 							}
 						}
 
-						print '<hr><p><input type="text" name="tags" class="round wide" placeholder="Тэги через запятую (ключевые термины для поиска контента)" value="'.implode(',',$tags_list).'"></p>';
-						print '<p><a class="post-content-action button">Сохранить изменения</a></p>';
+						print '<hr><p><input type="text" name="tags" class="round wide" placeholder="'.$l10n['media']['publication-tags'].'" value="'.implode(',',$tags_list).'"></p>';
+						print '<p><a class="post-content-action button">'.$l10n['media']['edit-action'].'</a></p>';
 						print '</div></div>';
 					}
 					else{
@@ -152,8 +152,8 @@ if('@'==mb_substr($path_array[2],0,1)){
 						print view_content($data);
 
 						print '<div class="page comments" id="comments">
-			<div class="actions"><div class="reply reply-action content-reply unselectable">Оставить комментарий</div></div>
-			<div class="subtitle">Комментарии</div>
+			<div class="actions"><div class="reply reply-action content-reply unselectable">'.$l10n['media']['comments-button'].'</div></div>
+			<div class="subtitle">'.$l10n['media']['comments-caption'].'</div>
 			<hr>';
 
 						$find=array('content'=>(int)$data['_id']);
@@ -184,7 +184,7 @@ if('@'==mb_substr($path_array[2],0,1)){
 				print user_badge($account_arr);
 
 				print '<div class="page content">
-				<h2>Контент пользователя</h2>
+				<h2>'.$l10n['media']['content-caption'].'</h2>
 				</div>';
 				$find=array('author'=>(int)get_user_id($account_arr['login']),'status'=>0);
 				$perpage=50;
@@ -202,42 +202,42 @@ if('@'==mb_substr($path_array[2],0,1)){
 }
 else
 if('publication'==$path_array[2]){
-	$replace['title']=htmlspecialchars('Опубликовать контент').' - '.$replace['title'];
+	$replace['title']=htmlspecialchars($l10n['media']['publication-caption']).' - '.$replace['title'];
 	print $config['wysiwyg'];
 	print '<div class="page content">
-	<h1><i class="fas fa-fw fa-plus-circle"></i> Опубликовать контент</h1>
+	<h1><i class="fas fa-fw fa-plus-circle"></i> '.$l10n['media']['publication-caption'].'</h1>
 	<div class="article post-content control">';
-	print '<p><input type="text" name="permlink" class="round wide" placeholder="URL"></p>';
-	print '<p><input type="text" name="title" class="round wide" placeholder="Заголовок"></p>';
-	print '<p><input type="text" name="foreword" class="round wide" placeholder="Предисловие (превью для текста)"></p>';
-	print '<p><input type="text" name="cover" class="round wide" placeholder="Ссылка на обложку (миниатюра для превью)"></p>';
-	print '<p><textarea name="content" rows="20" class="round wide" placeholder="Содержимое контента"></textarea></p>';
-	print '<p><input id="upload-file" type="file"><a class="upload-image-action action-button unselectable"><i class="fas fa-fw fa-file-image"></i> Загрузить изображение</a> <a class="wysiwyg-action action-button unselectable"><i class="fas fa-fw fa-pen-square"></i> WYSIWYG</a> <a class="beneficiaries-action action-button unselectable"><i class="fas fa-fw fa-money-bill-wave"></i> Бенефициары</a></p>';
+	print '<p><input type="text" name="permlink" class="round wide" placeholder="'.$l10n['media']['publication-caption'].'"></p>';
+	print '<p><input type="text" name="title" class="round wide" placeholder="'.$l10n['media']['publication-title'].'"></p>';
+	print '<p><input type="text" name="foreword" class="round wide" placeholder="'.$l10n['media']['publication-foreword'].'"></p>';
+	print '<p><input type="text" name="cover" class="round wide" placeholder="'.$l10n['media']['publication-cover'].'"></p>';
+	print '<p><textarea name="content" rows="20" class="round wide" placeholder="'.$l10n['media']['publication-content'].'"></textarea></p>';
+	print '<p><input id="upload-file" type="file"><a class="upload-image-action action-button unselectable"><i class="fas fa-fw fa-file-image"></i> '.$l10n['media']['publication-upload-image'].'</a> <a class="wysiwyg-action action-button unselectable"><i class="fas fa-fw fa-pen-square"></i> '.$l10n['media']['publication-wysiwyg'].'</a> <a class="beneficiaries-action action-button unselectable"><i class="fas fa-fw fa-money-bill-wave"></i> '.$l10n['media']['publication-beneficiaries'].'</a></p>';
 	print '<div class="add-beneficiaries">
-	<h4>Бенефициары</h4>
-	<p>Вы можете указать нескольких пользователей VIZ, которые будут получать часть вашей награды:</p>
-	<p class="add-beneficiaries-item"><input type="text" name="account" class="round" placeholder="Логин"> <input type="text" name="weight" class="round" placeholder="Процент от награды"></p>
-	<p class="add-beneficiaries-button"><a class="add-beneficiaries-action action-button"><i class="fas fa-fw fa-plus-circle"></i> Добавить</a></p></div>';
-	print '<hr><p><input type="text" name="tags" class="round wide" placeholder="Тэги через запятую (ключевые термины для поиска контента)"></p>';
-	print '<p><a class="post-content-action button">Опубликовать</a></p>';
-	print '<p><i class="fas fa-exclamation-circle"></i> Внимание! <em>Кто угодно сможет использовать публикуемую информацию без вашего разрешения, так как она будет сохранена в публичной блокчейн-системе. Информацию невозможно будет удалить.</em></p>';
+	<h4>'.$l10n['media']['beneficiaries-caption'].'</h4>
+	<p>'.$l10n['media']['beneficiaries-descr'].'</p>
+	<p class="add-beneficiaries-item"><input type="text" name="account" class="round" placeholder="'.$l10n['media']['beneficiaries-account-login'].'"> <input type="text" name="weight" class="round" placeholder="'.$l10n['media']['beneficiaries-weight'].'"></p>
+	<p class="add-beneficiaries-button"><a class="add-beneficiaries-action action-button"><i class="fas fa-fw fa-plus-circle"></i> '.$l10n['media']['beneficiaries-add'].'</a></p></div>';
+	print '<hr><p><input type="text" name="tags" class="round wide" placeholder="'.$l10n['media']['publication-tags'].'"></p>';
+	print '<p><a class="post-content-action button">'.$l10n['media']['publication-action'].'</a></p>';
+	print '<p>'.$l10n['media']['publication-warning'].'</p>';
 	print '</div></div>';
 }
 else
 if('profile'==$path_array[2]){
-	$replace['title']=htmlspecialchars('Профиль').' - '.$replace['title'];
+	$replace['title']=htmlspecialchars($l10n['media']['profile-caption']).' - '.$replace['title'];
 	print '<div class="page content">
-	<h1><i class="fas fa-fw fa-user-circle"></i> Профиль</h1>
+	<h1><i class="fas fa-fw fa-user-circle"></i> '.$l10n['media']['profile-caption'].'</h1>
 	<div class="article control">';
 	print '<div class="profile-control"></div>';
 	print '</div></div>';
 }
 else
 if('tags'==$path_array[2]){
-	$replace['title']='Тэги - '.$replace['title'];
+	$replace['title']=$l10n['media']['tags-title'].' - '.$replace['title'];
 	if(''==$path_array[3]){
 		print '<div class="page content">
-	<h1>Популярные тэги</h1>
+	<h1>'.$l10n['media']['tags-popular'].'</h1>
 	<div class="article">';
 		$cache_name='tags';
 		if($buf=$cache->get($cache_name)){
@@ -249,7 +249,7 @@ if('tags'==$path_array[2]){
 		}
 		$num=1;
 		foreach($tags as $tag){
-			print '<p id="'.$num.'">#'.$num.' <a href="/media/tags/'.htmlspecialchars($tag['name']).'/">'.htmlspecialchars($tag['name']).'</a>, количество отметок: '.$tag['top_posts'].', суммарная награда: '.$tag['total_payouts'].'</p>';
+			print '<p id="'.$num.'">#'.$num.' <a href="/media/tags/'.htmlspecialchars($tag['name']).'/">'.htmlspecialchars($tag['name']).'</a>, '.$l10n['media']['tags-count'].': '.$tag['top_posts'].', '.$l10n['media']['tags-awards'].': '.$tag['total_payouts'].'</p>';
 			$num++;
 		}
 		print '</div>';
@@ -260,8 +260,8 @@ if('tags'==$path_array[2]){
 		if($tag_id){
 			$replace['title']=htmlspecialchars($tag).' - '.$replace['title'];
 			print '<div class="page content">
-			<a class="right" href="/media/tags/">&larr; Вернуться</a>
-			<h1>Тэг: #'.$tag.'</h1>
+			<a class="right" href="/media/tags/">&larr; '.$l10n['media']['return'].'</a>
+			<h1>'.$l10n['media']['tags-caption'].$tag.$l10n['media']['tags-caption-append'].'</h1>
 			</div>';
 			$find=array('tag'=>(int)$tag_id);
 			$perpage=50;
@@ -279,16 +279,16 @@ if('tags'==$path_array[2]){
 else
 if('feed'==$path_array[2]){
 	print '<div class="page content">
-	<h1>Лента новостей</h1>';
+	<h1>'.$l10n['media']['feed-caption'].'</h1>';
 	if(!$auth){
-		print '<p>Личная лента новостей доступна после аутентификации и подписки на других пользователей.</p>';
+		print '<p>'.$l10n['media']['feed-need-auth'].'</p>';
 		print '</div>';
 	}
 	else{
 		$perpage=30;
 		$rows=redis_read_feed($user_arr['_id'],0,$perpage);
 		if(0==count($rows)){
-			print '<p>У вас нет публикаций в ленте.</p>';
+			print '<p>'.$l10n['media']['feed-none'].'</p>';
 		}
 		else{
 			foreach($rows as $row){
@@ -301,10 +301,10 @@ if('feed'==$path_array[2]){
 }
 else
 if('users'==$path_array[2]){
-	$replace['title']=htmlspecialchars('Пользователи').' - '.$replace['title'];
+	$replace['title']=htmlspecialchars($l10n['media']['users-caption']).' - '.$replace['title'];
 	if(''==$path_array[3]){
 		print '<div class="page content">
-		<h1><i class="fas fa-fw fa-users"></i> Пользователи</h1>';
+		<h1><i class="fas fa-fw fa-users"></i> '.$l10n['media']['users-caption'].'</h1>';
 		$find=['status'=>0,'shares'=>['$ne'=>0]];
 		$sort=['login'=>1];
 		$page=1;
@@ -323,15 +323,15 @@ if('users'==$path_array[2]){
 		$offset=$perpage*($page - 1);
 		$prev_page=$page-1;
 		$next_page=$page+1;
-		print '<p>Всего пользователей: '.$users_count.', текущая страница: '.$page.', всего страниц: '.$pages.'</p>';
-		print '<p><em>Пользователи с нулевым SHARES скрыты.</em></p>';
+		print '<p>'.$l10n['media']['users-count'].': '.$users_count.', '.$l10n['media']['users-current-page'].': '.$page.', '.$l10n['media']['users-pages-count'].': '.$pages.'</p>';
+		print '<p>'.$l10n['media']['users-descr'].'</p>';
 		print '<hr>';
 		print '<div class="pages clearfix">';
 		if($prev_page>0){
-			print '<a href="?page='.$prev_page.'">&larr; Предыдущая страница</a>';
+			print '<a href="?page='.$prev_page.'">&larr; '.$l10n['media']['users-prev-page'].'</a>';
 		}
 		if($next_page<=$pages){
-			print '<a class="right" href="?page='.$next_page.'">Следующая страница &rarr;</a>';
+			print '<a class="right" href="?page='.$next_page.'">'.$l10n['media']['users-next-page'].' &rarr;</a>';
 		}
 		print '</div>';
 		print '</div>';
@@ -343,10 +343,10 @@ if('users'==$path_array[2]){
 		print '<div class="page content">';
 		print '<div class="pages clearfix">';
 		if($prev_page>0){
-			print '<a href="?page='.$prev_page.'">&larr; Предыдущая страница</a>';
+			print '<a href="?page='.$prev_page.'">&larr; '.$l10n['media']['users-prev-page'].'</a>';
 		}
 		if($next_page<=$pages){
-			print '<a class="right" href="?page='.$next_page.'">Следующая страница &rarr;</a>';
+			print '<a class="right" href="?page='.$next_page.'">'.$l10n['media']['users-next-page'].' &rarr;</a>';
 		}
 		print '</div>';
 		print '</div>';

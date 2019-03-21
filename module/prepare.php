@@ -333,7 +333,7 @@ function mongo_counter_set($collection_name,$count){
 	return true;
 }
 function user_badge($account_arr){
-	global $auth,$user_arr;
+	global $l10n,$auth,$user_arr;
 	$account_name=$account_arr['login'];
 	$account_avatar='/default-avatar.png';
 	$account_about='';
@@ -357,13 +357,13 @@ function user_badge($account_arr){
 	<div class="actions" data-user-login="'.$account_arr['login'].'">';
 			$link=get_user_link($user_arr['_id'],$account_arr['_id']);
 			if(false===$link){
-				$ret.='<div class="follow follow-action">Подписаться</div><br><div class="ignore ignore-action">Игнорировать</div>';
+				$ret.='<div class="follow follow-action">'.$l10n['media']['user-follow'].'</div><br><div class="ignore ignore-action">'.$l10n['media']['user-ignore'].'</div>';
 			}
 			if(1==$link){
-				$ret.='<div class="unfollow unfollow-action">Отписаться</div>';
+				$ret.='<div class="unfollow unfollow-action">'.$l10n['media']['user-unfollow'].'</div>';
 			}
 			if(2==$link){
-				$ret.='<div class="unfollow unfollow-action">Перестать игнорировать</div>';
+				$ret.='<div class="unfollow unfollow-action">'.$l10n['media']['user-unignore'].'</div>';
 			}
 			$ret.='</div>';
 		}
@@ -374,9 +374,16 @@ function user_badge($account_arr){
 		<div class="descr">
 			<p>'.$account_about.'</p>';
 			if(isset($account_arr['content_count'])){
-				$ret.='<p>Контента: '.$account_arr['content_count'].', Наградил: '.$account_arr['vote_count'].'</p>';
+				if(!$account_arr['content_count'])
+					$account_arr['content_count']=0;
+				$ret.='<p>'.$l10n['media']['badge-content-count'].': '.$account_arr['content_count'];
+				if($account_arr['subcontent_count'])
+					$ret.=', '.$l10n['media']['badge-subcontent-count'].': '.$account_arr['subcontent_count'];
+				if($account_arr['awards_outcome_count'])
+					$ret.=', '.$l10n['media']['badge-awards-outcome-count'].': '.$account_arr['awards_outcome_count'];
+				$ret.='</p>';
 			}
-			$ret.='<p>Баланс: '.($account_arr['balance']/1000).' VIZ, ';
+			$ret.='<p>'.$l10n['media']['badge-balance'].': '.($account_arr['balance']/1000).' VIZ, ';
 			if($account_arr['effective_shares'] && ($account_arr['effective_shares']!=$account_arr['shares'])){
 				$ret.='<span title="Effective '.($account_arr['effective_shares']/1000000).' SHARES">';
 			}
@@ -1118,7 +1125,7 @@ function preview_content_by_id($id){
 	return preview_content(get_content_by_id($id));
 }
 function preview_content($data){
-	global $mongo,$config,$auth,$user_arr;
+	global $l10n,$mongo,$config,$auth,$user_arr;
 	$result='';
 	$repost=false;
 	if(isset($data['parent'])){
@@ -1251,8 +1258,8 @@ function preview_content($data){
 	$result.='</div>
 		<div class="timestamp" data-timestamp="'.$data['time'].'">'.date('d.m.Y H:i:s',$data['time']).'</div>
 		<div class="right">
-			<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы наградили '.($vote_weight/100).'% энергии"':'').'></a>
-			<div class="votes_count"><span>'.$votes_count.'</span> наград</div>
+			<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="'.$l10n['media']['awarded-energy'].': '.($vote_weight/100).'%"':'').'></a>
+			<div class="votes_count"><span>'.$votes_count.'</span> '.$l10n['media']['awards-count-append'].'</div>
 			<div class="comments"><span>'.$comments_count.'</span><a href="/media/@'.$author_login.'/'.$data['permlink_href'].'/#comments" class="icon"><i class="far fa-comment"></i></a></div>
 		</div>
 	</div>';
@@ -1261,7 +1268,7 @@ function preview_content($data){
 	return $result;
 }
 function view_content($data){
-	global $mongo,$config,$auth,$user_arr;
+	global $l10n,$mongo,$config,$auth,$user_arr;
 	$result='';
 	$data['title']=stripcslashes($data['title']);
 	$data['body']=stripcslashes($data['body']);
@@ -1332,14 +1339,14 @@ function view_content($data){
 	}
 	if($auth && $data['author']==$user_arr['_id']){
 		$result.='<hr><div class="content-actions">';
-		$result.='<a href="/media/@'.$author_login.'/'.$data['permlink_href'].'/edit/">Редактировать</a>';
+		$result.='<a href="/media/@'.$author_login.'/'.$data['permlink_href'].'/edit/">'.$l10n['media']['edit-link'].'</a>';
 		$result.='</div>';
 	}
 	$result.='<hr>
 	<div class="addon">
 		<div class="right"><div class="comments"><span>'.$comments_count.'</span><a href="#comments" class="icon"><i class="far fa-comment"></i></a></div></div>
-		<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="Вы наградили '.($vote_weight/100).'% энергии"':'').'></a>
-		<div class="votes_count"><span>'.$votes_count.'</span> наград</div>';
+		<a class="award'.($upvote?' active':'').' award-action"'.($upvote?' title="'.$l10n['media']['awarded-energy'].': '.($vote_weight/100).'%"':'').'></a>
+		<div class="votes_count"><span>'.$votes_count.'</span> '.$l10n['media']['awards-count-append'].'</div>';
 	if($reward_amount){
 		$result.='
 		<div class="reward_amount"><i class="far fa-fw fa-gem"></i> <span>'.$reward_amount.'</span></div>';
@@ -1351,7 +1358,7 @@ function view_content($data){
 	return $result;
 }
 function view_subcontent($data){
-	global $auth,$user_arr;
+	global $l10n,$auth,$user_arr;
 	$level=$data['level'];
 	if($level>5){
 		$level=5;
@@ -1392,7 +1399,7 @@ function view_subcontent($data){
 		</div>
 		<div class="addon">
 			<a class="reply reply-action subcontent-reply unselectable">Ответ <i class="far fa-fw fa-comment-dots"></i></a>
-			<a class="award award-subcontent-action'.($upvote?' active':'').'">Наградить <i class="fas fa-fw fa-angle-up"></i></a>
+			<a class="award award-subcontent-action'.($upvote?' active':'').'">'.$l10n['media']['award-action'].' <i class="fas fa-fw fa-angle-up"></i></a>
 		</div>
 	</div>';
 	return $ret;
@@ -1412,7 +1419,7 @@ if(isset($_COOKIE['session_id'])){
 		if($user_arr['login']){
 			$auth=true;
 			if($user_arr['avatar']){
-				$replace['menu'].='<a href="/media/@'.$user_arr['login'].'/" class="avatar"'.($user_arr['avatar']?' style="background-image:url(https://i.goldvoice.club/0x0/'.htmlspecialchars($user_arr['avatar']).');"':'').' title="Перейти в свой аккаунт"></a>';
+				$replace['menu'].='<a href="/media/@'.$user_arr['login'].'/" class="avatar"'.($user_arr['avatar']?' style="background-image:url(https://i.goldvoice.club/0x0/'.htmlspecialchars($user_arr['avatar']).');"':'').' title="'.$l10n['media']['menu-profile-link'].'"></a>';
 			}
 			$redis->zadd('users_action_time',time(),$user_arr['login']);
 			$redis->hset('session:'.$session_arr['id'],'action_time',time());
