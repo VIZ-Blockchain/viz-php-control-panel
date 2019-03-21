@@ -428,9 +428,9 @@ $l10n_preset['ru']=[
 		],
 	],
 	'landing'=>[
-		'seo-title'=>'VIZ Blockchain Worldwide',
-		'seo-description'=>'VIZ Blockchain — Decentralized Autonomous Society (DAS) with powerful award mechanic from emission',
-		'symbol'=>'VIZ Symbol',
+		'seo-title'=>'Блокчейн VIZ ',
+		'seo-description'=>'Блокчейн VIZ — Децентрализованное Автономное Общество (ДАО) с мощной механикой наград из эмиссии',
+		'symbol'=>'Символ VIZ',
 		'descriptions-dao'=>'ДАО (Децентрализованное Автономное Общество)',
 		'descriptions-committee'=>'Комитет общественных инициатив',
 		'descriptions-award'=>'Награждение достойных',
@@ -470,6 +470,11 @@ $l10n_preset['ru']=[
 <p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/paid-subscriptions-processing/" target="_blank">Система платных подписок</a> — процессинг периодических переводов на блокчейне.</p>
 <p><img src="/check.svg" alt=""> Система ваучеров (они же инвайт-коды) и <a href="https://viz.world/media/@on1x/anonymous-account/" target="_blank">анонимная регистрация</a> — две дополнительных механики для процессинга создания аккаунтов.</p>
 <p><img src="/check.svg" alt=""> Возможность экспансии — механизм награждения уникален: он мгновенный, <a href="https://viz.world/media/@on1x/viz-control-panel-beneficiaries/" target="_blank">гибкий</a>, самовозобновляемый, стремится к справедливой долевой конкуренции за фонд наград. В совокупности с <a href="https://viz.world/media/@on1x/viz-gates/" target="_blank">социальными шлюзами</a> позволяет привлекать без регистрации инициативных и созидающих людей со всего интернета!</p>',
+		'economic-caption'=>'Экономика',
+		'economic-info'=>'<center><img src="/ru-inflation.png" alt="Inflation diagram"></center>
+<hr>
+<p><i class="fas fa-fw fa-chart-pie"></i> Распределение эмиссии по умолчанию:<ul><li>4% &mdash; фонд наград</li><li>4% &mdash; комитет общественных инициатив</li><li>2% &mdash; делегатам</li></ul></p>
+<p>В код заложена стабильная модель инфляции — 10% в год. Каждые 3 секунды формируется новый блок который несет в себе часть годовой эмиссии. Именно она идет как награда делегату (за поддержание инфраструктуры блокчейн-системы), наполняет комитет общественных инициатив и фонд наград, распределением которых управляют участники сети.</p>',
 		'code-caption'=>'Код и библиотеки',
 		'code-info'=>'<p>Все основные разработки открыты (<a href="https://github.com/VIZ-Blockchain" target="_blank">ссылка на GitHub</a>) и большинство из них доступны по свободной MIT лицензии:
 <ul class="disc">
@@ -1076,6 +1081,9 @@ $l10n_preset['en']=[
 		'descriptions_committee'=>'Community Initiatives Committee',
 		'descriptions_award'=>'Reward worthy',
 		'descriptions_participation'=>'Fair participation',
+		'seo-title'=>'VIZ Blockchain Worldwide',
+		'seo-description'=>'VIZ Blockchain — Decentralized Autonomous Society (DAS) with powerful award mechanic from emission',
+		'symbol'=>'VIZ Symbol',
 	],
 	'menu'=>[
 		'media'=>'Media platform',

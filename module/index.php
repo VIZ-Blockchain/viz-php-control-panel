@@ -309,6 +309,13 @@ if(''==$path_array[1]){
 </div>';
 	print '
 <div class="info-block">
+	<h2>'.$l10n['landing']['economic-caption'].'</h2>
+	<div class="text">
+'.$l10n['landing']['economic-info'].'
+	</div>
+</div>';
+	print '
+<div class="info-block">
 	<h2>'.$l10n['landing']['code-caption'].'</h2>
 	<div class="text">
 '.$l10n['landing']['code-info'].'
