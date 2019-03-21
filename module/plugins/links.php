@@ -19,6 +19,10 @@ class viz_plugin_links extends viz_plugin{
 									redis_add_ulist('update_user',$user_login);
 									redis_add_ulist('update_user',$author);
 									$this->redis->zadd('users_action_time',$info['unixtime'],$user_login);
+
+									$bulk=new MongoDB\Driver\BulkWrite;
+									$bulk->update(['_id'=>(int)$user_id],['$inc'=>['awards_outcome_count'=>1]]);
+									$this->mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
 								}
 								$find_content=mongo_find_id('content',array('author'=>(int)$author_id,'permlink'=>mongo_prepare($permlink)));
 								if($find_content){

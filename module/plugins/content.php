@@ -71,6 +71,12 @@ class viz_plugin_content extends viz_plugin{
 						}
 						$this->mongo->executeBulkWrite($config['db_prefix'].'.content',$bulk);
 
+						if(!$find_content){
+							$bulk=new MongoDB\Driver\BulkWrite;
+							$bulk->update(['_id'=>(int)$user_id],['$inc'=>['content_count'=>1]]);
+							$this->mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
+						}
+
 						if(in_array('tags',$config['plugins_extensions']['content'])){
 							if($find_content){
 								$bulk=new MongoDB\Driver\BulkWrite;
@@ -216,6 +222,12 @@ class viz_plugin_content extends viz_plugin{
 							$bulk->insert($data_arr);
 						}
 						$this->mongo->executeBulkWrite($config['db_prefix'].'.subcontent',$bulk);
+
+						if(!$find_subcontent){
+							$bulk=new MongoDB\Driver\BulkWrite;
+							$bulk->update(['_id'=>(int)$user_id],['$inc'=>['subcontent_count'=>1]]);
+							$this->mongo->executeBulkWrite($config['db_prefix'].'.users',$bulk);
+						}
 					}
 				}
 			}
