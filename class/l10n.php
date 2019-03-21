@@ -738,7 +738,7 @@ $l10n_preset['en']=[
 	'template'=>[
 		'auth'=>'Authentication',
 		'energy_status'=>'Energy status',
-		'drop_file'=>'Drop file here',
+		'drop-file'=>'Drop file here',
 		'loading'=>'Loading',
 	],
 	'js'=>[
@@ -1076,14 +1076,31 @@ $l10n_preset['en']=[
 			'sign_offer_none'=>'No agreement terms',
 		],
 	],
+	'tools'=>[
+		'localization'=>[
+			'title'=>'Localization',
+			'descr'=>'List of available localizations for the control panel.',
+			'view_descr1'=>'You can',
+			'view_descr2'=>'save l10n file',
+			'view_descr3'=>', edit it and suggest to community.',
+			'active'=>'active',
+			'inactive'=>'inactive',
+			'selected'=>'selected',
+			'select'=>'select'
+		],
+	],
 	'landing'=>[
-		'descriptions_dao'=>'DAS (Decentralized Autonomous Society)',
-		'descriptions_committee'=>'Community Initiatives Committee',
-		'descriptions_award'=>'Reward worthy',
-		'descriptions_participation'=>'Fair participation',
+		'descriptions-dao'=>'DAS (Decentralized Autonomous Society)',
+		'descriptions-committee'=>'Community Initiatives Committee',
+		'descriptions-award'=>'Reward worthy',
+		'descriptions-participation'=>'Fair participation',
 		'seo-title'=>'VIZ Blockchain Worldwide',
 		'seo-description'=>'VIZ Blockchain — Decentralized Autonomous Society (DAS) with powerful award mechanic from emission',
 		'symbol'=>'VIZ Symbol',
+		'economic-info'=>'<center><img src="/en-inflation.png" alt="Inflation diagram"></center>
+		<hr>
+		<p><i class="fas fa-fw fa-chart-pie"></i> Default emission distribution:<ul><li>4% &mdash; reward fund</li><li>4% &mdash; committee</li><li>2% &mdash; witnesses</li></ul></p>
+		<p>В код заложена стабильная модель инфляции — 10% в год. Каждые 3 секунды формируется новый блок который несет в себе часть годовой эмиссии. Именно она идет как награда делегату (за поддержание инфраструктуры блокчейн-системы), наполняет комитет общественных инициатив и фонд наград, распределением которых управляют участники сети.</p>',
 	],
 	'menu'=>[
 		'media'=>'Media platform',
@@ -1104,12 +1121,13 @@ $l10n_preset['en']=[
 	],
 ];
 $l10n_preset['en']=array_replace_recursive($l10n_preset['ru'],$l10n_preset['en']);
+$l10n_preset['en']=array_replace_recursive($l10n_preset['en'],$l10n_preset['en']);
 
 $l10n_preset['be']=[
 	'template'=>[
 		'auth'=>'Аўтэнтыфікацыя',
 		'energy_status'=>'Стан энергіі акаўнта',
-		'drop_file'=>'Перацягнiце файл сюды',
+		'drop-file'=>'Перацягнiце файл сюды',
 		'loading'=>'Загрузка',
 	],
 	'js'=>[
@@ -1448,10 +1466,10 @@ $l10n_preset['be']=[
 		],
 	],
 	'landing'=>[
-		'descriptions_dao'=>'ДАГ (дэцэнтралізаванае аўтаномнае грамадства)',
-		'descriptions_committee'=>'Камітэт грамадскіх ініцыятыў',
-		'descriptions_award'=>'Ўзнагароджанне годных',
-		'descriptions_participation'=>'Справядлівы ўдзел',
+		'descriptions-dao'=>'ДАГ (дэцэнтралізаванае аўтаномнае грамадства)',
+		'descriptions-committee'=>'Камітэт грамадскіх ініцыятыў',
+		'descriptions-award'=>'Ўзнагароджанне годных',
+		'descriptions-participation'=>'Справядлівы ўдзел',
 	],
 	'menu'=>[
 		'media'=>'Медыя платформа',

@@ -256,7 +256,7 @@ if('tools'==$path_array[1]){
 			print '<p>'.$l10n['tools']['localization']['descr'].'</p>';
 			print '<ul>';
 			foreach($l10n_base as $k=>$v){
-				print '<li><a href="/tools/localization/'.$v['code2'].'/">'.$v['name'].'</a> &mdash; '.$v['local-name'].', '.($v['active']?$l10n['tools']['localization']['active'].', '.($l10n_current==$v['code2']?$l10n['tools']['localization']['selected']:'<a href="?set_localization='.$v['code2'].'">'.$l10n['tools']['localization']['select'].'</a>'):$l10n['tools']['localization']['inactive']).'</li>';
+				print '<li><a href="/tools/localization/'.$v['code2'].'/">'.$v['name'].'</a> &mdash; '.$v['local-name'].', '.($v['active']?$l10n['tools']['localization']['active'].', '.($l10n_current==$v['code2']?'<strong>'.$l10n['tools']['localization']['selected'].'</strong>':'<a href="?set_localization='.$v['code2'].'">'.$l10n['tools']['localization']['select'].'</a>'):$l10n['tools']['localization']['inactive']).'</li>';
 			}
 			print '</ul>';
 			print '</div></div>';
