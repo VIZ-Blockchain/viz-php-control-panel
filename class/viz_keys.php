@@ -117,6 +117,34 @@ class viz_keys{
 			}
 		}
 	}
+	function random_str($length,$keyspace='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:#@^&*()!?.,;"[]{}'){
+		$pieces=[];
+		$max=mb_strlen($keyspace,'8bit')-1;
+		for($i=0;$i<$length;++$i){
+			$pieces[]=$keyspace[random_int(0,$max)];
+		}
+		return implode('',$pieces);
+	}
+	function gen($seed='',$salt=''){
+		if(!$salt){
+			$salt=$this->random_str(40);
+		}
+		$seed=$salt.$seed;
+		$hex_key=hash('sha256',$seed);
+		$this->import_hex($hex_key);
+	}
+	function gen_pair($seed='',$salt=''){
+		if(!$salt){
+			$salt=$this->random_str(40);
+		}
+		$seed=$salt.$seed;
+		$hex_key=hash('sha256',$seed);
+		$this->import_hex($hex_key);
+		$wif=$this->wif();
+		$this->to_public();
+		$pub=$this->public_key();
+		return [$wif,$pub];
+	}
 	function import_hex($hex){
 		$this->bin=hex2bin($hex);
 		$this->hex=$hex;
