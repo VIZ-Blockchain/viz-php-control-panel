@@ -468,9 +468,15 @@ function load_session(){
 	shield_control();
 	paid_subscriptions_control();
 }
+var shield_link='http://127.0.0.1:51280';
+/*//Browsers limitation with selfsigned ssl-certs
+if('https:'==document.location.protocol){
+	shield_link='https://localhost:51283';
+}
+*/
 function shield_status(id,success=()=>{},failure=()=>{}){
 	var xhr=new XMLHttpRequest();
-	xhr.open('POST','http://127.0.0.1:51280/status/'+id+'/');
+	xhr.open('POST',shield_link+'/status/'+id+'/');
 	xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
 	xhr.onreadystatechange = function() {
 		if(4==xhr.readyState && 200==xhr.status){
@@ -508,7 +514,7 @@ function shield_status(id,success=()=>{},failure=()=>{}){
 }
 function shield_check(success=()=>{},failure=()=>{}){
 	var xhr=new XMLHttpRequest();
-	xhr.open('POST','http://127.0.0.1:51280/accounts/');
+	xhr.open('POST',shield_link+'/accounts/');
 	xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
 	xhr.onreadystatechange = function() {
 		if(4==xhr.readyState && 200==xhr.status){
@@ -525,7 +531,7 @@ function shield_check(success=()=>{},failure=()=>{}){
 }
 function shield_action(login,operation,data,success=()=>{},failure=()=>{}){
 	var xhr=new XMLHttpRequest();
-	xhr.open('POST','http://127.0.0.1:51280/action');
+	xhr.open('POST',shield_link+'/action');
 	xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
 	xhr.onreadystatechange = function() {
 		if(4==xhr.readyState && 200==xhr.status){
@@ -575,7 +581,7 @@ function shield_control(){
 			view.html(result);
 		}
 		let xhr=new XMLHttpRequest();
-		xhr.open('POST','http://127.0.0.1:51280/accounts/');
+		xhr.open('POST',shield_link+'/accounts/');
 		xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
 		xhr.onreadystatechange = function() {
 			if(4==xhr.readyState && 200==xhr.status){
@@ -601,7 +607,7 @@ function try_auth_shield(login){
 	$('.shield-auth-action').addClass('disabled');
 	$('.shield-auth-error').html('');
 	let xhr=new XMLHttpRequest();
-	xhr.open('POST','http://127.0.0.1:51280/accounts/'+login+'/');
+	xhr.open('POST',shield_link+'/accounts/'+login+'/');
 	xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
 	xhr.onreadystatechange = function() {
 		if(4==xhr.readyState && 200==xhr.status){
@@ -620,7 +626,8 @@ function try_auth_shield(login){
 					users[login].active_key=true;
 				}
 				current_user=login;
-				session_generate();
+				//session_generate();
+				try_auth_signature(login);
 			}
 		}
 	}
@@ -2142,7 +2149,7 @@ function auth_signature_check(hex){
 	}
 	return false;
 }
-function try_auth_signature(login,posting_key,active_key=''){
+function try_auth_signature(login,posting_key='',active_key=''){
 	$('.auth-action').addClass('disabled');
 	$('.auth-error').html('');
 	login=login.toLowerCase();
@@ -2151,65 +2158,102 @@ function try_auth_signature(login,posting_key,active_key=''){
 	}
 	login=login.trim();
 	if(login){
-		if(!gate.auth.isWif(posting_key)){
-			$('.auth-error').html(l10n.errors.invalid_regular_key);
+		let auth_signature_success=function(result){
+			let data='';
+			let signature='';
+			let find_shield=false;
+			if(typeof result.result !== 'undefined'){
+				data=result.result.data;
+				signature=result.result.signature;
+				find_shield=true;
+			}
+			else{
+				data=result.data;
+				signature=result.signature;
+			}
+			$.ajax({
+				type:'POST',
+				url:'/ajax/auth/',
+				data:{'data':data,'signature':signature},
+				success:function(data_json){
+					console.log(data_json);
+					data_obj=JSON.parse(data_json);
+					if(typeof data_obj.error !== 'undefined'){
+						console.log(''+new Date().getTime()+': '+data_obj.error+' - '+data_obj.error_str);
+						add_notify(data_obj.error_str,true);
+						$('.auth-error').html(data_obj.error_str);
+						$('.auth-action').removeClass('disabled');
+						return;
+					}
+					else
+					if(typeof data_obj !== 'undefined'){
+						if(find_shield){
+							if(users[login].shield){
+								users[login]['session_id']=data_obj.session;
+								users[login]['session_verify']=1;
+							}
+						}
+						if(!find_shield){
+							users[login]={'posting_key':posting_key,'active_key':active_key,'shield':false,'session_id':data_obj.session,'session_verify':1};
+						}
+						current_user=login;
+						save_session();
+						set_session_cookie();
+						$('.auth-error').html(l10n.sessions.success);
+						if('/'==document.location.pathname){
+							document.location='https://'+domain+'/media/';
+						}
+						else
+						if('/login/'==document.location.pathname){
+							document.location='https://'+domain+'/media/';
+						}
+						else{
+							document.location=document.location;
+						}
+					}
+					else{
+						add_notify('Service unavailable',true);
+						$('.auth-action').removeClass('disabled');
+						return;
+					}
+				},
+			});
+		}
+		let auth_signature_failure=function(err){
+			$('.auth-error').html(l10n.global.error);
 			$('.auth-action').removeClass('disabled');
 			return;
 		}
-		if(''!=active_key){
-			if(!gate.auth.isWif(active_key)){
-				$('.auth-error').html(l10n.errors.invalid_active_key);
+		let find_shield=false;
+		if(typeof users[login] !== 'undefined'){
+			if(users[login].shield){
+				shield_action(current_user,'auth_sign',{action:'auth',authority:'posting'},auth_signature_success,auth_signature_failure);
+				find_shield=true;
+			}
+		}
+		if(!find_shield){
+			if(!gate.auth.isWif(posting_key)){
+				$('.auth-error').html(l10n.errors.invalid_regular_key);
 				$('.auth-action').removeClass('disabled');
 				return;
 			}
-		}
-		var nonce=0;
-		var data='';
-		var signature='';
-		while(!auth_signature_check(signature)){
-			data=auth_signature_data('viz.world','auth',login,'posting',nonce);
-			signature=gate.auth.signature.sign(data,posting_key).toHex();
-			nonce++;
-		}
-		$.ajax({
-			type:'POST',
-			url:'/ajax/auth/',
-			data:{'data':data,'signature':signature,'posting_key':posting_key},
-			success:function(data_json){
-				console.log(data_json);
-				data_obj=JSON.parse(data_json);
-				if(typeof data_obj.error !== 'undefined'){
-					console.log(''+new Date().getTime()+': '+data_obj.error+' - '+data_obj.error_str);
-					add_notify(data_obj.error_str,true);
-					$('.auth-error').html(data_obj.error_str);
+			if(''!=active_key){
+				if(!gate.auth.isWif(active_key)){
+					$('.auth-error').html(l10n.errors.invalid_active_key);
 					$('.auth-action').removeClass('disabled');
 					return;
 				}
-				else
-				if(typeof data_obj !== 'undefined'){
-					users[login]={'posting_key':posting_key,'active_key':active_key,'shield':false,'session_id':data_obj.session,'session_verify':1};
-					current_user=login;
-					save_session();
-					set_session_cookie();
-					$('.auth-error').html(l10n.sessions.success);
-					if('/'==document.location.pathname){
-						document.location='https://'+domain+'/media/';
-					}
-					else
-					if('/login/'==document.location.pathname){
-						document.location='https://'+domain+'/media/';
-					}
-					else{
-						document.location=document.location;
-					}
-				}
-				else{
-					add_notify('Service unavailable',true);
-					$('.auth-action').removeClass('disabled');
-					return;
-				}
-			},
-		});
+			}
+			var nonce=0;
+			var data='';
+			var signature='';
+			while(!auth_signature_check(signature)){
+				data=auth_signature_data('viz.world','auth',login,'posting',nonce);
+				signature=gate.auth.signature.sign(data,posting_key).toHex();
+				nonce++;
+			}
+			auth_signature_success({data,signature});
+		}
 	}
 	else{
 		$('.auth-error').html(l10n.errors.user_not_provided);
