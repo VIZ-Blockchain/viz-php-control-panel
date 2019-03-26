@@ -20,7 +20,7 @@ if('login'==$path_array[1]){
 	print '<p><input type="password" name="active_key" class="round"> &mdash; '.$l10n['login']['form-active-key-append'].'</label></p>';
 	print '<p><span class="auth-error"></span></p>';
 	print '<p><input type="button" class="auth-action button" value="'.$l10n['login']['form-action'].'"></p>';
-	print '<hr><p><input type="button" class="auth-custom-action button opacity" value="'.$l10n['custom-action'].'"></p>';
+	print '<hr><p><input type="button" class="auth-custom-action button opacity" value="'.$l10n['login']['custom-action'].'"></p>';
 	print '<hr><h3><img src="/shield-icon.svg"> '.$l10n['login']['shield-caption'].'</h3>';
 	print '<div class="shield-auth-control"></div>';
 	print '</div>';
