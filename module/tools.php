@@ -195,7 +195,7 @@ if('tools'==$path_array[1]){
 		$replace['title']=htmlspecialchars($l10n['tools']['list']['reset-account']).' - '.$replace['title'];
 		print '<div class="page content">
 		<a class="right" href="/tools/">&larr; '.$l10n['tools']['title'].'</a>
-		<h1><i class="fas fa-fw fa-exchange-alt"></i> '.$l10n['tools']['reset-account'].'</h1>
+		<h1><i class="fas fa-fw fa-exchange-alt"></i> '.$l10n['tools']['list']['reset-account'].'</h1>
 		<div class="article control">';
 		print '<p>'.$l10n['tools']['list']['reset-account-descr'].'</p>';
 		print '<div class="reset-account-control"></div>';
