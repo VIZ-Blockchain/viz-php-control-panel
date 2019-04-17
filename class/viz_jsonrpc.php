@@ -30,6 +30,7 @@ class viz_jsonrpc_web{
 		'get_witnesses'=>'witness_api',
 		'get_witness_by_account'=>'witness_api',
 		'get_witnesses_by_vote'=>'witness_api',
+		'get_witnesses_by_counted_vote'=>'witness_api',
 		'get_witness_count'=>'witness_api',
 		'lookup_witness_accounts'=>'witness_api',
 		'get_active_witnesses'=>'witness_api',
@@ -89,7 +90,7 @@ class viz_jsonrpc_web{
 		$this->request_arr=array();
 		$this->result_arr=array();
 	}
-	function get_url($url,$post=array()){
+	function get_url($url,$post=array(),$debug=false){
 		$this->last_url=$url;
 		$method='GET';
 		if($post){
@@ -124,6 +125,9 @@ class viz_jsonrpc_web{
 		$request.="\r\n";
 		if($this->debug){
 			$this->request_arr[]=$request;
+		}
+		if($debug){
+			print_r($request);
 		}
 		$result='';
 		$port=80;
