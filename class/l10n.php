@@ -327,6 +327,11 @@ $l10n_preset['ru']=[
 			'params_inflation_witness_percent'=>'Доля инфляции для награды делегатам (процент)',
 			'params_inflation_ratio_committee_vs_reward_fund'=>'Соотношение разделения остатка инфляции между комитетом и фондом наград (процент)',
 			'params_inflation_recalc_period'=>'Количество блоков между пересчётом инфляционной модели',
+
+			'params_data_operations_cost_additional_bandwidth'=>'Дополнительная наценка пропускной способности за каждую data операцию в транзакции (процент от размера транзакции)',
+			'params_witness_miss_penalty_percent'=>'Штраф делегату за пропуск блока в процентах от суммарного веса голосов',
+			'params_witness_miss_penalty_duration'=>'Длительность штрафа делегату за пропуск блока в секундах',
+
 			'params_min_curation_percent'=>'(Устаревшее) Минимально допустимый процент кураторской награды',
 			'params_max_curation_percent'=>'(Устаревшее) Максимально допустимый процент кураторской награды',
 			'params_flag_energy_additional_cost'=>'(Устаревшее) Дополнительная трата энергии на флаг (процент)',
@@ -563,7 +568,7 @@ $l10n_preset['ru']=[
 		'request-votes-count'=>'Количество голосов',
 		'request-votes-percent'=>'доля проголосовавших от всей сети',
 		'request-conclusion-percent'=>'требуется',
-		'request-votes-calculated-payout'=>'расчитанная сумма заявки на текущий момент'
+		'request-votes-calculated-payout'=>'рассчитанная сумма заявки на текущий момент'
 	],
 	'mongo'=>[
 		'return'=>'Вернуться',
@@ -975,6 +980,11 @@ $l10n_preset['en']=[
 			'params_inflation_witness_percent'=>'Inflation share for witnesses reward (in percent)',
 			'params_inflation_ratio_committee_vs_reward_fund'=>'Ratio of the inflation balance between the committee and the awards fund (in percent)',
 			'params_inflation_recalc_period'=>'Blocks number between the recalculation of the inflationary model',
+
+			'params_data_operations_cost_additional_bandwidth'=>'Additional bandwidth cost for each data operation in transaction',
+			'params_witness_miss_penalty_percent'=>'Witness penalty for missing block in percent from summary votes',
+			'params_witness_miss_penalty_duration'=>'Witness penalty duration in seconds for missing block',
+
 			'params_min_curation_percent'=>'(Deprecated) Min. curation rewards',
 			'params_max_curation_percent'=>'(Deprecated) Max. curation rewards',
 			'params_flag_energy_additional_cost'=>'(Deprecated) Additional waste of the flag energy (in %)',
@@ -1119,16 +1129,659 @@ $l10n_preset['en']=[
 		'settings'=>'Settings',
 	],
 ];
+
+$l10n_preset['en']=[
+	'js'=>[
+		'global'=>[
+			'loading'=>'Load',
+			'auth'=>'Authentication',
+			'attempt'=>'Attempt',
+			'error'=>'Error',
+			'need_auth'=>'You need to <a href="/login/">authorize</a>.',
+			'need_auth_with_active_key'=>'You need to <a href="/login/">authorize</a> with Active key.',
+			'generate_new'=>'generate new',
+			'spend_energy'=>'You spent some energy'
+		],
+		'success'=>[
+			'award_author'=>'You have successfully awarded an author'
+		],
+		'create_account'=>[
+			'descr'=>'To create an account, specify the number of tokens (that you will transfer to the new account), the number of shares (that you transfer to a new account) and generate master key (private keys will be generated automatically).',
+			'login'=>'Login',
+			'tokens'=>'Amount of VIZ transferred',
+			'shares'=>'Amount of SHARES to delegate',
+			'global_password'=>'Main password',
+			'action'=>'Create account',
+			'success'=>'Account created successfully',
+			'error'=>'Error creating account',
+			'login_is_not_available'=>'Login is not available'
+		],
+		'reset_account'=>[
+			'login'=>'Login',
+			'master_key'=>'Private master key (master)',
+			'global_password'=>'Master password',
+			'action'=>'Set new access',
+			'success'=>'Account details successfully updated',
+			'error'=>'Error updating account'
+		],
+		'errors'=>[
+			'user_not_found'=>'User not found',
+			'user_not_provided'=>'User not specified',
+			'awarded_content'=>'You have already awarded this content',
+			'api'=>'Error API request',
+			'invalid_regular_key'=>'Regular key invalid',
+			'invalid_active_key'=>'Active key invalid',
+			'failure_regular_key'=>'Regular key doesn\'t match',
+			'failure_active_key'=>'Active key doesn\'t match'
+		],
+		'media'=>[
+			'follow_success'=>'You have successfully subscribed to',
+			'follow_failure'=>'Can\'t send operation of subscribing to',
+			'unfollow_success'=>'You have become neutral with',
+			'unfollow_success_append'=>'',
+			'unfollow_failure'=>'Can\'t send neutrality operation with',
+			'unfollow_failure_append'=>'',
+			'follow'=>'Subscribe',
+			'unfollow'=>'Unsubscribe',
+			'ignore'=>'Ignore',
+			'stop_ignore'=>'Stop ignoring',
+			'ignore_success'=>'You have successfully started to ignore',
+			'ignore_failure'=>'Ignore operation can\'t be sent',
+			'comment_success'=>'Comment sent',
+			'comment_failure'=>'Error while sending a comment',
+			'posting_status'=>'Sending',
+			'content_rewrite'=>'Content with the same URL already exists, do you want to replace it?',
+			'content_rewrite_success'=>'Publication successfully changed, redirection will take place in 6 seconds...',
+			'save_changes'=>'Save changed',
+			'content_success'=>'Publication has been successful, redirection...',
+			'content_error'=>'Error while publishing',
+			'content_publication'=>'Publish',
+			'reply_placeholder'=>'Type your answer...',
+			'reply_action'=>'Answer'
+		],
+		'profile'=>[
+			'edit_descr'=>'You can change public profile in blockchain by filling in the form below.',
+			'edit_warning'=>'<b>Attention!</b> After the changes are introduced and saved, no one will be able to delete this data from the internet.',
+			'current_account'=>'Active account',
+			'edit_nickname'=>'Nickname (nickname)',
+			'edit_about'=>'About the account (about)',
+			'edit_avatar'=>'Аvatar (link, avatar)',
+			'edit_gender'=>'Gender/account type (gender)',
+			'gender_none'=>'Not specifies',
+			'gender_male'=>'Male',
+			'gender_female'=>'Female',
+			'edit_action'=>'Save profile',
+			'edit_success'=>'Profile successfully saved'
+		],
+		'sessions'=>[
+			'auth_error'=>'Session initialization error. Try to authorize again later.',
+			'init_session'=>'Wait, the session is being initialized.',
+			'time_error'=>'Synchronization error, check your system time (switch on NTP).',
+			'success'=>'You have been successfully authorized, the session has been initialized.',
+			'custom_failure'=>'Can\'t send custom operation for system initialization.',
+			'verify'=>'Session confirmed',
+			'active_key'=>'Active key saved',
+			'viz_shield'=>'VIZ-Shield is being used',
+			'active'=>'is being used',
+			'switch'=>'switch to',
+			'eject'=>'switch off'
+		],
+		'shield'=>[
+			'locked'=>'Your wallet is blocked. After unblocking, refresh the page or',
+			'link'=>'Click the link',
+			'accounts'=>'Choose an account to be authenticated on the site.',
+			'login'=>'AUthenticate',
+			'not_found'=>'You haven\'t switched on <a class="start-shield-action link">VIZ.Shield</a>. After <a class="start-shield-action link">is launched</a> and unblocked refresh the page or <a class="shield-auth-control-action link">click the link</a>.',
+			'miss_user'=>'Can\'t get user information.'
+		],
+		'wallet'=>[
+			'withdraw_disabled'=>'Powerdown cancelled',
+			'withdraw_enabled'=>'Powerdown started',
+			'delegate_success'=>'Delegating has been done successfully',
+			'delegate_failure'=>'Delegating error',
+			'no_records'=>'No entries',
+			'return_delegation_caption'=>'Delegated share return',
+			'returning'=>'Will return',
+			'delegated_caption'=>'Delegated share list',
+			'none_delegated'=>'You haven\'t delegated your share to anyone.',
+			'delegated_hold'=>'Holds',
+			'delegated_expire'=>'Is possible to revoke',
+			'received_delegation_caption'=>'Holding the share',
+			'none_received_delegation'=>'No one has delegated you a share.',
+			'received_delegation_from'=>'From',
+			'received_delegation_expire_time'=>'It\'s possible to revoke with',
+			'enable_withdraw'=>'Start powerdown',
+			'disable_withdraw'=>'Stop powerdown',
+			'balance'=>'Balance',
+			'shares'=>'Network share',
+			'effective_shares'=>'Efficient network share',
+			'delegated'=>'Delegated',
+			'received_delegation'=>'Received through delegation',
+			'delegate_caption'=>'Assign delegation',
+			'delegate_descr'=>'To revoke delegating specify zero SHARES value. The return of the delegated share might take some time.',
+			'delegate_receiver'=>'Recipient',
+			'delegate_amount'=>'Amount',
+			'delegate_action'=>'Delegate',
+			'transfer_caption'=>'Transfer',
+			'transfer_receiver'=>'Recipient',
+			'transfer_amount'=>'Amount',
+			'transfer_memo'=>'Note',
+			'transfer_in_shares'=>'Transfer to network share',
+			'transfer_action'=>'Send transfer',
+			'transfer_failure'=>'Transfer error',
+			'history_caption'=>'Transfer history',
+			'history_filter_text'=>'Filter',
+			'history_filter_range1'=>'From',
+			'history_filter_range2'=>'To',
+			'history_filter_all'=>'All',
+			'history_filter_income'=>'Received',
+			'history_filter_outcome'=>'Sent',
+			'history_memo'=>'Note',
+			'history_token'=>'Token',
+			'history_amount'=>'Amount',
+			'history_receiver'=>'Recipient',
+			'history_sender'=>'Sender',
+			'history_date'=>'Date'
+		],
+		'wysiwyg'=>[
+			'center'=>'Centering',
+			'spoiler'=>'Spoiler',
+			'header'=>'Header'
+		],
+		'invite'=>[
+			'reg_success'=>'Invite code has been successfully activated',
+			'reg_failure'=>'Error activating invite code',
+			'login'=>'Login',
+			'unavailable'=>'Not available',
+			'claim_success'=>'Code has been successfully activated',
+			'claim_failure'=>'Error activating the code',
+			'create_caption'=>'Create a new invite code',
+			'create_descr'=>'To create an invite code fill in the amount of tokens to spend and generate a pair of keys (private key to be transferred to another user, public key to check the code).',
+			'create_private_key'=>'Private key',
+			'create_public_key'=>'Public key (for checking)',
+			'create_amount'=>'VIZ amount',
+			'create_action'=>'Create a code',
+			'create_success'=>'Invite code has been successfully created (Information saved in the file)',
+			'create_failure'=>'Error when creating invite code',
+			'lookup_caption'=>'Checking invite code',
+			'lookup_public_key'=>'Insert public key to check:',
+			'lookup_action'=>'Code searching and checking',
+			'claim_descr'=>'Introduce invite code (private key) and the name of the account to send the code balance:',
+			'claim_private_key'=>'Invite code (private key)',
+			'claim_receiver'=>'Recipient',
+			'claim_action'=>'Activate code',
+			'registration_descr'=>'Introduce invite code (private key), account name and its private key (generated automatically):',
+			'registration_private_key'=>'Invite code (private key)',
+			'registration_account'=>'Account name',
+			'registration_account_private_key'=>'Private key for account',
+			'registration_action'=>'Activate code',
+			'lookup_creator'=>'Creator',
+			'lookup_create_date'=>'Creation date',
+			'lookup_balance'=>'Code balance',
+			'lookup_status'=>'Status',
+			'lookup_status_unused'=>'Waiting for activation',
+			'lookup_status_activated'=>'Activated',
+			'lookup_claimed'=>'Balance transferred to user',
+			'lookup_registered'=>'User registered',
+			'lookup_claimed_balance'=>'Balance used',
+			'lookup_secret_key'=>'Private key for checking'
+		],
+		'committee'=>[
+			'create_success'=>'You have successfully created an application',
+			'cancel_success'=>'You have successfully cancelled an application',
+			'vote_success'=>'You have successfully voted for an application',
+			'vote_caption'=>'Vote for application',
+			'vote_percent'=>'Percentage of the maximum application sum',
+			'vote_action'=>'Vote',
+			'manage_request_caption'=>'Manage an application',
+			'cancel_request_action'=>'Cancel an application',
+			'request_url'=>'Application URL',
+			'request_worker'=>'Contractor\'s account (tokens recipient)',
+			'request_min_amount'=>'Minimum amount of tokens',
+			'request_max_amount'=>'Maximum amount of tokens',
+			'request_duration'=>'Duration of the application (in days, 5 to 30)',
+			'request_action'=>'Create an application'
+		],
+		'witness'=>[
+			'invalid_user'=>'Current user doesn\'t match the witness to update',
+			'update_success'=>'Data successfully translated into the network',
+			'properties_success'=>'Parameters successfully translated into the network',
+			'vote_success'=>'You have successfully voted for the witness',
+			'votes_list'=>'Your votes',
+			'vote_caption'=>'Voting for a witness',
+			'unvote_action'=>'Cancel voting for a witness',
+			'vote_action'=>'Vote for the witness',
+			'manage_caption'=>'Manage the witness',
+			'manage_url'=>'Statement of intent URL',
+			'manage_public_key'=>'Public signature key',
+			'manage_action'=>'Save',
+			'params_caption'=>'Network parameters',
+			'params_account_creation_fee'=>'Commission transmitted when creating account',
+			'params_create_account_delegation_ratio'=>'Delegating coefficient when creating account',
+			'params_create_account_delegation_time'=>'Delegating time when creating account (seconds)',
+			'params_bandwidth_reserve_percent'=>'Network share allocated to reserve bandwidth (percentage)',
+			'params_bandwidth_reserve_below'=>'Reserve bandwidth capacity is valid for accounts with network share below threshold',
+			'params_committee_request_approve_min_percent'=>'Minimum percentage of the voting network share, necessary to make decisions regarding an application to the committee',
+			'params_min_delegation'=>'Minimum number of tokens when delegating',
+			'params_vote_accounting_min_rshares'=>'Minimum vote weight to count when voting for the content (rshares)',
+			'params_maximum_block_size'=>'Maximum block size within network (bytes)',
+			'params_inflation_witness_percent'=>'Inflation share to award witnesses (percentage)',
+			'params_inflation_ratio_committee_vs_reward_fund'=>'Ratio of inflation leftover split between the committee and the awards fund (percentage)',
+			'params_inflation_recalc_period'=>'Number of blocks between inflation model recalculation',
+
+			'params_data_operations_cost_additional_bandwidth'=>'Additional bandwidth cost for each data operation in transaction',
+			'params_witness_miss_penalty_percent'=>'Witness penalty for missing block in percent from summary votes',
+			'params_witness_miss_penalty_duration'=>'Witness penalty duration in seconds for missing block',
+
+			'params_min_curation_percent'=>'(Outdated) Curator\'s award minimum allowed percentage',
+			'params_max_curation_percent'=>'(Outdated) Curator\'s award maximum allowed percentage',
+			'params_flag_energy_additional_cost'=>'(Outdated) Additional energy spent to flag (percentage)',
+			'params_action'=>'Set witness network parameters'
+		],
+		'ps'=>[
+			'subscribe_success'=>'Agreement conditions signed',
+			'subscribe_failure'=>'Error when signing the terms of agreement',
+			'set_success'=>'The terms of the agreement set',
+			'set_failure'=>'Error occurred while setting the terms of the agreement',
+			'manage_list'=>'Manage subscriptions',
+			'contract_with'=>'Agreement with',
+			'account_prepand'=>'Account',
+			'none_contracts'=>'There are no active paid subscription.',
+			'sign_offer_descr'=>'Enter the username of the agreement\'s creator to view the terms of the paid subscription agreement.',
+			'sign_offer_login'=>'Login',
+			'sign_offer_lookup'=>'Request information',
+			'set_offer_caption'=>'Terms of payment subscriptions agreement',
+			'set_offer_creator'=>'Creator of the agreement',
+			'set_offer_url'=>'URL (service links)',
+			'set_offer_levels'=>'Number of subscription levels available',
+			'set_offer_levels_descr'=>'Specify 0, if you want to stop the renewal or signing of new agreements',
+			'set_offer_amount'=>'Amount of VIZ tokens (for example, 12.500)',
+			'set_offer_period'=>'Subscription period (number of days, for example, 30)',
+			'set_offer_action'=>'Set agreement terms for paid subscriptions',
+			'options_caption'=>'Paid subscription agreement terms',
+			'options_descr'=>'Enter the username of the agreement\'s creator to see the paid subscription agreement terms.',
+			'options_login'=>'Login',
+			'options_action'=>'Request information',
+			'lookup_subscriptions_caption'=>'Paid subscription agreements list',
+			'lookup_subscriptions_descr'=>'Enter subscriber\'s username to view the related paid subscriptions agreement.',
+			'lookup_subscriptions_login'=>'Login',
+			'lookup_subscriptions_action'=>'Search',
+			'lookup_contract_caption'=>'Agreement information',
+			'lookup_contract_descr'=>'Enter subscriber\'s username, creator of the agreement user ID, to view the current agreement status and information on it.',
+			'lookup_contract_subscriber'=>'Subscriber\'s login',
+			'lookup_contract_creator'=>'Login of the creator of the agreement',
+			'lookup_contract_action'=>'Request contract information',
+			'view_offer_creator'=>'Creator of the agreement',
+			'view_offer_url'=>'Information link',
+			'view_offer_update'=>'Last agreement modification date',
+			'view_offer_closed'=>'New agreements and extension of old ones suspended',
+			'view_offer_levels'=>'Number of subscription levels',
+			'view_offer_amount_per_level'=>'Number of tokens per level',
+			'view_offer_period'=>'Subscription duration (number of days)',
+			'view_offer_addon_caption'=>'Additional information',
+			'view_offer_active_auto_renewal'=>'Active auto-renewal agreements',
+			'view_offer_active_auto_renewal_summary_amount'=>'Active agreement with auto-renewal in the amount of',
+			'view_offer_active'=>'Active agreements',
+			'view_offer_active_summary_amount'=>'Active agreements worth',
+			'view_offer_none'=>'Agreement conditions not found',
+			'contracts_caption'=>'Active agreements',
+			'contracts_with_creator'=>'Agreement with',
+			'contracts_none'=>'there are no active paid subscriptions.',
+			'inactive_contracts_caption'=>'Inactive agreements',
+			'inactive_contracts_none'=>'There are no inactive paid subscriptions.',
+			'manage_status'=>'Agreement status',
+			'manage_status_active'=>'Active',
+			'manage_status_inactive'=>'Inactive',
+			'manage_auto_renewal'=>'Auto-renew',
+			'manage_auto_renewal_enabled'=>'Enabled',
+			'manage_auto_renewal_disabled'=>'Disabled',
+			'manage_level'=>'Subscription level',
+			'manage_amount_per_level'=>'Amount of tokens per level',
+			'manage_period'=>'Subscription duration (number of days)',
+			'manage_start_date'=>'Date of agreement',
+			'manage_next_date'=>'Date of the next agreement renewal',
+			'manage_set_auto_renewal'=>'Enable automatic payment',
+			'manage_action'=>'Change automatic payment',
+			'manage_none'=>'Agreement not found',
+			'contract_between_subscriber'=>'Agreement between the subscriber',
+			'contract_between_creator'=>'And the creator',
+			'contract_status'=>'Agreement status',
+			'contract_status_active'=>'Active',
+			'contract_status_inactive'=>'Inactive',
+			'contract_auto_renewal'=>'Auto-renewal',
+			'contract_auto_renewal_enabled'=>'Enabled',
+			'contract_auto_renewal_disabled'=>'Disabled',
+			'contract_level'=>'Subscription level',
+			'contract_amount_per_level'=>'Amount of tokens per level',
+			'contract_period'=>'Subscription duration (number of days)',
+			'contract_start_date'=>'Agreement date',
+			'contract_next_date'=>'Next agreement renewal date',
+			'contract_end_date'=>'Agreement end date',
+			'contract_none'=>'Agreement not found',
+			'sign_offer_creator'=>'Agreement creator',
+			'sign_offer_url'=>'Information link',
+			'sign_offer_update_date'=>'Last terms of agreement modification date',
+			'sign_offer_closed'=>'New agreements and renewal of old ones suspended',
+			'sign_offer_levels'=>'Number of subscription levels',
+			'sign_offer_amount_per_level'=>'Amount of tokens per level',
+			'sign_offer_period'=>'Subscription duration (days)',
+			'sign_offer_approve'=>'If you agree with the terms of the agreement, select subscription level, set automatic agreement  renewal if necessary.',
+			'sign_offer_level'=>'Paid subscription level',
+			'sign_offer_cost'=>'Total subscription price',
+			'sign_offer_auto_renewal'=>'Enable automatic payment',
+			'sign_offer_action'=>'Sign paid subscription agreement',
+			'sign_offer_none'=>'Agreement terms no found'
+		]
+	],
+	'landing'=>[
+		'seo-title'=>'VIZ blockchain',
+		'seo-description'=>'VIZ blockchain is Decentralized Autonomous Community (DAC) with powerful mechanics of awards from the emission.',
+		'symbol'=>'VIZ symbol',
+		'descriptions-dao'=>'DAC Decentralized Autonomous Community',
+		'descriptions-committee'=>'Public initiatives committee',
+		'descriptions-award'=>'Rewarding the worthy ones',
+		'descriptions-participation'=>'Fair participation',
+		'learn-more'=>'Get to know more',
+		'slogan-award'=>'Reward',
+		'slogan-award-descr'=>'Stimulate DAC expansion in any direction, reward the useful ones.',
+		'slogan-create'=>'Create',
+		'slogan-create-descr'=>'Take part in common projects, create, communicate.',
+		'slogan-manage'=>'Manage',
+		'slogan-manage-descr'=>'DAC participants manage all the VIZ blockchain. Join them!',
+		'award-info'=>'<p>Each participant can award other participants from the awards fund, replenished by emission. The bigger the DAC share of a participant, the bigger share of the emission he can distribute via awards. Awarding happens instantly.<br>An award can also be <a href="https://viz.world/media/@on1x/viz-control-panel-beneficiaries/" target="_blank">split between several recipients</a>.</p>
+<p><strong>Conscious participation</strong> in VIZ DAC is logically reduced to awarding actions that are useful for the DAC and for the user personally.</p>
+<p>In that way, awards stimulate useful actions, generating chain reaction and increasing VIZ DAC value.</p>
+<p>Has anyone created a useful service and deserves an award? <strong>Do simply award him.</strong> It will come back a hundredfold.</p>
+<p>Has anyone written an interesting article, created a video, planted a tree, reported on volunteering work done, painted a picture or performed any other socially significant action? Do simply award them. <strong>Awarding stimulates a behaviour pattern.</strong> <a href="https://viz.world/media/@on1x/using-viz-in-life/" target="_blank">The good attracts the good</a>.</p>
+<p>Energy regenerates linearly, 20% every 24 hours, which allows to plan and control its usage.</p>
+<p><em>The are no limits for energy usage. Account can be used to award with all the 100% of its potential.</em></p>',
+		'create-info'=>'<p>No matter who you are and what you do, <strong>the initiatives ones</strong> will always find a place in VIZ DAC:</p>
+<p>1. Users can simply use a site (integrated with VIZ) as intended and receive awards from others.</p>
+<p>2. Owners of web sites and communities can integrate with VIZ, <strong>stimulate useful actions within their communities</strong> and form user\'s rating or reputation. It can be any kind of site: creative groups, collections of scientific publications, stories for children, blogs on videogames or volunteers portal to raise funds.</p>
+<p>3. It will be interesting for the researchers to become familiar with the intricacies of the blockchain system. For visionaries it will be exciting to take part in educating beginners and expanding local communities.</p>
+<p>4. For those who develop games, applications and services <strong>integration with VIZ</strong> will give the opportunity to award the users. Paid subscriptions service allows to organize token transfer processing for any type of applications. The mechanics of awarding from the emission also allows to create a close loop system with its own distribution of the application\'s awards fund.</p>
+<p>You can do whatever you want - either alone or with a group of like-minded supporters. Everything depends on you only.</p>',
+		'manage-info'=>'<p>Management occurs on a voluntary basis. The main VIZ DAC principle is freedom of choice and true share democracy. If someone doesn\'t use his right to manage according to his share, the management will be done by the initiative DAC participants.</p>
+<p>Any participant can convert tokens (VIZ) into VIZ DAC share (SHARES). It\'s thanks to equity participation that VIZ DAC is managed:</p>
+<p>1. <strong>Managing the awards fund:</strong> each participant can use his energy (VIZ DAC share potential that regenerates with time) to manage a part of the awards fund on a competitive basis. Awarding happens instantly.</p>
+<p>2. <strong>Managing the fund of the public initiatives committee:</strong> each participant can vote for an application to the committee, influencing the sum that the contractor will receive in case his application is granted. Influence potential depends linearly on VIZ DAC share.</p>
+<p>3. <strong>Voting for witnesses:</strong> each participant can vote for any number of witnesses who support the infrastructure of the neywork and take part in <a href="https://viz.world/media/@on1x/viz-quorum-calc-median-chain-properties/" target="_blank">voting for the parameters of the blockchain system</a>. The weight of VIZ DAC share will be distributed evenly between the chosen witnesses.</p>',
+		'features-caption'=>'Peculiarities and capabilities',
+		'features-info'=>'<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/en-viz-technical-description/" target="_blank">VIZ DAC</a> — only the community of VIZ participants makes decision on how to develop the ecosystem. There are no bosses or official site! Do you see an opportunity? Just take it and make it happen!</p>
+<p><img src="/check.svg" alt=""> Very quick, just 3 seconds between blocks, VIZ blockchain belongs to Graphene ecosystem.</p>
+<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/viz-quorum-calc-median-chain-properties/" target="_blank">Blockchain system management consensus</a> is a unique system for alternating witnesses. </p>
+<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/fair-dpos/" target="_blank">Fair DPoS</a> — a participant can vote for any amount of witnesses, the weight of his share meanwhile will be distributed between them equally.</p>
+<p><img src="/check.svg" alt=""> Rewarding the useful is made from the awards fund, replenished by the emission. Thus, each participant can manage his \'emission flow\' according to his VIZ DAC share.</p>
+<p><img src="/check.svg" alt=""> Committee to support initiatives: help VIZ DAC develop and receive tokens from the committee for it. Take part in the work of the committee by voting to award other participants of the community.</p>
+<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/paid-subscriptions-processing/" target="_blank">Paid subscriptions system</a> is processing of periodic payments in blockchain.</p>
+<p><img src="/check.svg" alt=""> Voucher system (also known as invite codes) and <a href="https://viz.world/media/@on1x/anonymous-account/" target="_blank">anonymous registration</a> are the two additional mechanics for the processing of creating accounts.</p>
+<p><img src="/check.svg" alt=""> Capability of expansion: awarding mechanism is unique. It is instant, <a href="https://viz.world/media/@on1x/viz-control-panel-beneficiaries/" target="_blank">flexible</a>, self-renewable, strives for fair share competition for the awards fund. Together with <a href="https://viz.world/media/@on1x/viz-gates/" target="_blank">social gateways</a> allows to attract initiative and creative people from all over the web without registration!</p>',
+		'economic-caption'=>'Economics',
+		'economic-info'=>'<center><img src="/en-inflation.png" alt="Inflation diagram"></center>
+<hr>
+<p><i class="fas fa-fw fa-chart-pie"></i> Emission distribution by default:<ul><li>40% — awards fund</li><li>40% — public initiatives committee</li><li>20% — witnesses</li></ul></p>
+<p>Stable inflation model is embedded in the code: 10% per year. Each 3 seconds a new block is generated, carrying a part of the annual emission. It\'s this very part that goes to the witness as an award (for maintaining the infrastructure of blockchain system), fills up the public initiatives committee and the awards fund, which distribution is managed by the participants of the network.</p>',
+		'code-caption'=>'Code and libraries',
+		'code-info'=>'<p>All the main developments are open (<a href="https://github.com/VIZ-Blockchain" target="_blank">link to GitHub</a>) and most of them are available with a free MIT license:
+<ul class="disc">
+<li><a href="https://github.com/VIZ-Blockchain/viz-cpp-node" target="_blank">VIZ blockchain node in C++</a> — current version in master thread, MIT license.</li>
+<li><a href="https://github.com/VIZ-Blockchain/viz-php-control-panel" target="_blank">Control panel in PHP</a> — supports current VIZ version, MIT license, plugins system, contains media platform in plugin form (<a href="https://viz.world/media/" target="_blank">working example is located at VIZ.world</a>).</li>
+<li><a href="https://github.com/VIZ-Blockchain/viz-js-lib" target="_blank">JS library</a> — supports current VIZ version, MIT license, <a href="https://github.com/VIZ-Blockchain/viz-js-lib/tree/master/doc" target="_blank">documentation available</a>.</li>
+<li><a href="https://github.com/VIZ-Blockchain/viz-go-lib" target="_blank">GO library</a> — supports current VIZ version, MIT license <a href="https://viz.world/media/@asuleymanov/viz-gov2/" target="_blank">author\'s publication</a>.</li>
+<li><a href="https://github.com/t3ran13/php-graphene-node-client" target="_blank">PHP library</a> — supports current VIZ version, MIT license, <a href="https://viz.world/media/@php-node-client/update-of-php-graphene-node-client-v5-1-2-v5-2-0/" target="_blank">author\'s publication</a>.</li>
+<li><a href="https://github.com/VIZ-Blockchain/viz-python-lib" target="_blank">Python library</a> — under construction, MIT license.</li>
+</ul>
+</p>',
+		'services-caption'=>'Services by the developers',
+		'services-info'=>'<p>Among VIZ DAC participants there are developers (programmers) who have created or implemented diverse applications and services:
+<ul class="disc">
+<li><a href="https://viz-doc.rtfd.io/" target="_blank">VIZ.doc</a> — VIZ documentation and description of its mechanisms, <a href="https://viz.world/media/@viz.report/viz-doc-2-0/" target="_blank">author\'s publication</a>.</li>
+<li><a href="https://viz.world/media/" target="_blank">VIZ.World</a> — one of the first web site about VIZ (it\'s where you are now), serves as a media platform about VIZ and its control panel.</li>
+<li><a href="https://viz.world/media/@viz-social-bot/social-viz-gateway-for-telegram/" target="_blank">Social VIZ bot for Telegram</a> — simple service bot, allows to award other participants after being added to a chat.</li>
+<li><a href="https://viz.sale/" target="_blank">VIZ invites shop</a> — Invite codes shop, <a href="https://viz.world/media/@solox/invites/" target="_blank">author\'s publication</a>.</li>
+<li><a href="https://viz.world/media/@xchng/%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B-%D0%B0%D0%B2%D1%82%D0%BE%D0%BC%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B3%D0%BE-%D1%88%D0%BB%D1%8E%D0%B7%D0%B0-xchngviz/" target="_blank">BitShares gateway by XCHNG</a> — allow to trade the ticker <a href="http://cryptofresh.com/a/XCHNG.VIZ" target="_blank">XCHNG.VIZ</a> in BitShares DEX blockchain system.</li>
+<li><a href="https://github.com/denis-skripnik/viz-exchange" target="_blank">Service code for a private exchange</a> — allows to automatically exchange tokens between Graphene blockchain systems, <a href="https://viz.world/media/@denis-skripnik/viz-exchange-1/" target="_blank">author\'s publication</a>.</li>
+<li><a href="https://t.me/viz_awards_bot" target="_blank">Telegram bot with VIZ awards notifications</a> — <a href="https://viz.world/media/@denis-skripnik/viz-awards-notify/" target="_blank">author\'s publication</a>.</li>
+<li><a href="https://t.me/viz_committee_bot" target="_blank">Telegran bit that notifies about applications to VIZ committee.</a> — <a href="https://viz.world/media/@denis-skripnik/viz-committee-bot/" target="_blank">author\'s publication</a>.</li>
+<li><a href="https://t.me/thallid_pom_bot" target="_blank">Thallid POM bot for VIZ</a> — bot that awards Telegram chat participants, <a href="https://viz.world/media/@ksantoprotein/thallid-intro/" target="_blank">author\'s publication</a>.</li>
+<li><a href="https://t.me/viz_props_bot" target="_blank">Telegram bot that notifies about changing VIZ voting parameters</a> — <a href="https://viz.world/media/@denis-skripnik/" target="_blank">author</a>.</li>
+<li><a href="https://t.me/vizwatchdogbot" target="_blank">Watchdog bot for Telegram</a> — follows and notifies about witnesses being active or inactive, <a href="https://viz.world/media/@ropox/viz-watchdog-1539462587/" target="_blank">author\'s publication</a>.</li>
+<li><a href="https://dpos.space/profiles/" target="_blank">Dpos.space</a> — web site with numerous VIZ services (account history review), <a href="https://viz.world/media/@denis-skripnik/dpos.space/" target="_blank">author\'s publication</a>.</li>
+</ul>
+</p>'
+	],
+	'menu'=>[
+		'media'=>'Media platform',
+		'media_feed'=>'Content feed',
+		'media_users'=>'Users',
+		'media_profile'=>'Profile',
+		'media_social'=>'Social connections',
+		'media_notifications'=>'Notifications',
+		'media_publication'=>'Publish content',
+		'wallet'=>'Wallet',
+		'accounts'=>'Accounts',
+		'committee'=>'Commitee',
+		'witnesses'=>'Witnesses',
+		'tools'=>'Tools',
+		'documentation'=>'Documentation',
+		'services'=>'Services',
+		'settings'=>'Settings'
+	],
+	'template'=>[
+		'auth'=>'Authentication',
+		'energy_status'=>'Account energy status',
+		'drop-file'=>'Drag file here (Drop file here)',
+		'loading'=>'Loading',
+		'accounts-descr'=>'Attention! You can authenticate your account <a href="/login/">using this link</a>. Logging out means ending the session with a specific account.<br>To clear the session, disable all accounts.'
+	],
+	'committee'=>[
+		'return'=>'Return',
+		'caption'=>'Committee',
+		'status_0'=>'Pending',
+		'status_1'=>'Canceled by creator',
+		'status_2'=>'Refusal (lack of votes)',
+		'status_3'=>'Failure (total out of range)',
+		'status_4'=>'Accepted (payments)',
+		'status_5'=>'Completed',
+		'fund'=>'Committee fund',
+		'requests-caption'=>'Committee applications',
+		'request-range'=>'Request range',
+		'request-end-time'=>'Request end time',
+		'create-button'=>'Create request',
+		'create-caption'=>'Create committee request',
+		'create-descr'=>'Any account can create a request to be considered by the Committee. By taking part in the voting, network participants determine themselves which initiatives the fund of the committee will support. It can be not just new technical developments, but also internal activity within the network (support, contests, work with beginners), external PR,  useful registrations compensation,  project infrastructure support. The purpose of the committee is to bring maximum benefit to the network and the token.',
+		'request-num'=>'Request #',
+		'request-num-append'=>' To Committee',
+		'request-status'=>'Request status',
+		'request-creator'=>'Request creator',
+		'request-url'=>'Link to request description',
+		'request-worker'=>'Recipient from funds from the committee',
+		'request-min-amount'=>'Minimum amount of tokens to meet the request',
+		'request-max-amount'=>'Maximum amount of tokens to meet the request',
+		'request-start-time'=>'Request creation time',
+		'request-conclusion-time'=>'Decision time',
+		'request-conclusion-amount'=>'Agreed amount',
+		'request-payout-amount'=>'Paid',
+		'request-remain-payout-amount'=>'Remaining to pay',
+		'request-last-payout-time'=>'Last payout time',
+		'request-vote-caption'=>'Vote',
+		'request-vote'=>'Voted to support the request in the amount of',
+		'request-votes-count'=>'Number of votes',
+		'request-votes-percent'=>'Share of votes from the whole network',
+		'request-conclusion-percent'=>'Required',
+		'request-votes-calculated-payout'=>'Calculated amount for the request at the moment'
+	],
+	'mongo'=>[
+		'return'=>'Return',
+		'caption'=>'Mongo admin',
+		'rows-count'=>'Records',
+		'current-page'=>'Current page',
+		'prev-page'=>'Previous page',
+		'next-page'=>'Next page',
+		'indexes-caption'=>'Indexes',
+		'remove-index'=>'Remove index',
+		'index-keys'=>'Keys',
+		'index-keys-weights'=>'Weight',
+		'index-keys-sort'=>'Sort',
+		'add-index-caption'=>'Add index',
+		'add-index-database'=>'Database',
+		'add-index-collection'=>'Collection',
+		'add-index-attr'=>'Index field',
+		'add-index-value'=>'Index',
+		'add-index-action'=>'Create index'
+	],
+	'login'=>[
+		'caption'=>'Authentication',
+		'descr'=>'Attention! During authentication, the key is written to your browser and is not sent to the server. If you clear your browser cache or localStorage, you will need to re-enter your login information.',
+		'form-login-append'=>'Login',
+		'form-regular-key-append'=>'Regular key',
+		'form-active-key-append'=>'Active key (optional)',
+		'form-action'=>'Save access and authenticate',
+		'custom-action'=>'Authenticate via sending a custom transaction to the blockchain',
+		'shield-caption'=>'Authentication via  VIZ Shield'
+	],
+	'witnesses'=>[
+		'caption'=>'Witnesses',
+		'hf-version'=>'VIZ current version',
+		'votes'=>'Votes',
+		'params'=>'Parameters',
+		'version'=>'Version',
+		'version-vote'=>'Votes to switch to version',
+		'version-vote-date'=>'Starting with',
+		'return-link'=>'Return to the list of witnesses',
+		'view-caption'=>'Witness',
+		'view-date'=>'Statement of intent date',
+		'view-last-block'=>'Last block',
+		'view-signing-key'=>'Public signature key',
+		'view-props-caption'=>'Voting chain parameters'
+	],
+	'media'=>[
+		'return'=>'Return',
+		'feed-caption'=>'News feed',
+		'feed-need-auth'=>'Personal news feed is available after authentication and subscription to other users.',
+		'feed-none'=>'There are no posts in your feed.',
+		'tags-title'=>'Tags',
+		'tags-popular'=>'Popular tags',
+		'tags-caption'=>'Tag: #',
+		'tags-caption-append'=>'',
+		'tags-count'=>'Numbers of marks',
+		'tags-awards'=>'Total awards',
+		'profile-caption'=>'Profile',
+		'publication-caption'=>'Publish content',
+		'publication-permlink'=>'URL',
+		'publication-title'=>'Title',
+		'publication-foreword'=>'Preface (text preview)',
+		'publication-cover'=>'Cover link (thumbnail preview)',
+		'publication-content'=>'Content',
+		'publication-upload-image'=>'Image upload',
+		'publication-wysiwyg'=>'WYSIWYG',
+		'publication-beneficiaries'=>'Beneficiaries',
+		'publication-tags'=>'Comma separated tags(key terms for content search)',
+		'publication-action'=>'Publish',
+		'publication-warning'=>'<i class="fas fa-exclamation-circle"></i> Attention! <em>Anyone can use the published information without your permission, as it will be stored in the public blockchain system. The information cannot be deleted.</em>',
+		'beneficiaries-caption'=>'Beneficiaries',
+		'beneficiaries-descr'=>'You can specify multiple VIZ users who will receive a part of your award:',
+		'beneficiaries-account-login'=>'Login',
+		'beneficiaries-weight'=>'Award percentage',
+		'beneficiaries-add'=>'Add',
+		'users-caption'=>'Users',
+		'users-count'=>'Total users',
+		'users-current-page'=>'Current page',
+		'users-pages-count'=>'Total pages',
+		'users-descr'=>'<em>Users with zero SHARES are hidden.</em>',
+		'users-next-page'=>'Next page',
+		'users-prev-page'=>'Previous page',
+		'user-manage-caption'=>'User management',
+		'user-manage-id'=>'Account ID',
+		'user-manage-status'=>'Status',
+		'user-manage-show'=>'Display user',
+		'user-manage-hide'=>'Hide user',
+		'user-manage-hide-content'=>'Hide user content',
+		'user-manage-hide-subcontent'=>'Hide user subcontent',
+		'edit-caption'=>'Edit',
+		'edit-link'=>'Edit',
+		'edit-action'=>'Save changes',
+		'comments-button'=>'Show comment form',
+		'comments-caption'=>'Comments',
+		'content-caption'=>'User content',
+		'user-follow'=>'Subscribe',
+		'user-unfollow'=>'Unsubscribe',
+		'user-ignore'=>'Ignore',
+		'user-unignore'=>'Stop ignoring',
+		'awards-count-append'=>'Awards',
+		'awarded-energy'=>'You have spent energy',
+		'award-action'=>'Award',
+		'menu-profile-link'=>'Go to your account',
+		'badge-awards-outcome-count'=>'Awarded',
+		'badge-content-count'=>'Publications',
+		'badge-subcontent-count'=>'Comments',
+		'badge-balance'=>'Balance'
+	],
+	'tools'=>[
+		'title'=>'Tools',
+		'return'=>'Return',
+		'list'=>[
+			'paid-subscriptions'=>'Paid subscriptions system',
+			'invites'=>'Invite system (checks)',
+			'create-account'=>'Create account',
+			'delegation'=>'Delegate share',
+			'schedule'=>'Witnesses schedule',
+			'blocks'=>'Blocks overview',
+			'reset-account'=>'Change access to the account',
+			'localization'=>'Localization'
+		],
+		'reset-account-descr'=>'Attention! This form of access change uses the master key mechanism. It generates private keys for each type of access. Public keys will be translated into blockchain. Make sure you save the master key, otherwise you risk losing access to your account and its tokens forever.',
+		'create-account-descr'=>'Attention! This account creation form uses the master key mechanism. With the help of it, private keys are formed, and from them — public ones, which will be translated into the blockchain. Make sure you additionally save the master key or private keys.',
+		'schedule_support_caption'=>'Backup witnesses',
+		'blocks'=>[
+			'genesis'=>'Network launch time',
+			'api_num'=>'Number of blocks',
+			'index_num'=>'Number of blocks in database (index)',
+			'cursor_num'=>'Number of blocks in database (cursor)',
+			'users_num'=>'Number of users in database',
+			'global_var'=>'Global variable',
+			'ratio'=>'Conversion rate total_vesting_fund/total_vesting_shares on block',
+			'ratio_equal'=>'Equal',
+			'chain_properties_caption'=>'Voting network settings',
+			'last_blocks_caption'=>'Last blocks',
+			'block_title'=>'VIZ block overview',
+			'block_caption'=>'VIZ block #',
+			'near_blocks_caption'=>'Adjacent blocks'
+		],
+		'localization'=>[
+			'title'=>'Localization',
+			'descr'=>'List of available localizations for the control panel.',
+			'view_descr1'=>'You can',
+			'view_descr2'=>'Save localization file',
+			'view_descr3'=>', edit it and suggest edits to the community.',
+			'active'=>'Active',
+			'inactive'=>'Inactive',
+			'selected'=>'Selected',
+			'select'=>'Select'
+		],
+		'ps'=>[
+			'descr'=>'System of paid subscriptions — universal processing tool for registration of periodic VIZ payments for service or services. The account can <a href="/tools/paid-subscriptions/set-options/">configure the options for an agreement with periodic payments</a> towards it. Other users can <a href="/tools/paid-subscriptions/sign-agreement/">to sign the agreement on periodic payments (to apply for a paid subscription)</a>, <a href="/tools/paid-subscriptions/manage-subscription/">manage automatic payments</a>.',
+			'descr-open'=>'Any party can check the status of the agreement, the list of subscriptions or subscribers registered in the public blockchain system VIZ with the help of API requests.',
+			'set-offer-caption'=>'Install the conditions of paid subscription',
+			'set-offer-descr'=>'You can set up options for agreement with periodic payments to your account (paid subscription). Fill in the form below and send the transaction to VIZ blockchain.',
+			'sign-offer-caption'=>'Signature of paid subscription agreement',
+			'sign-offer-descr'=>'Download the terms of the agreement with the creator of the paid subscription. Select the subscription level and sign the agreement, send the transaction to VIZ blockchain.',
+			'sign-offer-descr-open'=>'Any party can check the status of the agreement in the public blockchain system VIZ using API requests.',
+			'manage-contracts-caption'=>'Manage automatic payments',
+			'manage-contracts-descr'=>'Select a valid paid subscription and set the automatic payment option.'
+		],
+		'invites'=>[
+			'descr'=>'Invite codes (also known as checks) are a universal tool for transferring a fixed number of VIZ tokens to other people (or bots) outside the blockchain. You can redeem the code in two ways: <a href="/tools/invites/claim/">transfer its balance to your account</a> or <a href="/tools/invites/registration/">use it to register a new account</a>.',
+			'claim_caption'=>'Pick up the code balance',
+			'registration_caption'=>'Registration by invite code',
+			'registration_descr'=>'Attention! You can <a href="/tools/invites/">check the balance of the code before registering</a> with the public key. After registration, the entire balance of the code will be transferred to SHARES of the new account. All account keys will be identical to those specified in the form, if desired, you can <a href="/tools/reset-account/">share keys for different types of access</a>.'
+		]
+	]
+];
 $l10n_preset['en']=array_replace_recursive($l10n_preset['ru'],$l10n_preset['en']);
 $l10n_preset['en']=array_replace_recursive($l10n_preset['en'],$l10n_preset['en']);
 
 $l10n_preset['be']=[
-	'template'=>[
-		'auth'=>'Аўтэнтыфікацыя',
-		'energy_status'=>'Стан энергіі акаўнта',
-		'drop-file'=>'Перацягнiце файл сюды',
-		'loading'=>'Загрузка',
-	],
 	'js'=>[
 		'global'=>[
 			'loading'=>'Загрузка',
@@ -1136,15 +1789,15 @@ $l10n_preset['be']=[
 			'attempt'=>'спроба',
 			'error'=>'памылка',
 			'need_auth'=>'вам неабходна <a href="/login/">аўтарызавацца</a>.',
-			'need_auth_with_active_key'=>'вам неабходна <a href="/login/">аўтарызавацца</a> з Active ключом.',
+			'need_auth_with_active_key'=>'вам неабходна <a href="/login/">аўтарызавацца</a> з Active-ключом.',
 			'generate_new'=>'згенераваць новы',
-			'spend_energy'=>'Вы страцілі энергіі',
+			'spend_energy'=>'Вы страцілі энергіі'
 		],
 		'success'=>[
-			'award_author'=>'Вы паспяхова ўзнагародзілі аўтара',
+			'award_author'=>'Вы паспяхова ўзнагародзілі аўтара'
 		],
 		'create_account'=>[
-			'descr'=>'Для таго, каб стварыць рахунак, запоўніце колькасць токенаў (якія вы перададзіце новаму акаўнта), колькасць долі (якую делегируете акаўнта) і сгенерируйте галоўны пароль (прыватныя ключы будуць сфармаваныя аўтаматычна)',
+			'descr'=>'Дзеля таго, каб стварыць акаўнт, запоўніце колькасць токенаў (якія вы перададзіце новаму акаўнту), колькасць долі (якую делегуеце акаўнту) і згенеруйце галоўны пароль (прыватныя ключы будуць сфармаваныя аўтаматычна)',
 			'login'=>'Лагін',
 			'tokens'=>'Колькасць VIZ, якiя перадаюцца',
 			'shares'=>'Колькасць SHARES для дэлегавання',
@@ -1152,7 +1805,7 @@ $l10n_preset['be']=[
 			'action'=>'Стварыць акаўнт',
 			'success'=>'Акаўнт паспяхова створаны',
 			'error'=>'Памылка пры стварэнні акаўнта',
-			'login_is_not_available'=>'Лагін недаступны',
+			'login_is_not_available'=>'Лагін недаступны'
 		],
 		'reset_account'=>[
 			'login'=>'Лагін',
@@ -1160,31 +1813,33 @@ $l10n_preset['be']=[
 			'global_password'=>'Галоўны пароль',
 			'action'=>'Усталяваць новы доступ',
 			'success'=>'Дадзеныя акаўнта паспяхова абноўлены',
-			'error'=>'Памылка пры абнаўленні акаўнта',
+			'error'=>'Памылка пры абнаўленні акаўнта'
 		],
 		'errors'=>[
 			'user_not_found'=>'Карыстальнік не знойдзены',
 			'user_not_provided'=>'Карыстальнік не паказаны',
 			'awarded_content'=>'Вы ўжо ўзнагароджвалі дадзены кантэнт',
 			'api'=>'Памылка ў API запыце',
-			'invalid_regular_key'=>'Regular key несапраўдны',
-			'invalid_active_key'=>'Active key несапраўдны',
-			'failure_regular_key'=>'Regular key не падыходзіць',
-			'failure_active_key'=>'Active key несапраўдны',
+			'invalid_regular_key'=>'Regular-key несапраўдны',
+			'invalid_active_key'=>'Active-key несапраўдны',
+			'failure_regular_key'=>'Regular-key не падыходзіць',
+			'failure_active_key'=>'Active-key не падыходзіць'
 		],
 		'media'=>[
 			'follow_success'=>'Вы паспяхова падпісаліся на',
 			'follow_failure'=>'Не ўдаецца адправіць аперацыю падпіскі на',
 			'unfollow_success'=>'Вы сталі выконваць нейтралітэт з',
+			'unfollow_success_append'=>'',
 			'unfollow_failure'=>'Не ўдаецца адправіць аперацыю нейтралітэту з',
+			'unfollow_failure_append'=>'Не ўдаецца дабавіць',
 			'follow'=>'Падпісацца',
 			'unfollow'=>'Адпісацца',
 			'ignore'=>'Ігнараваць',
 			'stop_ignore'=>'Перастаць ігнараваць',
 			'ignore_success'=>'Вы паспяхова пачалі ігнараваць',
 			'ignore_failure'=>'Не ўдаецца адправіць аперацыю ігнаравання',
-			'comment_success'=>'Каментар адпраўлены',
-			'comment_failure'=>'Памылка пры адпраўцы каментара',
+			'comment_success'=>'Каментарый адпраўлены',
+			'comment_failure'=>'Памылка пры адпраўцы каментарыя',
 			'posting_status'=>'Адпраўка',
 			'content_rewrite'=>'Кантэнт з такім URL ужо існуе, вы хочаце замяніць яго?',
 			'content_rewrite_success'=>'Публікацыя паспяхова зменена, пераадрасацыя праз 6 секунд & hellip;',
@@ -1193,11 +1848,11 @@ $l10n_preset['be']=[
 			'content_error'=>'Памылка пры публікацыі',
 			'content_publication'=>'Апублікаваць',
 			'reply_placeholder'=>'Калі ласка, увядзіце ваш адказ...',
-			'reply_action'=>'Адказаць',
+			'reply_action'=>'Адказаць'
 		],
 		'profile'=>[
-			'edit_descr'=>'Вы можаце змяніць публічны профіль у блокчейне, запоўніўшы форму ніжэй.',
-			'edit_warning'=>'Увага!пасля ўнесеных і захаваных зменаў ніхто не зможа выдаліць гэтыя дадзеныя з інтэрнэту.',
+			'edit_descr'=>'Вы можаце змяніць публічны профіль у блокчэйне, запоўніўшы форму ніжэй.',
+			'edit_warning'=>'Увага! Пасля ўнесеных і захаваных зменаў ніхто не здоляе выдаліць гэтыя дадзеныя з інтэрнэту.',
 			'current_account'=>'Актыўны акаўнт',
 			'edit_nickname'=>'Псеўданім (nickname)',
 			'edit_about'=>'Пра акаўнт (about)',
@@ -1207,7 +1862,7 @@ $l10n_preset['be']=[
 			'gender_male'=>'Мужчынскі',
 			'gender_female'=>'Жаночы',
 			'edit_action'=>'Захаваць профіль',
-			'edit_success'=>'Профіль паспяхова захаваны',
+			'edit_success'=>'Профіль паспяхова захаваны'
 		],
 		'sessions'=>[
 			'auth_error'=>'Памылка пры ініцыялізацыі сесіі, паспрабуйце аўтарызавацца паўторна пазней',
@@ -1216,19 +1871,19 @@ $l10n_preset['be']=[
 			'success'=>'Вы паспяхова аўтарызаваны, сесія ініцыялізаваная',
 			'custom_failure'=>'Не ўдаецца адправіць custom аперацыю для ініцыялізацыі сесіі',
 			'verify'=>'Сесія пацверджана',
-			'active_key'=>'Захаваны Active ключ',
+			'active_key'=>'Захаваны Active-ключ',
 			'viz_shield'=>'Выкарыстоўваецца VIZ-Shield',
 			'active'=>'Выкарыстоўваецца',
 			'switch'=>'пераключыцца',
-			'eject'=>'адключыць',
+			'eject'=>'адключыць'
 		],
 		'shield'=>[
-			'locked'=>'У вас заблякаваны кашалёк. Пасля разблакоўкі перазагрузіце старонку або',
+			'locked'=>'У вас заблакаваны кашалёк. Пасля разблакоўкі перазагрузіце старонку або',
 			'link'=>'націсніце на спасылку',
 			'accounts'=>'Абярыце акаўнт для аўтарызацыі на сайце:',
 			'login'=>'Прайсці аўтэнтыфікацыю',
-			'not_found'=>'У вас не ўключаны <a class="start-shield-action link">VIZ.Shield< / a>. Пасля < a class= "start-shield-action link" >запуску </a> і разблакоўкі перазагрузіце старонку або<a class="shield-auth-control-action link">націсніце на спасылку < / a>.',
-			'miss_user'=>'Не ўдаецца атрымаць інфармацыю пра карыстальніка',
+			'not_found'=>'У вас не ўключаны <a class="start-shield-action link">VIZ.Shield</a>. Пасля <a class="start-shield-action link">запуску </a> і разблакоўкі перазагрузіце старонку або <a class="shield-auth-control-action link">націсніце на спасылку </a>.',
+			'miss_user'=>'Не ўдаецца атрымаць інфармацыю пра карыстальніка'
 		],
 		'wallet'=>[
 			'withdraw_disabled'=>'Паніжэнне долі адменена',
@@ -1238,13 +1893,13 @@ $l10n_preset['be']=[
 			'no_records'=>'Запісы адсутнічаюць',
 			'return_delegation_caption'=>'Вяртанне дэлегаванай долі',
 			'returning'=>'вернецца',
-			'delegated_caption'=>'Спіс дэлегаванай лёсу',
+			'delegated_caption'=>'Спіс дэлегаванай долі',
 			'none_delegated'=>'Вы нікому не дэлегавалі долю.',
 			'delegated_hold'=>'трымае',
 			'delegated_expire'=>'адклікаць можна',
 			'received_delegation_caption'=>'Трыманне долі',
 			'none_received_delegation'=>'Ніхто не дэлегаваў вам долю.',
-			'received_delegation_from'=>'ат',
+			'received_delegation_from'=>'водзыў магчымы ат',
 			'received_delegation_expire_time'=>'водзыў магчымы з',
 			'enable_withdraw'=>'Уключыць паніжэнне',
 			'disable_withdraw'=>'Адключыць паніжэнне',
@@ -1254,7 +1909,7 @@ $l10n_preset['be']=[
 			'delegated'=>'Дэлегавана',
 			'received_delegation'=>'Атрымана дэлегаваннем',
 			'delegate_caption'=>'Прызначыць дэлегаванне',
-			'delegate_descr'=>'Для таго каб адклікаць дэлегаванне, пакажыце ў колькасці SHARES нулявое значэнне. Вяртанне дэлегаванай долі можа заняць час.',
+			'delegate_descr'=>'Дзеля таго, каб адклікаць дэлегаванне, пакажыце ў колькасці SHARES нулявое значэнне. Вяртанне дэлегаванай долі можа заняць час.',
 			'delegate_receiver'=>'атрымальнік',
 			'delegate_amount'=>'колькасць',
 			'delegate_action'=>'Дэлегаваць',
@@ -1262,12 +1917,12 @@ $l10n_preset['be']=[
 			'transfer_receiver'=>'атрымальнік',
 			'transfer_amount'=>'колькасць',
 			'transfer_memo'=>'заўважка',
-			'transfer_in_shares'=>'пераклад долю ў сеткі',
+			'transfer_in_shares'=>'пераклад долі ў сеткі',
 			'transfer_action'=>'Адправіць пераклад',
 			'transfer_failure'=>'Памылка ў перакладзе',
 			'history_caption'=>'Гісторыя перакладаў',
 			'history_filter_text'=>'Фільтр',
-			'history_filter_range1'=>'Ад',
+			'history_filter_range1'=>'Ат',
 			'history_filter_range2'=>'Да',
 			'history_filter_all'=>'Усе',
 			'history_filter_income'=>'Уваходныя',
@@ -1277,37 +1932,37 @@ $l10n_preset['be']=[
 			'history_amount'=>'Колькасць',
 			'history_receiver'=>'Атрымальнік',
 			'history_sender'=>'Адпраўнік',
-			'history_date'=>'Дата',
+			'history_date'=>'Дата'
 		],
-		'wysiwyg'=>[//editor styles
+		'wysiwyg'=>[
 			'center'=>'Цэнтраванне',
 			'spoiler'=>'Спойлер',
-			'header'=>'Загаловак',
+			'header'=>'Загаловак'
 		],
 		'invite'=>[
-			'reg_success'=>'Инвайт-код паспяхова актываваны',
-			'reg_failure'=>'Памылка пры актывацыі инвайт-кода',
+			'reg_success'=>'Iнвайт-код паспяхова актываваны',
+			'reg_failure'=>'Памылка пры актывацыі iнвайт-кода',
 			'login'=>'Лагін',
 			'unavailable'=>'недаступны',
 			'claim_success'=>'Код паспяхова актываваны',
 			'claim_failure'=>'Памылка пры актывацыі кода',
-			'create_caption'=>'Стварэнне новага инвайт коду',
-			'create_descr'=>'Для таго каб стварыць инвайт код, запоўніце колькасць токенаў, якія вы выдаткуеце і згенеруйце пару ключоў (прыватны для перадачы іншаму карыстальніку, публічны для праверкі кода).',
+			'create_caption'=>'Стварэнне новага iнвайт коду',
+			'create_descr'=>'Для таго каб стварыць iнвайт код, запоўніце колькасць токенаў, якія вы выдаткуеце і згенеруйце пару ключоў (прыватны для перадачы іншаму карыстальніку, публічны для праверкі кода).',
 			'create_private_key'=>'Прыватны ключ',
 			'create_public_key'=>'Публічны ключ (для праверкі)',
 			'create_amount'=>'Колькасць VIZ',
 			'create_action'=>'Стварыць код',
-			'create_success'=>'Инвайт-код паспяхова створаны (інфармацыя захавана ў файл)',
+			'create_success'=>'Iнвайт-код паспяхова створаны (інфармацыя захавана ў файл)',
 			'create_failure'=>'Памылка пры стварэнні інвайт-кода',
-			'lookup_caption'=>'Праверка инвайт кода',
+			'lookup_caption'=>'Праверка iнвайт кода',
 			'lookup_public_key'=>'Калі ласка, увядзіце публічны код для праверкі:',
 			'lookup_action'=>'Пошук і праверка кода',
-			'claim_descr'=>'Калі ласка, увядзіце инвайт-код (прыватны ключ) і імя акаўнта, куды перавесці баланс кода:',
-			'claim_private_key'=>'Инвайт-код (прыватны ключ)',
+			'claim_descr'=>'Калі ласка, увядзіце iнвайт-код (прыватны ключ) і імя акаўнта, куды перавесці баланс кода:',
+			'claim_private_key'=>'Iнвайт-код (прыватны ключ)',
 			'claim_receiver'=>'Атрымальнік',
 			'claim_action'=>'Актываваць код',
-			'registration_descr'=>'Калі ласка, увядзіце инвайт-код (прыватны ключ), імя акаўнта і прыватны ключ для яго (сфарміраваны аўтаматычна):',
-			'registration_private_key'=>'Инвайт-код (прыватны ключ)',
+			'registration_descr'=>'Калі ласка, увядзіце iнвайт-код (прыватны ключ), імя акаўнта і прыватны ключ для яго (сфарміраваны аўтаматычна):',
+			'registration_private_key'=>'Iнвайт-код (прыватны ключ)',
 			'registration_account'=>'Імя акаўнта',
 			'registration_account_private_key'=>'Прыватны ключ для акаўнта',
 			'registration_action'=>'Прыватны ключ для акаўнта',
@@ -1320,11 +1975,11 @@ $l10n_preset['be']=[
 			'lookup_claimed'=>'баланс пераведзены карыстальніку',
 			'lookup_registered'=>'зарэгістраваны карыстальнік',
 			'lookup_claimed_balance'=>'Скарыстаны баланс',
-			'lookup_secret_key'=>'Праверачны прыватны ключ',
+			'lookup_secret_key'=>'Праверачны прыватны ключ'
 		],
 		'committee'=>[
 			'create_success'=>'Вы паспяхова падалі заяўку',
-			'cancel_success'=>'Вы успешно отменили заявку',
+			'cancel_success'=>'Вы паспяхова адмянілі заявку',
 			'vote_success'=>'Вы паспяхова прынялі ўдзел у галасаванні па заяўцы',
 			'vote_caption'=>'Галасаванне за заяўку',
 			'vote_percent'=>'Працэнт ад максімальнай сумы заяўкі',
@@ -1336,12 +1991,12 @@ $l10n_preset['be']=[
 			'request_min_amount'=>'Мінімальная сума токенаў',
 			'request_max_amount'=>'Максімальная сума токенаў',
 			'request_duration'=>'Працягласць заяўкі ў днях (ад 5 да 30)',
-			'request_action'=>'Стварыць заяўку',
+			'request_action'=>'Стварыць заяўку'
 		],
 		'witness'=>[
 			'invalid_user'=>'Бягучы карыстальнік не супадае з дэлегатам для абнаўлення',
-			'update_success'=>'Дадзеныя паспяхова трансліравацца ў сетку',
-			'properties_success'=>'Параметры паспяхова трансліравацца ў сетку',
+			'update_success'=>'Дадзеныя паспяхова транслююцца ў сетку',
+			'properties_success'=>'Параметры паспяхова транслююцца ў сетку',
 			'vote_success'=>'Вы паспяхова прагаласавалі за дэлегата',
 			'votes_list'=>'Вашы галасы',
 			'vote_caption'=>'Галасаванне за дэлегата',
@@ -1364,21 +2019,21 @@ $l10n_preset['be']=[
 			'params_inflation_witness_percent'=>'Доля інфляцыі для ўзнагароды дэлегатам (працэнт)',
 			'params_inflation_ratio_committee_vs_reward_fund'=>'Суадносіны падзелу астатку інфляцыі паміж Камітэтам і Фондам узнагарод (працэнт)',
 			'params_inflation_recalc_period'=>'Колькасць блокаў паміж пералікам інфляцыйнай мадэлі',
-			'params_min_curation_percent'=>'(Састарэлае) мінімальна-дапушчальны працэнт куратарскай ўзнагароды',
-			'params_max_curation_percent'=>'(Састарэлае) максімальна-дапушчальны працэнт куратарскай ўзнагароды',
+			'params_min_curation_percent'=>'(Састарэлае) мінімальна дапушчальны працэнт куратарскай ўзнагароды',
+			'params_max_curation_percent'=>'(Састарэлае) максімальна дапушчальны працэнт куратарскай ўзнагароды',
 			'params_flag_energy_additional_cost'=>'(Састарэлае) дадатковая трата энергіі на сцяг (працэнт)',
-			'params_action'=>'Усталяваць параметры сеткі дэлегата',
+			'params_action'=>'Усталяваць параметры сеткі дэлегата'
 		],
-		'ps'=>[//paid subscriptions
+		'ps'=>[
 			'subscribe_success'=>'Умовы пагаднення падпісаныя',
 			'subscribe_failure'=>'Памылка пры подпісы умоў пагаднення',
-			'set_success'=>'Памылка пры подпісы умоў пагаднення',
-			'set_failure'=>'Умовы пагаднення ўстаноўлены',
+			'set_success'=>'Умовы пагаднення ўстаноўлены',
+			'set_failure'=>'Памылка пры ўсталёўцы умоў пагаднення',
 			'manage_list'=>'Упраўленне падпіскамі',
 			'contract_with'=>'Пагадненне з',
 			'account_prepand'=>'У акаўнта',
 			'none_contracts'=>'адсутнічаюць актыўныя платныя падпіскі.',
-			'sign_offer_descr'=>'Калі ласка, увядзіце лагін стваральніка пагаднення, каб паглядзець ўмовы пагаднення платнай падпіскі.',
+			'sign_offer_descr'=>'Калі ласка, увядзіце лагін стваральніка пагаднення, каб паглядзець умовы пагаднення платнай падпіскі.',
 			'sign_offer_login'=>'Лагін',
 			'sign_offer_lookup'=>'Запытаць інфармацыю',
 			'set_offer_caption'=>'Умовы пагаднення платнай падпіскі',
@@ -1396,8 +2051,8 @@ $l10n_preset['be']=[
 			'lookup_subscriptions_caption'=>'Спіс пагадненняў на платныя падпіскі',
 			'lookup_subscriptions_descr'=>'Калі ласка, увядзіце лагін падпісчыка, каб паглядзець звязаныя з ім пагаднення на платныя падпіскі.',
 			'lookup_subscriptions_login'=>'Лагін',
-			'lookup_subscriptions_action'=>'Выполнить поиск',
-			'lookup_contract_caption'=>'Информация о соглашении',
+			'lookup_subscriptions_action'=>'Выканаць пошук',
+			'lookup_contract_caption'=>'інфармацыя аб пагадненні',
 			'lookup_contract_descr'=>'Калі ласка, увядзіце лагін падпісчыка, лагін стваральніка пагаднення, каб паглядзець бягучы статус Пагаднення і інфармацыю па ім.',
 			'lookup_contract_subscriber'=>'Лагін падпісчыка',
 			'lookup_contract_creator'=>'Лагін стваральніка пагаднення',
@@ -1410,12 +2065,12 @@ $l10n_preset['be']=[
 			'view_offer_amount_per_level'=>'Колькасць токенаў за кожны ўзровень',
 			'view_offer_period'=>'Працягласць падпіскі (колькасць дзён)',
 			'view_offer_addon_caption'=>'Дадатковая інфармацыя',
-			'view_offer_active_auto_renewal'=>'Актыўныя пагаднення з аўтапрадленнем',
-			'view_offer_active_auto_renewal_summary_amount'=>'Актыўныя пагаднення з аўтапрадленнем на суму',
-			'view_offer_active'=>'Актыўныя пагаднення',
-			'view_offer_active_summary_amount'=>'Актыўныя пагаднення на суму',
+			'view_offer_active_auto_renewal'=>'Актыўныя пагадненні з аўтапрадленнем',
+			'view_offer_active_auto_renewal_summary_amount'=>'Актыўныя пагадненні з аўтапрадленнем на суму',
+			'view_offer_active'=>'Актыўныя пагадненні',
+			'view_offer_active_summary_amount'=>'Актыўныя пагадненні на суму',
 			'view_offer_none'=>'Умоў пагаднення не знойдзена',
-			'contracts_caption'=>'Актыўныя пагаднення',
+			'contracts_caption'=>'Актыўныя пагадненні',
 			'contracts_with_creator'=>'Пагадненне з',
 			'contracts_none'=>'адсутнічаюць актыўныя платныя падпіскі.',
 			'inactive_contracts_caption'=>'Неактыўныя пагадненні',
@@ -1453,7 +2108,7 @@ $l10n_preset['be']=[
 			'sign_offer_url'=>'Спасылка з інфармацыяй',
 			'sign_offer_update_date'=>'Дата апошняй змены ўмоў пагаднення',
 			'sign_offer_closed'=>'Новыя пагадненні і падаўжэнне старых прыпынена',
-			'sign_offer_levels'=>'Количество уровней подписки',
+			'sign_offer_levels'=>'Колькасць узроўняў падпіскі',
 			'sign_offer_amount_per_level'=>'Колькасць токенаў за кожны ўзровень',
 			'sign_offer_period'=>'Колькасць токенаў за кожны ўзровень',
 			'sign_offer_approve'=>'Калі вы згодныя з умовамі пагаднення, Абярыце ўзровень падпіскі, Усталюйце пры неабходнасці аўтаматычнае падаўжэнне пагаднення.',
@@ -1461,14 +2116,85 @@ $l10n_preset['be']=[
 			'sign_offer_cost'=>'выніковы кошт падпіскі',
 			'sign_offer_auto_renewal'=>'Уключыць аўтаматычную аплату',
 			'sign_offer_action'=>'Падпісаць пагадненне па платнай падпісцы',
-			'sign_offer_none'=>'Умоў пагаднення не знойдзена',
-		],
+			'sign_offer_none'=>'Умоў пагаднення не знойдзена'
+		]
 	],
 	'landing'=>[
-		'descriptions-dao'=>'ДАГ (дэцэнтралізаванае аўтаномнае грамадства)',
+		'seo-title'=>'Блокчэйн VIZ ',
+		'seo-description'=>'Блокчэйн VIZ — дэцэнтралізаванае аўтаномнае таварыства (ДАТ) з магутнай механікай узнагарод з эмісіі',
+		'symbol'=>'Сімвал VIZ',
+		'descriptions-dao'=>'ДАТ (дэцэнтралізаванае аўтаномнае таварыства)',
 		'descriptions-committee'=>'Камітэт грамадскіх ініцыятыў',
 		'descriptions-award'=>'Ўзнагароджанне годных',
 		'descriptions-participation'=>'Справядлівы ўдзел',
+		'learn-more'=>'Даведацца больш',
+		'slogan-award'=>'Узнагароджвай',
+		'slogan-award-descr'=>'Стымулюйце экспансію ДАТ у любым кірунку, ўзнагароджвайце карыснае.',
+		'slogan-create'=>'Стварай',
+		'slogan-create-descr'=>'Удзельнічайце ў сумесных праектах, стварайце, размаўляйце.',
+		'slogan-manage'=>'Кіруй',
+		'slogan-manage-descr'=>'Удзельнікі ДАТ кіруюць усім блокчэйнам VIZ. Далучайцеся!',
+		'award-info'=>'<p>кожны ўдзельнік можа ўзнагароджваць іншых карыстальнікаў з фонду узнагарод, дапаўняемага эмісіяй. Чым вышэй доля ўдзельніка ў ДАТ, тым вялікшую долю эмісіі ён можа раздаць ў выглядзе ўзнагарод. Ўзнагароджанне адбываецца імгненна.<br>таксама ўзнагарода можа быць <a href="https://viz.world/media/@on1x/viz-control-panel-beneficiaries/" target="_blank">падзелена паміж некалькімі атрымальнікамі</a>.</p>
+<p><strong>ўсвядомлены ўдзел</strong> у ДАТ VIZ лагічна зводзіцца да ўзнагароджання карысных дзеянняў для ДАТ ці асабіста для карыстальніка.</p>
+<p>Такім чынам, ўзнагарода стымулюе карысныя дзеянні, спараджаючы ланцуговую рэакцыю і павялічваючы каштоўнасць ДАТ VIZ.</p>
+<p>Хтосьці напісаў карысны сэрвіс і варты ўзнагароды? <strong>проста ўзнагародзіце яго.</strong> Гэта вернецца ў сто разоў.</p>
+<p>Хтосьці напісаў цікавы артыкул, запісаў відэаролік, пасадзіў дрэва, напісаў справаздачу па валанцёрскай працы, намаляваў карціну ці зрабіў грамадска значную справу? Проста ўзнагародзіце яго. <strong>ўзнагароджанне стымулюе патэрн паводзін.</strong> <a href="https://viz.world/media/@on1x/viz-real-life-usage/" target="_blank">добрае прыцягвае добрае </a>.</p>
+<p>Энергія аднаўляецца лінейна на 20% за 24 гадзіны, што дазваляе планаваць і кантраляваць яе выкарыстанне.</p>
+<p><em>Абмежаванняў на выкарыстанне энергіі няма, акаўнт можа выкарыстоўваць для ўзнагароджання ўсе 100% свайго патэнцыялу.</em></p>',
+		'create-info'=>'<p>Кім бы вы ні былі, чым бы ні займаліся, <strong>ініцыятыўным </strong> заўсёды знойдзецца месца ў ДАТ VIS:</p>
+<p>1. Карыстальнікі могуць проста выкарыстоўваць сайт (інтэграваны з VIZ) па прызначэнні і атрымліваць ўзнагароды ад іншых.</p>
+<p>2.Уладальнікі сайтаў і супольнасцяў могуць падключыць VIZ, <strong>стымуляваць карысныя дзеянні ўнутры сваёй супольнасці</strong> і фармаваць рэйтынг або рэпутацыю карыстальнікаў. Гэта могуць быць любыя сайты: творчыя групы, зборнік навуковых публікацый, апавяданні для дзяцей, блог пра відэагульні або партал валанцёраў для збору ахвяраванняў.</p>
+<p>3. Даследчыкам будзе цікава разабрацца ў тонкасцях механікі блакчэйн-сістэмы, візіянерам — прымаць удзел у асвеце пачаткоўцаў, пашырэнні лакальных супольнасцяў.</p>
+<p>4. Для распрацоўшчыкаў гульняў, прыкладанняў і сэрвісаў — <strong>інтэграцыя VIZ</strong> для ўзнагароджання сваіх карыстальнікаў. Сэрвіс платных падпісак дазваляе арганізаваць працэсінг перакладаў токенаў для любога віду прыкладанняў. Механіка ўзнагароджанняў з эмісіі таксама дазваляе стварыць замкнёную сістэму з уласным размеркаваннем фонду ўзнагарод прыкладання.</p>
+<p>Вы можаце рабіць што пажадаеце - ў адзіночку ці з камандай аднадумцаў. Усё залежыць ад вас саміх.</p>',
+		'manage-info'=>'<p>Кіраванне адбываецца на добраахвотнай аснове. Прынцып ДАТ VIZ-свабода выбару і праўдзівая далевая дэмакратыя. Калі хтосьці не карыстаецца сваім правам кіравання паводле сваёй долі, тады кіраваць будуць ініцыятыўныя ўдзельнікі ДАТ.</p>
+<p>Кожны ўдзельнік можа канвертаваць токены (VIZ) у долю ДАТ VIZ (SHARES). Менавіта дзякуючы далеваму ўдзелу і адбываецца кіраванне ДАТ VIZ:</p>
+<p>1. <strong>Кіраванне фондам узнагарод</strong> — кожны ўдзельнік можа выкарыстоўваць энергію (аднаўляльны з часам патэнцыял долі ў ДАТ VIZ), каб на канкурэнтнай аснове распараджацца часткай фонду узнагарод. Ўзнагароджанне адбываецца імгненна.</p>
+<p>2. <strong>Кіраванне фондам камітэта падтрымкі ініцыятыў</strong> - кожны ўдзельнік можа прагаласаваць за заяўку ў Камітэце, паўплываўшы на суму, якую атрымае выканаўца ў выпадку задавальнення заяўкі. Патэнцыял ўплыву лінейна залежыць ад долі ў ДАТ VIZ.</p>
+<p>3. <strong>Галасаванне за дэлегатаў</strong> - кожны ўдзельнік можа прагаласаваць за любую колькасць дэлегатаў, якія падтрымліваюць інфраструктуру сеткі і ўдзельнічаюць у <a href="https://viz.world/media/@on1x/viz-quorum-calc-median-chain-properties/" target="_blank">галасаванні за параметры блакчэйн-сістэмы</a>. Вага ад долі ў ДАТ VIZ будзе пароўну размеркаваны паміж абранымі дэлегатамі.</p>',
+		'features-caption'=>'Асаблівасці і магчымасці',
+		'features-info'=>'<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/viz-technical-documentation/" target="_blank">ДАТ VIZ</a> — толькі супольнасць удзельнікаў VIZ вырашае, як будзе развівацца экасістэма. Ніякіх начальнікаў або афіцыйнага сайта! Бачыце магчымасць? Проста бярыцеся за яе і рэалізуйце!</p>
+<p><img src="/check.svg" alt=""> Вельмі хуткі-3 секунды паміж блокамі, блокчэйн VIZ ставіцца на Graphene экасістэме.</p>
+<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/viz-quorum-calc-median-chain-properties/" target="_blank">Кансенсус кіравання блокчэйн-сістэмай </a> — унікальная сістэма чаргавання дэлегатаў.</p>
+<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/fair-dpos/" target="_blank">Справядлівы DPoS</a> — удзельнік можа прагаласаваць за любую колькасць дэлегатаў, пры гэтым вага яго долі падзеліцца паміж імі пароўну.</p>
+<p><img src="/check.svg" alt=""> Ўзнагароджанне карыснага адбываецца з фонду узнагарод, папаўняецца эмісіяй. Кожны ўдзельнік, такім чынам, можа кіраваць сваім "патокам эмісіі", згодна са сваёй доляй ДАТ VIZ.</p>
+<p><img src="/check.svg" alt=""> Камітэт падтрымкі ініцыятыў - дапамагайце развіваць ДАТ VIZ і атрымлівацьць за гэта токены ад камітэта. Удзельнічайце ў працы Камітэта, галасуючы за ўзнагароджанне іншых удзельнікаў супольнасці.</p>
+<p><img src="/check.svg" alt=""> <a href="https://viz.world/media/@on1x/paid-subscriptions-processing/" target="_blank">Сістэма платных падпісак</a> — працэсінг перыядычных перакладаў на блокчэйне.</p>
+<p><img src="/check.svg" alt=""> Сістэма ваўчараў (яны ж iнвайт-коды) i <a href="https://viz.world/media/@on1x/anonymous-account/" target="_blank">ананімная рэгістрацыя </a> — дзве дадатковых механікі для працэсінгу стварэння акаўнтаў.</p>
+<p><img src="/check.svg" alt=""> Магчымасць экспансіі-механізм ўзнагароджання унікальны: ён імгненны, <a href="https://viz.world/media/@on1x/viz-control-panel-beneficiaries/" target="_blank">гнуткі</a>,самаузабнаўляльны, імкнецца да справядлівай долевай канкурэнцыі за фонд узнагарод. У сукупнасці з <a href="https://viz.world/media/@on1x/viz-gates/" target="_blank">сацыяльнымі шлюзамі</a> дазваляе прыцягваць без рэгістрацыі ініцыятыўных і стваральных людзей з усяго Інтэрнэту!</p>',
+		'economic-caption'=>'Эканоміка',
+		'economic-info'=>'<center><img src="/ru-inflation.png" alt="Inflation diagram"></center>
+<hr>
+<p><i class="fas fa-fw fa-chart-pie"></i> Размеркаванне эмісіі па змаўчанні:<ul> <li>4% - фонд узнагарод</li><li>4% - камітэт грамадскіх ініцыятыў</li><li>2% - дэлегатам</li></ul></p>
+<p>У код закладзена стабільная мадэль інфляцыі-10% у год. Кожныя 3 секунды фармуецца новы блок, які нясе ў сабе частку гадавой эмісіі. Менавіта яна ідзе як ўзнагарода дэлегату( за падтрыманне інфраструктуры блокчэйн-сістэмы), напаўняе камітэт грамадскіх ініцыятыў і фонд узнагарод, размеркаваннем якіх кіруюць ўдзельнікі сеткі.</p>',
+		'code-caption'=>'Код і бібліятэкі',
+		'code-info'=>'<p>Усе асноўныя распрацоўкі адкрыты (<a href="https://github.com/VIZ-Blockchain" target="_blank">спасылка на GitHub</a>) і большасць з іх даступныя па свабоднай MIT ліцэнзіі:
+<ul class="disc">
+<li><a href="https://github.com/VIZ-Blockchain/viz-cpp-node" target="_blank">Блакчэйн-нода VIZ на C ++ </a> — актуальная версія ў галінцы master, MIT Ліцэнзія.</li>
+<li><a href="https://github.com/VIZ-Blockchain/viz-php-control-panel" target="_blank">Кантрольная панэль на PHP</a> — падтрымлівае актуальную версію VIZ, MIT Ліцэнзія, сістэма убудоў, змяшчае медыя-платформу ў выглядзе плагіна (<a href="https://viz.world/media/" target="_blank">працоўны прыклад размешчаны на VIZ.world</a>).</li>
+<li><a href="https://github.com/VIZ-Blockchain/viz-js-lib" target="_blank">JS бібліятэка</a> - падтрымлівае актуальную версію VS, MIT Ліцэнзія, <a href="https://github.com/VIZ-Blockchain/vis-js-lib/tree/master/doc" target="_blank">дакументацыя даступная</a>.</li>
+<li><a href="https://github.com/VIZ-Blockchain/viz-go-lib" target="_blank">GO бібліятэка</a> - падтрымлівае актуальную версію VICE, MIT Ліцэнзія, <a href="https://viz.world/media/@asuleymanov/viz-gov2/" target="_blank">Публікацыя аўтара</a>.</li>
+<li><a href="https://github.com/t3ran13/php-graphene-node-client" target="_blank">PHP бiблiятэка</a> — падтрымлівае актуальную версію VIZ, MIT Ліцэнзія, <a href="https://viz.world/media/@php-node-client/update-of-php-graphene-node-client-v5-1-2-v5-2-0/" target="_blank">Публікацыя аўтара</a>.</li>
+<li><a href="https://github.com/VIZ-Blockchain/viz-python-lib" target="_blank">Python бібліятэка</a> — у распрацоўцы, MIT Ліцэнзія.</li>
+</ul>
+</p>',
+		'services-caption'=>'Сэрвісы ад распрацоўшчыкаў',
+		'services-info'=>'<p>Сярод удзельнікаў ДАТ VIZ ёсць распрацоўшчыкі (праграмісты), якія стварылі або імплементавалі розныя прыкладання або сэрвісы:
+<ul class="disc">
+<li><a href="https://viz-doc.rtfd.io/" target="_blank">VIZ.doc</a> — дакументацыя і апісанне механізмаў VIZ, <a href="https://viz.world/media/@viz.report/viz-doc-2-0/" target=" _blank">Публікацыя аўтара</a>.</li>
+<li><a href="https://viz.world/media/" target="_blank">VIZ.World</a> — адзін з першых сайтаў пра VIS (на ім вы зараз і знаходзіцеся), выступае ў ролі медыя-платформы пра VIN і кантрольнай панэлі.</li>
+<li><a href="https://viz.world/media/@viz-social-bot/social-viz-gateway-for-telegram/" target="_blank">Сацiяльны бот VIZ для Telegram</a> — просты сэрвіс-бот, пасля дадання ў любы чат дазваляе ўзнагароджваць іншых удзельнікаў.</li>
+<li><a href="https://viz.sale/" target="_blank">просты сэрвіс-бот, пасля дадання ў любы чат дазваляе ўзнагароджваць іншых удзельнікаў.</li>
+<li><a href="https://viz.world/media/@xchng/%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B-%D0%B0%D0%B2%D1%82%D0%BE%D0%BC%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B3%D0%BE-%D1%88%D0%BB%D1%8E%D0%B7%D0%B0-xchngviz/" target="_blank">BitShares шлюз от XCHNG</a> — дазваляе гандляваць цікерам <a href="http://crypto fresh.com/a/XCHNG.VIS" target="_blank">XCHNG.VIS</a> у DEX блакчэйн-сістэме BitShares.</li>
+<li><a href="https://github.com/denis-skripnik/viz-exchange" target="_blank">Код сэрвісу для прыватнага абменніка</a> — дазваляе абменьваць ў аўтаматычным рэжыме токены паміж Graphene блакчэйн-сістэмамі, <a href="https://viz.world/media/@denis-skripnik/viz-exchange-1/" target="_blank">Публікацыя аўтара</a>.</li>
+<li><a href="https://t.me/viz_awards_bot" target="_blank">Тэлеграм бот апавяшчэнняў аб узнагародах у VIZ</a> — <a href="https://viz.world/media/@denis-skripnik/viz-awards-notify/" target="_blank">Публікацыя аўтара</a>.</li>
+<li><a href="https://t.me/viz_committee_bot" target="_blank">Тэлеграм бот апавяшчэнняў аб заяўках ў Камітэт VIZ</a> — <a href="https://viz.world/media/@denis-skripnik/viz-committee-bot/" target="_blank">Публікацыя аўтара</a>.</li>
+<li><a href="https://t.me/thallid_pom_bot" target="_blank">Thallid POM бот для VIZ</a> - бот для ўзнагароджання ўдзельнікаў тэлеграм чата, <a href="https://viz.world/media/@ksantoprotein/thallid-intro/" target="_blank">Публікацыя аўтара</a>.</li>
+<li><a href="https://t.me/viz_props_bot" target="_blank">Тэлеграм бот апавяшчэнняў аб змене галасуемых параметраў VIZ</a> — <a href="https://viz.world/media/@denis-skripnik/" target="_blank">автор</a>.</li>
+<li><a href="https://t.me/vizwatchdogbot" target="_blank">Тэлеграм бот Watchdog</a> - сочыць і паведамляе аб актыўнасці (або неактыўнасці) дэлегатаў, <a href="https://viz.world/media/@ropox/viz-watchdog-1539462587/" target="_blank">Публікацыя аўтара</a>.</li>
+<li><a href="https://dpos.space/profiles/" target="_blank">Dpos.space</a> — сайт з мноствам сэрвісаў для VIZ (прагляд гiсторыi аккаунта), <a href="https://viz.world/media/@denis-skripnik/dpos.space/" target="_blank">Публікацыя аўтара</a>.</li>
+</ul>
+</p>'
 	],
 	'menu'=>[
 		'media'=>'Медыя платформа',
@@ -1485,7 +2211,217 @@ $l10n_preset['be']=[
 		'tools'=>'Інструменты',
 		'documentation'=>'Дакументацыя',
 		'services'=>'Сэрвісы',
-		'settings'=>'Налады',
+		'settings'=>'Налады'
 	],
+	'template'=>[
+		'auth'=>'Аўтэнтыфікацыя',
+		'energy_status'=>'Стан энергіі акаўнта',
+		'drop-file'=>'Перацягнiце файл сюды',
+		'loading'=>'Загрузка',
+		'accounts-descr'=>'Увага! Прайсці аўтэнтыфікацыю акаўнтам вы можаце <a href="/login/">па гэтай спасылцы</a>. Выхад з акаўнта значыць выхад з сесіі канкрэтным акаўнтам.<br>для ачысткі сесіі адключыце ўсе акаўнты.'
+	],
+	'committee'=>[
+		'return'=>'Вярнуцца',
+		'caption'=>'Камiтэт',
+		'status_0'=>'Чакае разгляду',
+		'status_1'=>'Адменена стваральнікам',
+		'status_2'=>'Адмова (недахоп галасоў)',
+		'status_3'=>'Адмова (выніковая сума па-за дыяпазону)',
+		'status_4'=>'Прынятая (ідуць выплаты)',
+		'status_5'=>'Завершаны',
+		'fund'=>'Фонд камітэту',
+		'requests-caption'=>'Заяўкі ў Камітэт',
+		'request-range'=>'дыяпазон заяўкі',
+		'request-end-time'=>'Час заканчэння заяўкі',
+		'create-button'=>'Стварыць заяўку',
+		'create-caption'=>'Стварыць заяўку ў Камітэт',
+		'create-descr'=>'Любы акаунт можа стварыць заяўку для разгляду ў Камітэце. Удзельнікі сеткі прымаючы ўдзел у галасаванні самі вызначаюць, на што будзе накіраваны фонд камітэта. Гэта могуць быць не толькі тэхнічныя новыя распрацоўкі, але і ўнутраная актыўнасць у сеткі (Падтрымка, конкурсы, праца з пачаткоўцамі), знешні піяр, кампенсацыя за карысныя рэгістрацыі, падтрымка інфраструктуры праектаў. Мэта камітэта-прынесці максімальную карысць сетцы і токену.',
+		'request-num'=>'Заяўка #',
+		'request-num-append'=>' ў Камітэт',
+		'request-status'=>'Статус заяўкі',
+		'request-creator'=>'Стваральнік заяўкі',
+		'request-url'=>'Спасылка на апісанне заяўкі',
+		'request-worker'=>'Атрымальнік сродкаў з Камітэта',
+		'request-min-amount'=>'Мінімальная сума токенаў для задавальнення заяўкі',
+		'request-max-amount'=>'Максімальная сума токенаў заяўкі',
+		'request-start-time'=>'Час стварэння заяўкі',
+		'request-conclusion-time'=>'Час прыняцця рашэння',
+		'request-conclusion-amount'=>'Ўзгодненая сума',
+		'request-payout-amount'=>'Выплачаны',
+		'request-remain-payout-amount'=>'Засталося выплаціць',
+		'request-last-payout-time'=>'Час апошняй выплаты',
+		'request-vote-caption'=>'Галасаванне',
+		'request-vote'=>'прагаласаваў за забеспячэнне заяўкі ў памеры',
+		'request-votes-count'=>'Колькасць галасоў',
+		'request-votes-percent'=>'доля прагаласаваўшых ад усёй сеткі',
+		'request-conclusion-percent'=>'патрабуецца',
+		'request-votes-calculated-payout'=>'разлічаная сума заяўкі на бягучы момант'
+	],
+	'mongo'=>[
+		'return'=>'Вярнуцца',
+		'caption'=>'Mongo admin',
+		'rows-count'=>'запісу',
+		'current-page'=>'Бягучая старонка',
+		'prev-page'=>'Папярэдняя старонка',
+		'next-page'=>'Наступная старонка',
+		'indexes-caption'=>'Індэксы',
+		'remove-index'=>'Выдалiць iндэкс',
+		'index-keys'=>'ключы',
+		'index-keys-weights'=>'вага',
+		'index-keys-sort'=>'сартаваць',
+		'add-index-caption'=>'Дадаць індэкс',
+		'add-index-database'=>'База дадзеных',
+		'add-index-collection'=>'Калекцыя',
+		'add-index-attr'=>'Поле для індэкса',
+		'add-index-value'=>'Iндэкс',
+		'add-index-action'=>'Стварыць iндэкс'
+	],
+	'login'=>[
+		'caption'=>'Аўтэнтыфікацыя',
+		'descr'=>'Увага! Пры аўтэнтыфікацыі ключ запісваецца ў ваш браўзэр і не перадаецца на сервер. Калі вы ачысціце кэш браўзэра або localStorage, вам патрэбна будзе зноў ўвесці свае дадзеныя дзеля ўваходу.',
+		'form-login-append'=>'лагін',
+		'form-regular-key-append'=>'regular-ключ',
+		'form-active-key-append'=>'актыўны ключ (па жаданнi)',
+		'form-action'=>'Захаваць доступ і прайсці аўтэнтыфікацыю',
+		'custom-action'=>'Прайсці аўтэнтыфікацыю праз адпраўку custom аперацыі ў блокчэйн',
+		'shield-caption'=>'Аўтэнтыфікацыя праз VIZ Shield'
+	],
+	'witnesses'=>[
+		'caption'=>'Дэлегаты',
+		'hf-version'=>'Бягучая версія VIZ',
+		'votes'=>'Галасоў',
+		'params'=>'параметры',
+		'version'=>'версія',
+		'version-vote'=>'галасуе за пераход на версію',
+		'version-vote-date'=>'пачыная з',
+		'return-link'=>'Вярнуцца да спісу дэлегатаў',
+		'view-caption'=>'Дэлегат',
+		'view-date'=>'Дата заявы аб намерах',
+		'view-last-block'=>'Апошні блок',
+		'view-signing-key'=>'Публічны ключ подпісу',
+		'view-props-caption'=>'Галасуемыя параметры ланцуга'
+	],
+	'media'=>[
+		'return'=>'Вярнуцца',
+		'feed-caption'=>'Стужка навін',
+		'feed-need-auth'=>'Асабістая стужка навін, даступная пасля аўтэнтыфікацыі і падпіскі на іншых карыстальнікаў.',
+		'feed-none'=>'У вас няма публікацый у стужцы.',
+		'tags-title'=>'тэгі',
+		'tags-popular'=>'Папулярныя тэгі',
+		'tags-caption'=>'Тэг: #',
+		'tags-caption-append'=>'',
+		'tags-count'=>'колькасць адзнак',
+		'tags-awards'=>'сумарная ўзнагарода',
+		'profile-caption'=>'Профіль',
+		'publication-caption'=>'Апублікаваць кантэнт',
+		'publication-permlink'=>'URL',
+		'publication-title'=>'Загаловак',
+		'publication-foreword'=>'Прадмова (прэв\'ю для тэксту)',
+		'publication-cover'=>'Спасылка на вокладку (мініяцюра для прэв\'ю)',
+		'publication-content'=>'Змесціва кантэнту',
+		'publication-upload-image'=>'Загрузіць малюнак',
+		'publication-wysiwyg'=>'WYSIWYG',
+		'publication-beneficiaries'=>'Бенефіцыяры',
+		'publication-tags'=>'Тэгі праз коску (ключавыя тэрміны для пошуку кантэнту)',
+		'publication-action'=>'Апублікаваць',
+		'publication-warning'=>'<i class="fas fa-exclamation-circle"></i> Увага! <em>Хто заўгодна зможа выкарыстоўваць публікуемую інфармацыю без вашага дазволу, так як яна будзе захавана ў публічнай блакчэйн-сістэме. Інфармацыю немагчыма будзе выдаліць.</em>',
+		'beneficiaries-caption'=>'Бенефіцыяры',
+		'beneficiaries-descr'=>'Вы можаце паказаць некалькіх карыстальнікаў VIZ, якія будуць атрымліваць частку вашай ўзнагароды:',
+		'beneficiaries-account-login'=>'Лагін',
+		'beneficiaries-weight'=>'Працэнт ад ўзнагароды',
+		'beneficiaries-add'=>'Дадаць',
+		'users-caption'=>'Карыстальнікі',
+		'users-count'=>'Усяго карыстальнікаў',
+		'users-current-page'=>'бягучая старонка',
+		'users-pages-count'=>'усяго старонак',
+		'users-descr'=>'<em>Карыстальнікі з нулявым SHARES схаваныя.</em>',
+		'users-next-page'=>'Наступная старонка',
+		'users-prev-page'=>'Папярэдняя старонка',
+		'user-manage-caption'=>'Кіраванне карыстальнікам',
+		'user-manage-id'=>'ЙД акаўнта',
+		'user-manage-status'=>'Статут',
+		'user-manage-show'=>'Паказваць карыстальніка',
+		'user-manage-hide'=>'Схаваць карыстальніка',
+		'user-manage-hide-content'=>'Схаваць кантэнт карыстальніка',
+		'user-manage-hide-subcontent'=>'Схаваць субкантэнт карыстальніка',
+		'edit-caption'=>'Рэдагаванне',
+		'edit-link'=>'Рэдагаваць',
+		'edit-action'=>'Захаваць змены',
+		'comments-button'=>'Адлюстраваць форму каментавання',
+		'comments-caption'=>'Каментар',
+		'content-caption'=>'Змест карыстальніка',
+		'user-follow'=>'Падпісацца',
+		'user-unfollow'=>'Адпісацца',
+		'user-ignore'=>'ігнараваць',
+		'user-unignore'=>'Перастаць ігнараваць',
+		'awards-count-append'=>'узнагарод',
+		'awarded-energy'=>'Вы патрацілі энергіі',
+		'award-action'=>'Узнагародзіць',
+		'menu-profile-link'=>'Перайсці ў свой акаунт',
+		'badge-awards-outcome-count'=>'Узнагародзіў',
+		'badge-content-count'=>'Публікацый',
+		'badge-subcontent-count'=>'Каментароў',
+		'badge-balance'=>'Баланс'
+	],
+	'tools'=>[
+		'title'=>'Начынне',
+		'return'=>'Вярнуцца',
+		'list'=>[
+			'paid-subscriptions'=>'Сістэма платных падпісак',
+			'invites'=>'Сістэма iнвайтов (чэкі)',
+			'create-account'=>'Стварэнне акаўнта',
+			'delegation'=>'Дэлегаванне долі',
+			'schedule'=>'Расклад дэлегатаў',
+			'blocks'=>'Агляд блокаў',
+			'reset-account'=>'Змена доступаў да акаўнта',
+			'localization'=>'Лакалізацыя'
+		],
+		'reset-account-descr'=>'Увага! Дадзеная форма змены доступаў выкарыстоўвае механізм галоўнага пароля. З яго дапамогай  фармуюцца прыватныя ключы для кожнага тыпу доступу. Публічныя ключы будуць трансляваныя ў блокчэйн. Пераканайцеся, што захавалі дадаткова галоўны пароль, інакш вы рызыкуеце страціць доступ да акаўнта і яго токенаў назаўжды.',
+		'create-account-descr'=>'Увага! Дадзеная форма стварэння акаўнта выкарыстоўвае механізм галоўнага пароля. З дапамогай яго фармуюцца прыватныя ключы і з іх публічныя, якія будуць трансляваныя ў блокчэйн. Пераканайцеся, што захавалі дадаткова галоўны пароль або прыватныя ключы.',
+		'schedule_support_caption'=>'Рэзервовыя дэлегаты',
+		'blocks'=>[
+			'genesis'=>'Час запуску сеткі',
+			'api_num'=>'Колькасць блокаў',
+			'index_num'=>'Колькасць блокаў у базе дадзеных (індэкс)',
+			'cursor_num'=>'Колькасць блокаў у базе дадзеных (курсор)',
+			'users_num'=>'Колькасць карыстальнікаў у базе дадзеных',
+			'global_var'=>'Глабальная пераменная',
+			'ratio'=>'Каэфіцыент канвертацыі total_vesting_fund/total_vesting_shares на блоку',
+			'ratio_equal'=>'роўны',
+			'chain_properties_caption'=>'Галасуемыя параметры сеткі',
+			'last_blocks_caption'=>'Апошнія блокі',
+			'block_title'=>'Агляд блока VIZ',
+			'block_caption'=>'VIZ блок #',
+			'near_blocks_caption'=>'Суседнія блокі'
+		],
+		'localization'=>[
+			'title'=>'Лакалізацыя',
+			'descr'=>'Спіс даступных лакалізацый для кантрольнай панэлі.',
+			'view_descr1'=>'Вы можаце',
+			'view_descr2'=>'захаваць файл лакалізацыі',
+			'view_descr3'=>', адрэдагаваць яго і прапанаваць супольнасці праўкі.',
+			'active'=>'актыўна',
+			'inactive'=>'неактыўна',
+			'selected'=>'выбрана',
+			'select'=>'выбраць'
+		],
+		'ps'=>[
+			'descr'=>'Сістэма платных падпісак - універсальны працэсінгавы інструмент для афармлення перыядычных плацяжоў VIZ за сэрвіс ці паслугі. Акаўнт можа <a href="/tools/paid-subscriptions/set-options/">наладзіць опцыі для пагаднення з перыядычнымі плацяжамі</a> У яго бок. Іншыя карыстальнікі могуць <a href="/tools/paid-subscriptions/sign-agreement/">падпісаць пагадненне на перыядычныя плацяжы (аформіць платную падпіску)</a>, <a href="/tools/paid-subscriptions/manage-subscription/">кіраваць аўтаматычнымі плацяжамі</a>.',
+			'descr-open'=>'Любы бок з дапамогай API запытаў можа праверыць статус пагаднення, Спіс падпісак або падпісчыкаў зафіксаваных у публічнай блокчэйн-сістэме VIZ.',
+			'set-offer-caption'=>'Ўстаноўка умоў платнай падпіскі',
+			'set-offer-descr'=>'Вы можаце наладзіць опцыі дзеля пагаднення з перыядычнымі плацяжамі на ваш рахунак (платная падпіска). Запоўніце ніжэй форму і адпраўце транзакцыю ў блокчэйн VIZ.',
+			'sign-offer-caption'=>'Подпіс пагаднення платнай падпіскі',
+			'sign-offer-descr'=>'Загрузіце ўмовы пагаднення з стваральнікам платнай падпіскі. Абярыце ўзровень падпіскі і падпішыце пагадненне, адпраўце транзакцыю ў блокчэйн VIZ.',
+			'sign-offer-descr-open'=>'Любы бок з дапамогай API запытаў можа праверыць статус пагаднення ў публічнай блокчэйн-сістэме VIZ.',
+			'manage-contracts-caption'=>'Кіраванне аўтаматычнымі плацяжамі',
+			'manage-contracts-descr'=>'Выберыце дзейсную платную падпіску і ўсталюйце параметр па аўтаматычнай аплаце.'
+		],
+		'invites'=>[
+			'descr'=>'Iнвайт коды (яны ж чэкі) - універсальны інструмент дзеля перадачы фіксаванай колькасці токенаў VIZ іншым людзям (або ботам) па-за блокчэйна. Пагасіць код можна двума спосабамі: <a href="/tools/invites/claim/">перавесці яго баланс сабе на рахунак</a> АБО <a href="/tools/invites/registration/">зарэгістраваць з яго дапамогай новы акаўнт</a>.',
+			'claim_caption'=>'Забраць баланс кода',
+			'registration_caption'=>'Рэгістрацыя па iнвайт-коду',
+			'registration_descr'=>'Увага! Вы можаце <a href="/tools/invites/">праверыць баланс кода да рэгістрацыі</a> з дапамогай публічнага ключа. Пасля рэгістрацыі ўвесь баланс кода будзе пераведзены ў SHARES новага акаўнта. Усе ключы акаўнта будуць ідэнтычныя паказанаму ў форме, пры жаданні вы можаце <a href="/tools/reset-account/">падзяліць ключы для розных тыпаў доступу</a>.'
+		]
+	]
 ];
 $l10n_preset['be']=array_replace_recursive($l10n_preset['ru'],$l10n_preset['be']);
