@@ -16,7 +16,7 @@ if('login'==$path_array[1]){
 	<div class="article control">';
 	print '<p>'.$l10n['login']['descr'].'</p>';
 	print '<p><label><input type="text" name="login" class="round"> &mdash; '.$l10n['login']['form-login-append'].'</label></p>';
-	print '<p><input type="password" name="posting_key" class="round"> &mdash; '.$l10n['login']['form-regular-key-append'].'</label></p>';
+	print '<p><input type="password" name="regular_key" class="round"> &mdash; '.$l10n['login']['form-regular-key-append'].'</label></p>';
 	print '<p><input type="password" name="active_key" class="round"> &mdash; '.$l10n['login']['form-active-key-append'].'</label></p>';
 	print '<p><span class="auth-error"></span></p>';
 	print '<p><input type="button" class="auth-action button" value="'.$l10n['login']['form-action'].'"></p>';
@@ -53,17 +53,17 @@ if('witnesses'==$path_array[1]){
 		<h1><i class="fas fa-fw fa-user-shield"></i> '.$l10n['witnesses']['caption'].'</h1>
 		<div class="article">
 		<div class="witness-votes"></div>
-		<h3>ТОП-100</h3>';
+		<h3>TOP-100</h3>';
 		$hf=$api->execute_method('get_hardfork_version',array(),true);
 		print '<p>'.$l10n['witnesses']['hf-version'].': '.$hf.'</p>';
 		$hf=intval(str_replace('.','',$hf));
 		$hf=intval($hf/10);
-		$list=$api->execute_method('get_witnesses_by_vote',array('',100));
+		$list=$api->execute_method('get_witnesses_by_counted_vote',array('',100));
 		$num=1;
 		foreach($list as $witness_arr){
 			$witness_hf=intval(str_replace('.','',$witness_arr['running_version']));
 			$witness_hf=intval($witness_hf/10);
-			print '<p'.('VIZ1111111111111111111111111111111114T1Anm'==$witness_arr['signing_key']?' style="opacity:0.5"':'').'>#'.$num.' <a href="/@'.$witness_arr['owner'].'/">@'.$witness_arr['owner'].'</a> (<a href="'.htmlspecialchars($witness_arr['url']).'">url</a>), '.$l10n['witnesses']['votes'].': '.number_format (floatval($witness_arr['votes'])/1000000/1000,1,'.',' ').'k SHARES, <a href="/witnesses/'.$witness_arr['owner'].'/">'.$l10n['witnesses']['params'].'</a>, '.$l10n['witnesses']['version'].': ';
+			print '<p'.('VIZ1111111111111111111111111111111114T1Anm'==$witness_arr['signing_key']?' style="opacity:0.5"':'').'>#'.$num.' <a href="/@'.$witness_arr['owner'].'/">@'.$witness_arr['owner'].'</a> (<a href="'.htmlspecialchars($witness_arr['url']).'">url</a>), '.$l10n['witnesses']['votes'].': '.number_format (floatval($witness_arr['counted_votes'])/1000000/1000,1,'.',' ').'k'.($witness_arr['penalty_percent']?' (<i class="fas fa-fw fa-angle-down" title="Penalty"></i>'.(min(10000,$witness_arr['penalty_percent'])/100).'%'.')':'').' SHARES, <a href="/witnesses/'.$witness_arr['owner'].'/">'.$l10n['witnesses']['params'].'</a>, '.$l10n['witnesses']['version'].': ';
 			if($witness_hf>$hf){
 				print '<span style="color:#090">';
 				print $witness_arr['running_version'];
