@@ -207,7 +207,7 @@ if('publication'==$path_array[2]){
 	print '<div class="page content">
 	<h1><i class="fas fa-fw fa-plus-circle"></i> '.$l10n['media']['publication-caption'].'</h1>
 	<div class="article post-content control">';
-	print '<p><input type="text" name="permlink" class="round wide" placeholder="'.$l10n['media']['publication-caption'].'"></p>';
+	print '<p><input type="text" name="permlink" class="round wide" placeholder="'.$l10n['media']['publication-permlink'].'"></p>';
 	print '<p><input type="text" name="title" class="round wide" placeholder="'.$l10n['media']['publication-title'].'"></p>';
 	print '<p><input type="text" name="foreword" class="round wide" placeholder="'.$l10n['media']['publication-foreword'].'"></p>';
 	print '<p><input type="text" name="cover" class="round wide" placeholder="'.$l10n['media']['publication-cover'].'"></p>';
