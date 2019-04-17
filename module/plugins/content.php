@@ -3,8 +3,8 @@ class viz_plugin_content extends viz_plugin{
 	function custom($info,$data){
 		global $config;
 		$custom_name=$data['id'];
-		$required_posting_auths=$data['required_posting_auths'];
-		$required_auths=$data['required_auths'];
+		$required_regular_auths=$data['required_regular_auths'];
+		$required_active_auths=$data['required_active_auths'];
 		$json=$data['json'];
 		$json=json_decode($json,true);
 
@@ -13,7 +13,7 @@ class viz_plugin_content extends viz_plugin{
 			$data=$json[1];
 			$user_login=$data['author'];
 			if('content'==$custom_action){
-				if(in_array($user_login,$required_posting_auths)){
+				if(in_array($user_login,$required_regular_auths)){
 					if(!isset($data['parent_author'])){
 						$data['parent_author']='';
 					}
@@ -233,7 +233,7 @@ class viz_plugin_content extends viz_plugin{
 			}
 			if('delete_content'==$custom_action){
 				$user_login=$data['author'];
-				if(in_array($user_login,$required_posting_auths)){
+				if(in_array($user_login,$required_regular_auths)){
 					$user_id=get_user_id($data['author']);
 					$permlink=mongo_prepare($data['permlink']);
 					$find_content=mongo_find_id('content',array('author'=>(int)$user_id,'permlink'=>$permlink));
@@ -264,7 +264,7 @@ class viz_plugin_content extends viz_plugin{
 					$author_id=get_user_id($author);
 					if($author_id){
 						$user_login=$custom_data['account'];
-						if(in_array($user_login,$required_posting_auths)){
+						if(in_array($user_login,$required_regular_auths)){
 							$user_id=get_user_id($user_login);
 							if($user_id){
 								$permlink=$custom_data['permlink'];

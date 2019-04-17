@@ -1,12 +1,12 @@
 var gate=viz;
-var api_ws_gates=['wss://viz.lexai.host/','wss://solox.world/ws','wss://ws.viz.ropox.app/'];
-var api_http_gates=['https://rpc.viz.lexai.host/','https://solox.world/','https://rpc.viz.ropox.app/'];
+var api_ws_gates=['wss://viz.lexai.host/','wss://solox.world/ws'/*,'wss://ws.viz.ropox.app/'*/];
+var api_http_gates=['https://rpc.viz.lexai.host/','https://solox.world/'/*,'https://rpc.viz.ropox.app/'*/];
 var api_gates=api_http_gates;
 var best_gate=-1;
 var best_gate_latency=-1;
 var api_gate;
 api_gate=api_gates[Math.floor(Math.random()*api_gates.length)];
-if(null!=localStorage.getItem('api_gate_default')){
+if(false){//null!=localStorage.getItem('api_gate_default')){
 	api_gate=localStorage.getItem('api_gate_default');
 	gate.config.set('websocket',api_gate);
 }
@@ -307,10 +307,10 @@ function follow_user(user,proper_target){
 			console.log(err);
 		}
 		if(users[current_user].shield){
-			shield_action(current_user,'custom',{id:'follow',required_auths:[],required_posting_auths:[current_user],json:json},follow_success,follow_failure);
+			shield_action(current_user,'custom',{id:'follow',required_active_auths:[],required_regular_auths:[current_user],json:json},follow_success,follow_failure);
 		}
 		else{
-			gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'follow',json,function(err,result){
+			gate.broadcast.custom(users[current_user].regular_key,[],[current_user],'follow',json,function(err,result){
 				if(!err){
 					follow_success(result);
 				}
@@ -334,10 +334,10 @@ function unfollow_user(user,proper_target){
 			console.log(err);
 		}
 		if(users[current_user].shield){
-			shield_action(current_user,'custom',{id:'follow',required_auths:[],required_posting_auths:[current_user],json:json},unfollow_success,unfollow_failure);
+			shield_action(current_user,'custom',{id:'follow',required_active_auths:[],required_regular_auths:[current_user],json:json},unfollow_success,unfollow_failure);
 		}
 		else{
-			gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'follow',json,function(err,result){
+			gate.broadcast.custom(users[current_user].regular_key,[],[current_user],'follow',json,function(err,result){
 				if(!err){
 					unfollow_success(result);
 				}
@@ -361,10 +361,10 @@ function ignore_user(user,proper_target){
 			console.log(err);
 		}
 		if(users[current_user].shield){
-			shield_action(current_user,'custom',{id:'follow',required_auths:[],required_posting_auths:[current_user],json:json},ignore_success,ignore_failure);
+			shield_action(current_user,'custom',{id:'follow',required_active_auths:[],required_regular_auths:[current_user],json:json},ignore_success,ignore_failure);
 		}
 		else{
-			gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'follow',json,function(err,result){
+			gate.broadcast.custom(users[current_user].regular_key,[],[current_user],'follow',json,function(err,result){
 				if(!err){
 					ignore_success(result);
 				}
@@ -407,10 +407,10 @@ function session_generate(){
 					console.log(err);
 				}
 				if(users[current_user].shield){
-					shield_action(current_user,'custom',{id:'session',required_auths:[],required_posting_auths:[current_user],json:'["auth",{"key":"'+key+'"}]'},session_success,session_failure);
+					shield_action(current_user,'custom',{id:'session',required_active_auths:[],required_regular_auths:[current_user],json:'["auth",{"key":"'+key+'"}]'},session_success,session_failure);
 				}
 				else{
-					gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'session','["auth",{"key":"'+key+'"}]',function(err,result){
+					gate.broadcast.custom(users[current_user].regular_key,[],[current_user],'session','["auth",{"key":"'+key+'"}]',function(err,result){
 						if(!err){
 							session_success(result);
 						}
@@ -442,6 +442,17 @@ function save_session(){
 	view_session();
 	session_control();
 }
+function fix_keys(){
+	for(user in users){
+		if(typeof users[user]['posting_key'] !== 'undefined'){
+			users[user]['regular_key']=users[user]['posting_key'];
+			users[user]['posting_key']='';
+			delete users[user]['posting_key'];
+		}
+	}
+	let users_json=JSON.stringify(users);
+	localStorage.setItem('users',users_json);
+}
 function load_session(){
 	if(null!=localStorage.getItem('users')){
 		users=JSON.parse(localStorage.getItem('users'));
@@ -450,6 +461,7 @@ function load_session(){
 		current_user=localStorage.getItem('current_user');
 	}
 	if(current_user){
+		fix_keys();
 		view_session();
 		session_control();
 		wait_session();
@@ -618,9 +630,9 @@ function try_auth_shield(login){
 				return;
 			}
 			else{
-				users[login]={'posting_key':'','active_key':'','shield':true};
-				if(json.posting){
-					users[login].posting_key=true;
+				users[login]={'regular_key':'','active_key':'','shield':true};
+				if(json.regular){
+					users[login].regular_key=true;
 				}
 				if(json.active){
 					users[login].active_key=true;
@@ -894,10 +906,10 @@ function invite_claim(secret_key,receiver){
 		});
 	}
 }
-function reset_account_with_general_key(account_login,owner_key,general_key){
+function reset_account_with_general_key(account_login,master_key,general_key){
 	let auth_types = ['regular','active','master','memo'];
 	let keys=gate.auth.getPrivateKeys(account_login,general_key,auth_types);
-	let owner = {
+	let master = {
 		'weight_threshold': 1,
 		'account_auths': [],
 		'key_auths': [
@@ -911,7 +923,7 @@ function reset_account_with_general_key(account_login,owner_key,general_key){
 			[keys.activePubkey, 1]
 		]
 	};
-	let posting = {
+	let regular = {
 		'weight_threshold': 1,
 		'account_auths': [],
 		'key_auths': [
@@ -930,8 +942,8 @@ function reset_account_with_general_key(account_login,owner_key,general_key){
 				add_notify(l10n.reset_account.success);
 				download('viz-reset-account.txt','VIZ.World Account: '+account_login+'\r\nGeneral key (for private keys): '+general_key+'\r\nPrivate master key: '+keys.master+'\r\nPrivate active key: '+keys.active+'\r\nPrivate regular key: '+keys.regular+'\r\nPrivate memo key: '+keys.memo+'');
 				if(typeof users[account_login] !== 'undefined'){
-					if(''!=users[account_login].posting_key){
-						users[account_login].posting_key=keys.regular;
+					if(''!=users[account_login].regular_key){
+						users[account_login].regular_key=keys.regular;
 					}
 					if(''!=users[account_login].active_key){
 						users[account_login].active_key=keys.active;
@@ -952,12 +964,12 @@ function reset_account_with_general_key(account_login,owner_key,general_key){
 			let find_shield=false;
 			if(current_user){
 				if(users[current_user].shield){
-					shield_action(current_user,'account_update',{owner:JSON.stringify(owner),active:JSON.stringify(active),posting:JSON.stringify(posting),memo_key:memo_key,json_metadata:json_metadata},account_success,account_failure);
+					shield_action(current_user,'account_update',{master:JSON.stringify(master),active:JSON.stringify(active),regular:JSON.stringify(regular),memo_key:memo_key,json_metadata:json_metadata},account_success,account_failure);
 					find_shield=true;
 				}
 			}
 			if(!find_shield){
-				gate.broadcast.accountUpdate(owner_key,account_login,owner,active,posting,memo_key,json_metadata,function(err,result){
+				gate.broadcast.accountUpdate(master_key,account_login,master,active,regular,memo_key,json_metadata,function(err,result){
 					if(!err){
 						account_success(result);
 					}
@@ -983,7 +995,7 @@ function create_account_with_general_key(account_login,token_amount,shares_amoun
 	}
 	let auth_types = ['regular','active','master','memo'];
 	let keys=gate.auth.getPrivateKeys(account_login,general_key,auth_types);
-	let owner = {
+	let master = {
 		'weight_threshold': 1,
 		'account_auths': [],
 		'key_auths': [
@@ -997,7 +1009,7 @@ function create_account_with_general_key(account_login,token_amount,shares_amoun
 			[keys.activePubkey, 1]
 		]
 	};
-	let posting = {
+	let regular = {
 		"weight_threshold": 1,
 		"account_auths": [],
 		"key_auths": [
@@ -1030,10 +1042,10 @@ function create_account_with_general_key(account_login,token_amount,shares_amoun
 		}
 	}
 	if(users[current_user].shield){
-		shield_action(current_user,'account_create',{referrer:current_user,fee:fixed_token_amount,delegation:fixed_shares_amount,new_account_name:account_login,owner:JSON.stringify(owner),active:JSON.stringify(active),posting:JSON.stringify(posting),memo_key:memo_key,json_metadata:json_metadata},account_success,account_failure);
+		shield_action(current_user,'account_create',{referrer:current_user,fee:fixed_token_amount,delegation:fixed_shares_amount,new_account_name:account_login,master:JSON.stringify(master),active:JSON.stringify(active),regular:JSON.stringify(regular),memo_key:memo_key,json_metadata:json_metadata},account_success,account_failure);
 	}
 	else{
-		gate.broadcast.accountCreate(users[current_user].active_key,fixed_token_amount,fixed_shares_amount,current_user,account_login,owner,active,posting,memo_key,json_metadata, referrer,[],function(err,result){
+		gate.broadcast.accountCreate(users[current_user].active_key,fixed_token_amount,fixed_shares_amount,current_user,account_login,master,active,regular,memo_key,json_metadata, referrer,[],function(err,result){
 			if(!err){
 				account_success(result);
 			}
@@ -1225,7 +1237,7 @@ function committee_worker_create_request(url,worker,min_amount,max_amount,durati
 		shield_action(current_user,'committee_worker_create_request',{url:url,worker:worker,required_amount_min:min_amount,required_amount_max:max_amount,duration:duration},committee_success,committee_failure);
 	}
 	else{
-		gate.broadcast.committeeWorkerCreateRequest(users[current_user]['posting_key'],current_user,url,worker,min_amount,max_amount,duration,function(err,result) {
+		gate.broadcast.committeeWorkerCreateRequest(users[current_user]['regular_key'],current_user,url,worker,min_amount,max_amount,duration,function(err,result) {
 			if(!err){
 				committee_success(result);
 			}
@@ -1250,7 +1262,7 @@ function committee_cancel_request(request_id){
 		shield_action(current_user,'committee_worker_cancel_request',{request_id:request_id},committee_success,committee_failure);
 	}
 	else{
-		gate.broadcast.committeeWorkerCancelRequest(users[current_user]['posting_key'],current_user,parseInt(request_id),function(err,result) {
+		gate.broadcast.committeeWorkerCancelRequest(users[current_user]['regular_key'],current_user,parseInt(request_id),function(err,result) {
 			if(!err){
 				committee_success(result);
 			}
@@ -1274,7 +1286,7 @@ function committee_vote_request(request_id,percent){
 		shield_action(current_user,'committee_vote_request',{request_id:request_id,vote_percent:percent*100},committee_success,committee_failure);
 	}
 	else{
-		gate.broadcast.committeeVoteRequest(users[current_user]['posting_key'],current_user,parseInt(request_id),percent*100,function(err,result) {
+		gate.broadcast.committeeVoteRequest(users[current_user]['regular_key'],current_user,parseInt(request_id),percent*100,function(err,result) {
 			if(!err){
 				committee_success(result);
 			}
@@ -1342,6 +1354,10 @@ function witness_chain_properties_update(witness_login,url,signing_key){
 				props.inflation_ratio_committee_vs_reward_fund=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=inflation_ratio_committee_vs_reward_fund]').val());
 				props.inflation_recalc_period=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=inflation_recalc_period]').val());
 
+				props.data_operations_cost_additional_bandwidth=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=data_operations_cost_additional_bandwidth]').val());
+				props.witness_miss_penalty_percent=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=witness_miss_penalty_percent]').val());
+				props.witness_miss_penalty_duration=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=witness_miss_penalty_duration]').val());
+
 				let properties_success=function(result){
 					witness_control();
 					add_notify(l10n.witness.properties_success);
@@ -1353,10 +1369,10 @@ function witness_chain_properties_update(witness_login,url,signing_key){
 					}
 				}
 				if(users[current_user].shield){
-					shield_action(current_user,'versioned_chain_properties_update',{props:JSON.stringify([1,props])},properties_success,properties_failure);
+					shield_action(current_user,'versioned_chain_properties_update',{props:JSON.stringify([2,props])},properties_success,properties_failure);
 				}
 				else{
-					gate.broadcast.versionedChainPropertiesUpdate(users[current_user]['active_key'],current_user,[1,props],function(err,result){
+					gate.broadcast.versionedChainPropertiesUpdate(users[current_user]['active_key'],current_user,[2,props],function(err,result){
 						if(!err){
 							properties_success(result);
 						}
@@ -1397,7 +1413,7 @@ function award_content(author,permlink,beneficiaries,target){
 		shield_action(current_user,'award',{receiver:author,memo:memo,energy:weight,beneficiaries:beneficiaries_list},award_success,award_failure);
 	}
 	else{
-		gate.broadcast.award(users[current_user].posting_key,current_user,author,weight,0,memo,beneficiaries_list,function(err,result){
+		gate.broadcast.award(users[current_user].regular_key,current_user,author,weight,0,memo,beneficiaries_list,function(err,result){
 			if(!err){
 				award_success(result);
 			}
@@ -1514,9 +1530,24 @@ function witness_control(){
 							if(typeof response.props.inflation_recalc_period == 'undefined'){
 								response.props.inflation_recalc_period=806400;
 							}
+
+							if(typeof response.props.data_operations_cost_additional_bandwidth == 'undefined'){
+								response.props.data_operations_cost_additional_bandwidth=0;
+							}
+							if(typeof response.props.witness_miss_penalty_percent == 'undefined'){
+								response.props.witness_miss_penalty_percent=100;
+							}
+							if(typeof response.props.witness_miss_penalty_duration == 'undefined'){
+								response.props.witness_miss_penalty_duration=86400;
+							}
+
 							result+='<label class="input-descr">'+l10n.witness.params_inflation_witness_percent+':<input type="text" name="inflation_witness_percent" class="witness-chain-properties round wide" value="'+response.props.inflation_witness_percent/100+'"></label>';
 							result+='<label class="input-descr">'+l10n.witness.params_inflation_ratio_committee_vs_reward_fund+':<input type="text" name="inflation_ratio_committee_vs_reward_fund" class="witness-chain-properties round wide" value="'+response.props.inflation_ratio_committee_vs_reward_fund/100+'"></label>';
 							result+='<label class="input-descr">'+l10n.witness.params_inflation_recalc_period+':<input type="text" name="inflation_recalc_period" class="witness-chain-properties round wide" value="'+response.props.inflation_recalc_period+'"></label>';
+
+							result+='<label class="input-descr">'+l10n.witness.params_data_operations_cost_additional_bandwidth+':<input type="text" name="data_operations_cost_additional_bandwidth" class="witness-chain-properties round wide" value="'+response.props.data_operations_cost_additional_bandwidth/100+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.params_witness_miss_penalty_percent+':<input type="text" name="witness_miss_penalty_percent" class="witness-chain-properties round wide" value="'+response.props.witness_miss_penalty_percent/100+'"></label>';
+							result+='<label class="input-descr">'+l10n.witness.params_witness_miss_penalty_duration+':<input type="text" name="witness_miss_penalty_duration" class="witness-chain-properties round wide" value="'+response.props.witness_miss_penalty_duration+'"></label>';
 							result+='<hr>';
 							result+='<label class="input-descr" style="opacity:0.4">'+l10n.witness.params_min_curation_percent+':<input type="text" name="min_curation_percent" class="witness-chain-properties round wide" value="'+response.props.min_curation_percent/100+'"></label>';
 							result+='<label class="input-descr" style="opacity:0.4">'+l10n.witness.params_max_curation_percent+':<input type="text" name="max_curation_percent" class="witness-chain-properties round wide" value="'+response.props.max_curation_percent/100+'"></label>';
@@ -1576,7 +1607,7 @@ function reset_account_control(){
 		let result='';
 		view.html(result+'<p><i class="fa fw-fw fa-spinner fa-spin"></i> '+l10n.global.loading+'&hellip;</p>');
 		result+='<p><label class="input-descr">'+l10n.reset_account.login+':<br><input type="text" name="account_login" class="round" value="'+current_user+'"></label></p>';
-		result+='<p><label class="input-descr">'+l10n.reset_account.master_key+':<br><input type="text" name="owner_key" class="round wide"></label></p>';
+		result+='<p><label class="input-descr">'+l10n.reset_account.master_key+':<br><input type="text" name="master_key" class="round wide"></label></p>';
 		result+='<p class="input-descr">'+l10n.reset_account.global_password+' (<i class="fas fa-fw fa-random"></i> <a class="generate-general-action unselectable">'+l10n.global.generate_new+'</a>):<br><input type="text" name="general_key" class="generate-general round wide"></p>';
 		result+='<p><a class="reset-account-action button">'+l10n.reset_account.action+'</a>';
 		view.html(result);
@@ -2149,7 +2180,7 @@ function auth_signature_check(hex){
 	}
 	return false;
 }
-function try_auth_signature(login,posting_key='',active_key=''){
+function try_auth_signature(login,regular_key='',active_key=''){
 	$('.auth-action').addClass('disabled');
 	$('.auth-error').html('');
 	login=login.toLowerCase();
@@ -2194,7 +2225,7 @@ function try_auth_signature(login,posting_key='',active_key=''){
 							}
 						}
 						if(!find_shield){
-							users[login]={'posting_key':posting_key,'active_key':active_key,'shield':false,'session_id':data_obj.session,'session_verify':1};
+							users[login]={'regular_key':regular_key,'active_key':active_key,'shield':false,'session_id':data_obj.session,'session_verify':1};
 						}
 						current_user=login;
 						save_session();
@@ -2227,12 +2258,12 @@ function try_auth_signature(login,posting_key='',active_key=''){
 		let find_shield=false;
 		if(typeof users[login] !== 'undefined'){
 			if(users[login].shield){
-				shield_action(current_user,'auth_sign',{action:'auth',authority:'posting'},auth_signature_success,auth_signature_failure);
+				shield_action(current_user,'auth_sign',{action:'auth',authority:'regular'},auth_signature_success,auth_signature_failure);
 				find_shield=true;
 			}
 		}
 		if(!find_shield){
-			if(!gate.auth.isWif(posting_key)){
+			if(!gate.auth.isWif(regular_key)){
 				$('.auth-error').html(l10n.errors.invalid_regular_key);
 				$('.auth-action').removeClass('disabled');
 				return;
@@ -2248,8 +2279,8 @@ function try_auth_signature(login,posting_key='',active_key=''){
 			var data='';
 			var signature='';
 			while(!auth_signature_check(signature)){
-				data=auth_signature_data('viz.world','auth',login,'posting',nonce);
-				signature=gate.auth.signature.sign(data,posting_key).toHex();
+				data=auth_signature_data('viz.world','auth',login,'regular',nonce);
+				signature=gate.auth.signature.sign(data,regular_key).toHex();
 				nonce++;
 			}
 			auth_signature_success({data,signature});
@@ -2261,7 +2292,7 @@ function try_auth_signature(login,posting_key='',active_key=''){
 		return;
 	}
 }
-function try_auth(login,posting_key,active_key){
+function try_auth(login,regular_key,active_key){
 	$('.auth-custom-action').addClass('disabled');
 	$('.auth-error').html('');
 	login=login.toLowerCase();
@@ -2272,12 +2303,12 @@ function try_auth(login,posting_key,active_key){
 	if(login){
 		gate.api.getAccounts([login],function(err,response){
 			if(typeof response[0] !== 'undefined'){
-				let posting_valid=false;
-				for(posting_check in response[0].active.key_auths){
-					if(response[0].posting.key_auths[posting_check][1]>=response[0].posting.weight_threshold){
+				let regular_valid=false;
+				for(regular_check in response[0].regular_authority.key_auths){
+					if(response[0].regular_authority.key_auths[regular_check][1]>=response[0].regular_authority.weight_threshold){
 						try{
-							if(gate.auth.wifIsValid(posting_key,response[0].posting.key_auths[posting_check][0])){
-								posting_valid=true;
+							if(gate.auth.wifIsValid(regular_key,response[0].regular_authority.key_auths[regular_check][0])){
+								regular_valid=true;
 							}
 						}
 						catch(e){
@@ -2287,17 +2318,17 @@ function try_auth(login,posting_key,active_key){
 						}
 					}
 				}
-				if(!posting_valid){
+				if(!regular_valid){
 					$('.auth-error').html(l10n.errors.failure_regular_key);
 					$('.auth-custom-action').removeClass('disabled');
 					return;
 				}
 				if(active_key){
 					let active_valid=false;
-					for(active_check in response[0].active.key_auths){
-						if(response[0].active.key_auths[active_check][1]>=response[0].active.weight_threshold){
+					for(active_check in response[0].active_authority.key_auths){
+						if(response[0].active_authority.key_auths[active_check][1]>=response[0].active_authority.weight_threshold){
 							try{
-								if(gate.auth.wifIsValid(active_key,response[0].active.key_auths[active_check][0])){
+								if(gate.auth.wifIsValid(active_key,response[0].active_authority.key_auths[active_check][0])){
 									active_valid=true;
 								}
 							}
@@ -2314,7 +2345,7 @@ function try_auth(login,posting_key,active_key){
 						return;
 					}
 				}
-				users[login]={'posting_key':posting_key,'active_key':active_key,'shield':false};
+				users[login]={'regular_key':regular_key,'active_key':active_key,'shield':false};
 				current_user=login;
 				session_generate();
 			}
@@ -2457,10 +2488,10 @@ function post_subcontent(target){
 
 			var custom_json=['content',{parent_author:parent_author,parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:subcontent}];
 			if(users[current_user].shield){
-				shield_action(current_user,'custom',{id:'media',required_auths:[],required_posting_auths:[current_user],json:JSON.stringify(custom_json)},subcontent_success,subcontent_failure);
+				shield_action(current_user,'custom',{id:'media',required_active_auths:[],required_regular_auths:[current_user],json:JSON.stringify(custom_json)},subcontent_success,subcontent_failure);
 			}
 			else{
-				gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'media',JSON.stringify(custom_json),function(err,result){
+				gate.broadcast.custom(users[current_user].regular_key,[],[current_user],'media',JSON.stringify(custom_json),function(err,result){
 					if(!err){
 						subcontent_success(result);
 					}
@@ -2565,10 +2596,10 @@ function post_content(target){
 						}
 						var custom_json=['content',{parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:content,beneficiaries:beneficiaries_list,metadata:json_object}];
 						if(users[current_user].shield){
-							shield_action(current_user,'custom',{id:'media',required_auths:[],required_posting_auths:[current_user],json:JSON.stringify(custom_json)},edit_success,edit_failure);
+							shield_action(current_user,'custom',{id:'media',required_active_auths:[],required_regular_auths:[current_user],json:JSON.stringify(custom_json)},edit_success,edit_failure);
 						}
 						else{
-							gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'media',JSON.stringify(custom_json),function(err,result){
+							gate.broadcast.custom(users[current_user].regular_key,[],[current_user],'media',JSON.stringify(custom_json),function(err,result){
 								if(!err){
 									edit_success(result);
 								}
@@ -2599,10 +2630,10 @@ function post_content(target){
 
 					var custom_json=['content',{parent_permlink:parent_permlink,author:current_user,permlink:permlink,title:title,body:content,beneficiaries:beneficiaries_list,metadata:json_object}];
 					if(users[current_user].shield){
-						shield_action(current_user,'custom',{id:'media',required_auths:[],required_posting_auths:[current_user],json:JSON.stringify(custom_json)},content_success,content_failure);
+						shield_action(current_user,'custom',{id:'media',required_active_auths:[],required_regular_auths:[current_user],json:JSON.stringify(custom_json)},content_success,content_failure);
 					}
 					else{
-						gate.broadcast.custom(users[current_user].posting_key,[],[current_user],'media',JSON.stringify(custom_json),function(err,result){
+						gate.broadcast.custom(users[current_user].regular_key,[],[current_user],'media',JSON.stringify(custom_json),function(err,result){
 							if(!err){
 								content_success(result);
 							}
@@ -2663,7 +2694,7 @@ function save_profile(target){
 					shield_action(current_user,'account_metadata',{json_metadata:JSON.stringify(metadata)},metadata_success,metadata_failure);
 				}
 				else{
-					gate.broadcast.accountMetadata(users[current_user].posting_key,current_user,JSON.stringify(metadata),function(err, result){
+					gate.broadcast.accountMetadata(users[current_user].regular_key,current_user,JSON.stringify(metadata),function(err, result){
 						if(!err){
 							metadata_success(result);
 						}
@@ -2950,7 +2981,7 @@ function app_mouse(e){
 		e.preventDefault();
 		if($(target).closest('.control').length){
 			if(!$(target).hasClass('disabled')){
-				try_auth_signature($('input[name=login]').val(),$('input[name=posting_key]').val(),$('input[name=active_key]').val());
+				try_auth_signature($('input[name=login]').val(),$('input[name=regular_key]').val(),$('input[name=active_key]').val());
 			}
 		}
 	}
@@ -2958,7 +2989,7 @@ function app_mouse(e){
 		e.preventDefault();
 		if($(target).closest('.control').length){
 			if(!$(target).hasClass('disabled')){
-				try_auth($('input[name=login]').val(),$('input[name=posting_key]').val(),$('input[name=active_key]').val());
+				try_auth($('input[name=login]').val(),$('input[name=regular_key]').val(),$('input[name=active_key]').val());
 			}
 		}
 	}
@@ -3325,8 +3356,8 @@ function app_mouse(e){
 		if($(target).closest('.control').length){
 			let general_key=$('.reset-account-control input[name=general_key]').val();
 			let account_login=$('.reset-account-control input[name=account_login]').val().toLowerCase();
-			let owner_key=$('.reset-account-control input[name=owner_key]').val();
-			reset_account_with_general_key(account_login,owner_key,general_key);
+			let master_key=$('.reset-account-control input[name=master_key]').val();
+			reset_account_with_general_key(account_login,master_key,general_key);
 		}
 	}
 	if($(target).hasClass('create-account-action') || $(target).parent().hasClass('create-account-action')){

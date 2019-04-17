@@ -8,7 +8,7 @@ if(in_array('content',$config['plugins'])){
 		if($signature){
 			if('viz.world'==$data_arr[0]){
 				if('auth'==$data_arr[1]){
-					if('posting'==$data_arr[3]){
+					if('regular'==$data_arr[3]){
 						$login=$data_arr[2];
 						$unixtime=(int)$data_arr[4];
 						if($unixtime<(time()-60)){
@@ -21,9 +21,9 @@ if(in_array('content',$config['plugins'])){
 						}
 						$account=$api->execute_method('get_accounts',array(array($login)))[0];
 						if($login==$account['name']){
-							$weight_threshold=$account['posting']['weight_threshold'];
+							$weight_threshold=$account['regular_authority']['weight_threshold'];
 							$summary_weight=0;
-							foreach($account['posting']['key_auths'] as $authority){
+							foreach($account['regular_authority']['key_auths'] as $authority){
 								$key=new viz_keys();
 								if($key->import_public($authority[0])){
 									if($key->verify_compact($data,$signature)){
@@ -68,7 +68,7 @@ if(in_array('content',$config['plugins'])){
 						}
 					}
 					else{
-						print '{"error":"authority","error_str":"Authorization only with posting key"}';
+						print '{"error":"authority","error_str":"Authorization only with regular key"}';
 					}
 				}
 				else{
