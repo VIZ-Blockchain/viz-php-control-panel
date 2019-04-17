@@ -8,7 +8,6 @@ $replace['script_change_time']=filemtime($site_root.'/js/app.js');
 $replace['css_change_time']=filemtime($site_root.'/css/app.css');
 
 $api_arr=array(
-	'https://rpc.viz.ropox.app/',
 	'https://rpc.viz.lexai.host/',
 	'https://solox.world/',
 );
