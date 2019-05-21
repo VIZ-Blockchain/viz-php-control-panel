@@ -54,7 +54,7 @@ if('witnesses'==$path_array[1]){
 		<div class="article">
 		<div class="witness-votes"></div>
 		<h3>TOP-100</h3>';
-		$hf=$api->execute_method('get_hardfork_version',array(),true);
+		$hf=$api->execute_method('get_hardfork_version',array(),false);
 		print '<p>'.$l10n['witnesses']['hf-version'].': '.$hf.'</p>';
 		$hf=intval(str_replace('.','',$hf));
 		$hf=intval($hf/10);
@@ -97,6 +97,13 @@ if('witnesses'==$path_array[1]){
 	}
 	else{
 		$witness_arr=$api->execute_method('get_witness_by_account',array($path_array[2]));
+		$new_witness=false;
+		if(!$witness_arr['owner']){
+			if($user_arr['login']==$path_array[2]){
+				$new_witness=true;
+				$witness_arr['owner']=$user_arr['login'];
+			}
+		}
 		if($witness_arr['owner']){
 			$replace['title']=htmlspecialchars($witness_arr['owner']).' - '.$replace['title'];
 			print '<div class="page content">
