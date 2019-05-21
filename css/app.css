@@ -491,6 +491,10 @@ label input[type=checkbox]{
 	margin: 0 21px 12px;
 	line-height:1.5;
 }
+.comment .text>ol,.comment .text>ul{
+	margin: 0 30px 12px;
+	line-height:1.5;
+}
 .page blockquote{
 	border-left:2px solid rgba(0,0,0,0.4);
 	margin-left:21px;
@@ -526,6 +530,7 @@ label input[type=checkbox]{
 	display:inline-block;
 	vertical-align: middle;
 	max-width:100%;
+	height:auto;
 	margin-bottom:8px;
 }
 
