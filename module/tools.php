@@ -9,6 +9,9 @@ if('tools'==$path_array[1]){
 		print '<p><a href="/tools/paid-subscriptions/">'.$l10n['tools']['list']['paid-subscriptions'].'</a></p>';
 		print '<p><a href="/tools/invites/">'.$l10n['tools']['list']['invites'].'</a></p>';
 		print '<p><a href="/tools/create-account/">'.$l10n['tools']['list']['create-account'].'</a></p>';
+		print '<p><a href="/tools/sell-account/">'.$l10n['tools']['list']['sell-account'].'</a></p>';
+		print '<p><a href="/tools/sell-subaccount/">'.$l10n['tools']['list']['sell-subaccount'].'</a></p>';
+		print '<p><a href="/tools/buy-account/">'.$l10n['tools']['list']['buy-account'].'</a></p>';
 		print '<p><a href="/tools/delegation/">'.$l10n['tools']['list']['delegation'].'</a></p>';
 		print '<p><a href="/tools/schedule/">'.$l10n['tools']['list']['schedule'].'</a></p>';
 		print '<p><a href="/tools/blocks/">'.$l10n['tools']['list']['blocks'].'</a></p>';
@@ -191,13 +194,43 @@ if('tools'==$path_array[1]){
 		print '<div class="create-account-control"></div>';
 		print '</div></div>';
 	}
+	elseif('sell-account'==$path_array[2]){
+		$replace['title']=htmlspecialchars($l10n['tools']['list']['sell-account']).' - '.$replace['title'];
+		print '<div class="page content">
+		<a class="right" href="/tools/">&larr; '.$l10n['tools']['title'].'</a>
+		<h1><i class="fas fa-fw fa-toolbox"></i> '.$l10n['tools']['list']['sell-account'].'</h1>
+		<div class="article control">';
+		print '<p>'.$l10n['tools']['sell-account-descr'].'</p>';
+		print '<div class="sell-account-control"></div>';
+		print '</div></div>';
+	}
+	elseif('sell-subaccount'==$path_array[2]){
+		$replace['title']=htmlspecialchars($l10n['tools']['list']['sell-subaccount']).' - '.$replace['title'];
+		print '<div class="page content">
+		<a class="right" href="/tools/">&larr; '.$l10n['tools']['title'].'</a>
+		<h1><i class="fas fa-fw fa-toolbox"></i> '.$l10n['tools']['list']['sell-subaccount'].'</h1>
+		<div class="article control">';
+		print '<p>'.$l10n['tools']['sell-subaccount-descr'].'</p>';
+		print '<div class="sell-subaccount-control"></div>';
+		print '</div></div>';
+	}
+	elseif('buy-account'==$path_array[2]){
+		$replace['title']=htmlspecialchars($l10n['tools']['list']['buy-account']).' - '.$replace['title'];
+		print '<div class="page content">
+		<a class="right" href="/tools/">&larr; '.$l10n['tools']['title'].'</a>
+		<h1><i class="fas fa-fw fa-toolbox"></i> '.$l10n['tools']['list']['buy-account'].'</h1>
+		<div class="article control">';
+		print '<p>'.$l10n['tools']['buy-account-descr'].'</p>';
+		print '<div class="buy-account-control"></div>';
+		print '</div></div>';
+	}
 	elseif('reset-account'==$path_array[2]){
 		$replace['title']=htmlspecialchars($l10n['tools']['list']['reset-account']).' - '.$replace['title'];
 		print '<div class="page content">
 		<a class="right" href="/tools/">&larr; '.$l10n['tools']['title'].'</a>
 		<h1><i class="fas fa-fw fa-exchange-alt"></i> '.$l10n['tools']['list']['reset-account'].'</h1>
 		<div class="article control">';
-		print '<p>'.$l10n['tools']['list']['reset-account-descr'].'</p>';
+		print '<p>'.$l10n['tools']['reset-account-descr'].'</p>';
 		print '<div class="reset-account-control"></div>';
 		print '</div></div>';
 	}

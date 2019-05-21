@@ -475,6 +475,7 @@ function load_session(){
 	delegation_control();
 	profile_control();
 	create_account_control();
+	sell_account_control();
 	reset_account_control();
 	invite_control();
 	shield_control();
@@ -906,6 +907,94 @@ function invite_claim(secret_key,receiver){
 		});
 	}
 }
+function sell_account(master_key,account_login,seller_login,price,on_sale){
+	let fixed_price_amount=''+parseFloat(price).toFixed(3)+' VIZ';
+	gate.api.getAccounts([account_login],function(err,response){
+		if(0==response.length){
+			err=true;
+		}
+		if(!err){
+			let set_price_success=function(result){
+				add_notify(l10n.sell_account.success);
+			}
+			let set_price_failure=function(err){
+				add_notify(l10n.sell_account.error,true);
+				if(typeof err.message !== 'undefined'){
+					add_notify(err.message,true);
+				}
+				else{
+					if(typeof err.payload !== 'undefined'){
+						add_notify(err.payload.error.data.stack[0].format,true);
+					}
+				}
+			}
+			let find_shield=false;
+			if(current_user){
+				if(users[current_user].shield){
+					shield_action(account_login,'set_account_price',{seller_login,price:fixed_price_amount,on_sale},set_price_success,set_price_failure);
+					find_shield=true;
+				}
+			}
+			if(!find_shield){
+				gate.broadcast.setAccountPrice(master_key,account_login,seller_login,fixed_price_amount,on_sale,function(err,result){
+					if(!err){
+						set_price_success(result);
+					}
+					else{
+						set_price_failure(err);
+					}
+				});
+			}
+		}
+		else{
+			add_notify(l10n.errors.user_not_found,true);
+		}
+	});
+}
+function sell_subaccount(master_key,account_login,seller_login,price,on_sale){
+	let fixed_price_amount=''+parseFloat(price).toFixed(3)+' VIZ';
+	gate.api.getAccounts([account_login],function(err,response){
+		if(0==response.length){
+			err=true;
+		}
+		if(!err){
+			let set_price_success=function(result){
+				add_notify(l10n.sell_account.success);
+			}
+			let set_price_failure=function(err){
+				add_notify(l10n.sell_account.error,true);
+				if(typeof err.message !== 'undefined'){
+					add_notify(err.message,true);
+				}
+				else{
+					if(typeof err.payload !== 'undefined'){
+						add_notify(err.payload.error.data.stack[0].format,true);
+					}
+				}
+			}
+			let find_shield=false;
+			if(current_user){
+				if(users[current_user].shield){
+					shield_action(account_login,'set_subaccount_price',{seller_login,price:fixed_price_amount,on_sale},set_price_success,set_price_failure);
+					find_shield=true;
+				}
+			}
+			if(!find_shield){
+				gate.broadcast.setSubaccountPrice(master_key,account_login,seller_login,fixed_price_amount,on_sale,function(err,result){
+					if(!err){
+						set_price_success(result);
+					}
+					else{
+						set_price_failure(err);
+					}
+				});
+			}
+		}
+		else{
+			add_notify(l10n.errors.user_not_found,true);
+		}
+	});
+}
 function reset_account_with_general_key(account_login,master_key,general_key){
 	let auth_types = ['regular','active','master','memo'];
 	let keys=gate.auth.getPrivateKeys(account_login,general_key,auth_types);
@@ -1031,6 +1120,7 @@ function create_account_with_general_key(account_login,token_amount,shares_amoun
 		});
 	}
 	let account_failure=function(err){
+		console.log(err);
 		add_notify(l10n.create_account.error,true);
 		gate.api.getAccounts([account_login],function(err,response){
 			if(!err){
@@ -1337,26 +1427,26 @@ function witness_chain_properties_update(witness_login,url,signing_key){
 		gate.api.getWitnessByAccount(witness_login,function(err,response){
 			if(!err){
 				let props=response.props;
-				props.account_creation_fee=$('.witness-control[data-witness='+witness_login+'] input[name=account_creation_fee]').val();
-				props.create_account_delegation_ratio=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=create_account_delegation_ratio]').val());
-				props.create_account_delegation_time=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=create_account_delegation_time]').val());
-				props.bandwidth_reserve_percent=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=bandwidth_reserve_percent]').val());
-				props.bandwidth_reserve_below=$('.witness-control[data-witness='+witness_login+'] input[name=bandwidth_reserve_below]').val();
-				props.committee_request_approve_min_percent=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=committee_request_approve_min_percent]').val());
-				props.flag_energy_additional_cost=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=flag_energy_additional_cost]').val());
-				props.min_curation_percent=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=min_curation_percent]').val());
-				props.max_curation_percent=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=max_curation_percent]').val());
-				props.min_delegation=$('.witness-control[data-witness='+witness_login+'] input[name=min_delegation]').val();
-				props.vote_accounting_min_rshares=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=vote_accounting_min_rshares]').val());
-				props.maximum_block_size=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=maximum_block_size]').val());
+				props.account_creation_fee=$('.witness-control[data-witness="'+witness_login+'"] input[name=account_creation_fee]').val();
+				props.create_account_delegation_ratio=parseInt($('.witness-control[data-witness="'+witness_login+'"] input[name=create_account_delegation_ratio]').val());
+				props.create_account_delegation_time=parseInt($('.witness-control[data-witness="'+witness_login+'"] input[name=create_account_delegation_time]').val());
+				props.bandwidth_reserve_percent=100*parseFloat($('.witness-control[data-witness="'+witness_login+'"] input[name=bandwidth_reserve_percent]').val());
+				props.bandwidth_reserve_below=$('.witness-control[data-witness="'+witness_login+'"] input[name=bandwidth_reserve_below]').val();
+				props.committee_request_approve_min_percent=100*parseFloat($('.witness-control[data-witness="'+witness_login+'"] input[name=committee_request_approve_min_percent]').val());
+				props.flag_energy_additional_cost=100*parseFloat($('.witness-control[data-witness="'+witness_login+'"] input[name=flag_energy_additional_cost]').val());
+				props.min_curation_percent=100*parseFloat($('.witness-control[data-witness="'+witness_login+'"] input[name=min_curation_percent]').val());
+				props.max_curation_percent=100*parseFloat($('.witness-control[data-witness="'+witness_login+'"] input[name=max_curation_percent]').val());
+				props.min_delegation=$('.witness-control[data-witness="'+witness_login+'"] input[name=min_delegation]').val();
+				props.vote_accounting_min_rshares=parseInt($('.witness-control[data-witness="'+witness_login+'"] input[name=vote_accounting_min_rshares]').val());
+				props.maximum_block_size=parseInt($('.witness-control[data-witness="'+witness_login+'"] input[name=maximum_block_size]').val());
 
-				props.inflation_witness_percent=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=inflation_witness_percent]').val());
-				props.inflation_ratio_committee_vs_reward_fund=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=inflation_ratio_committee_vs_reward_fund]').val());
-				props.inflation_recalc_period=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=inflation_recalc_period]').val());
+				props.inflation_witness_percent=100*parseFloat($('.witness-control[data-witness="'+witness_login+'"] input[name=inflation_witness_percent]').val());
+				props.inflation_ratio_committee_vs_reward_fund=100*parseFloat($('.witness-control[data-witness="'+witness_login+'"] input[name=inflation_ratio_committee_vs_reward_fund]').val());
+				props.inflation_recalc_period=parseInt($('.witness-control[data-witness="'+witness_login+'"] input[name=inflation_recalc_period]').val());
 
-				props.data_operations_cost_additional_bandwidth=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=data_operations_cost_additional_bandwidth]').val());
-				props.witness_miss_penalty_percent=100*parseFloat($('.witness-control[data-witness='+witness_login+'] input[name=witness_miss_penalty_percent]').val());
-				props.witness_miss_penalty_duration=parseInt($('.witness-control[data-witness='+witness_login+'] input[name=witness_miss_penalty_duration]').val());
+				props.data_operations_cost_additional_bandwidth=100*parseFloat($('.witness-control[data-witness="'+witness_login+'"] input[name=data_operations_cost_additional_bandwidth]').val());
+				props.witness_miss_penalty_percent=100*parseFloat($('.witness-control[data-witness="'+witness_login+'"] input[name=witness_miss_penalty_percent]').val());
+				props.witness_miss_penalty_duration=parseInt($('.witness-control[data-witness="'+witness_login+'"] input[name=witness_miss_penalty_duration]').val());
 
 				let properties_success=function(result){
 					witness_control();
@@ -1506,53 +1596,59 @@ function witness_control(){
 				else{
 					gate.api.getWitnessByAccount(witness_login,function(err,response){
 						if(!err){
+							let new_witness=false;
+							if(response === null){
+								new_witness=true;
+								response={url:'',signing_key:empty_signing_key};
+							}
 							result+='<label class="input-descr">'+l10n.witness.manage_url+':<input type="text" name="url" class="round wide" value="'+response.url+'"></label>';
 							result+='<label class="input-descr">'+l10n.witness.manage_public_key+':<input type="text" name="signing_key" class="round wide" value="'+response.signing_key+'" placeholder="'+empty_signing_key+'"></label>';
 							result+='<input type="button" class="witness-update-action button" value="'+l10n.witness.manage_action+'">';
+							if(!new_witness){
+								result+='<h4>'+l10n.witness.params_caption+'</h4>';
+								result+='<label class="input-descr">'+l10n.witness.params_account_creation_fee+':<input type="text" name="account_creation_fee" class="witness-chain-properties round wide" value="'+response.props.account_creation_fee+'"></label>';
+								result+='<label class="input-descr">'+l10n.witness.params_create_account_delegation_ratio+':<input type="text" name="create_account_delegation_ratio" class="witness-chain-properties round wide" value="'+response.props.create_account_delegation_ratio+'"></label>';
+								result+='<label class="input-descr">'+l10n.witness.params_create_account_delegation_time+':<input type="text" name="create_account_delegation_time" class="witness-chain-properties round wide" value="'+response.props.create_account_delegation_time+'"></label>';
+								result+='<label class="input-descr">'+l10n.witness.params_bandwidth_reserve_percent+':<input type="text" name="bandwidth_reserve_percent" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_percent/100+'"></label>';
+								result+='<label class="input-descr">'+l10n.witness.params_bandwidth_reserve_below+':<input type="text" name="bandwidth_reserve_below" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_below+'"></label>';
+								result+='<label class="input-descr">'+l10n.witness.params_committee_request_approve_min_percent+':<input type="text" name="committee_request_approve_min_percent" class="witness-chain-properties round wide" value="'+response.props.committee_request_approve_min_percent/100+'"></label>';
+								result+='<label class="input-descr">'+l10n.witness.params_min_delegation+':<input type="text" name="min_delegation" class="witness-chain-properties round wide" value="'+response.props.min_delegation+'"></label>';
+								result+='<label class="input-descr">'+l10n.witness.params_vote_accounting_min_rshares+':<input type="text" name="vote_accounting_min_rshares" class="witness-chain-properties round wide" value="'+response.props.vote_accounting_min_rshares+'"></label>';
+								result+='<label class="input-descr">'+l10n.witness.params_maximum_block_size+':<input type="text" name="maximum_block_size" class="witness-chain-properties round wide" value="'+response.props.maximum_block_size+'"></label>';
+								result+='<hr>';
+								if(typeof response.props.inflation_witness_percent == 'undefined'){
+									response.props.inflation_witness_percent=2000;
+								}
+								if(typeof response.props.inflation_ratio_committee_vs_reward_fund == 'undefined'){
+									response.props.inflation_ratio_committee_vs_reward_fund=5000;
+								}
+								if(typeof response.props.inflation_recalc_period == 'undefined'){
+									response.props.inflation_recalc_period=806400;
+								}
 
-							result+='<h4>'+l10n.witness.params_caption+'</h4>';
-							result+='<label class="input-descr">'+l10n.witness.params_account_creation_fee+':<input type="text" name="account_creation_fee" class="witness-chain-properties round wide" value="'+response.props.account_creation_fee+'"></label>';
-							result+='<label class="input-descr">'+l10n.witness.params_create_account_delegation_ratio+':<input type="text" name="create_account_delegation_ratio" class="witness-chain-properties round wide" value="'+response.props.create_account_delegation_ratio+'"></label>';
-							result+='<label class="input-descr">'+l10n.witness.params_create_account_delegation_time+':<input type="text" name="create_account_delegation_time" class="witness-chain-properties round wide" value="'+response.props.create_account_delegation_time+'"></label>';
-							result+='<label class="input-descr">'+l10n.witness.params_bandwidth_reserve_percent+':<input type="text" name="bandwidth_reserve_percent" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_percent/100+'"></label>';
-							result+='<label class="input-descr">'+l10n.witness.params_bandwidth_reserve_below+':<input type="text" name="bandwidth_reserve_below" class="witness-chain-properties round wide" value="'+response.props.bandwidth_reserve_below+'"></label>';
-							result+='<label class="input-descr">'+l10n.witness.params_committee_request_approve_min_percent+':<input type="text" name="committee_request_approve_min_percent" class="witness-chain-properties round wide" value="'+response.props.committee_request_approve_min_percent/100+'"></label>';
-							result+='<label class="input-descr">'+l10n.witness.params_min_delegation+':<input type="text" name="min_delegation" class="witness-chain-properties round wide" value="'+response.props.min_delegation+'"></label>';
-							result+='<label class="input-descr">'+l10n.witness.params_vote_accounting_min_rshares+':<input type="text" name="vote_accounting_min_rshares" class="witness-chain-properties round wide" value="'+response.props.vote_accounting_min_rshares+'"></label>';
-							result+='<label class="input-descr">'+l10n.witness.params_maximum_block_size+':<input type="text" name="maximum_block_size" class="witness-chain-properties round wide" value="'+response.props.maximum_block_size+'"></label>';
-							result+='<hr>';
-							if(typeof response.props.inflation_witness_percent == 'undefined'){
-								response.props.inflation_witness_percent=2000;
-							}
-							if(typeof response.props.inflation_ratio_committee_vs_reward_fund == 'undefined'){
-								response.props.inflation_ratio_committee_vs_reward_fund=5000;
-							}
-							if(typeof response.props.inflation_recalc_period == 'undefined'){
-								response.props.inflation_recalc_period=806400;
-							}
+								if(typeof response.props.data_operations_cost_additional_bandwidth == 'undefined'){
+									response.props.data_operations_cost_additional_bandwidth=0;
+								}
+								if(typeof response.props.witness_miss_penalty_percent == 'undefined'){
+									response.props.witness_miss_penalty_percent=100;
+								}
+								if(typeof response.props.witness_miss_penalty_duration == 'undefined'){
+									response.props.witness_miss_penalty_duration=86400;
+								}
 
-							if(typeof response.props.data_operations_cost_additional_bandwidth == 'undefined'){
-								response.props.data_operations_cost_additional_bandwidth=0;
-							}
-							if(typeof response.props.witness_miss_penalty_percent == 'undefined'){
-								response.props.witness_miss_penalty_percent=100;
-							}
-							if(typeof response.props.witness_miss_penalty_duration == 'undefined'){
-								response.props.witness_miss_penalty_duration=86400;
-							}
+								result+='<label class="input-descr">'+l10n.witness.params_inflation_witness_percent+':<input type="text" name="inflation_witness_percent" class="witness-chain-properties round wide" value="'+response.props.inflation_witness_percent/100+'"></label>';
+								result+='<label class="input-descr">'+l10n.witness.params_inflation_ratio_committee_vs_reward_fund+':<input type="text" name="inflation_ratio_committee_vs_reward_fund" class="witness-chain-properties round wide" value="'+response.props.inflation_ratio_committee_vs_reward_fund/100+'"></label>';
+								result+='<label class="input-descr">'+l10n.witness.params_inflation_recalc_period+':<input type="text" name="inflation_recalc_period" class="witness-chain-properties round wide" value="'+response.props.inflation_recalc_period+'"></label>';
 
-							result+='<label class="input-descr">'+l10n.witness.params_inflation_witness_percent+':<input type="text" name="inflation_witness_percent" class="witness-chain-properties round wide" value="'+response.props.inflation_witness_percent/100+'"></label>';
-							result+='<label class="input-descr">'+l10n.witness.params_inflation_ratio_committee_vs_reward_fund+':<input type="text" name="inflation_ratio_committee_vs_reward_fund" class="witness-chain-properties round wide" value="'+response.props.inflation_ratio_committee_vs_reward_fund/100+'"></label>';
-							result+='<label class="input-descr">'+l10n.witness.params_inflation_recalc_period+':<input type="text" name="inflation_recalc_period" class="witness-chain-properties round wide" value="'+response.props.inflation_recalc_period+'"></label>';
-
-							result+='<label class="input-descr">'+l10n.witness.params_data_operations_cost_additional_bandwidth+':<input type="text" name="data_operations_cost_additional_bandwidth" class="witness-chain-properties round wide" value="'+response.props.data_operations_cost_additional_bandwidth/100+'"></label>';
-							result+='<label class="input-descr">'+l10n.witness.params_witness_miss_penalty_percent+':<input type="text" name="witness_miss_penalty_percent" class="witness-chain-properties round wide" value="'+response.props.witness_miss_penalty_percent/100+'"></label>';
-							result+='<label class="input-descr">'+l10n.witness.params_witness_miss_penalty_duration+':<input type="text" name="witness_miss_penalty_duration" class="witness-chain-properties round wide" value="'+response.props.witness_miss_penalty_duration+'"></label>';
-							result+='<hr>';
-							result+='<label class="input-descr" style="opacity:0.4">'+l10n.witness.params_min_curation_percent+':<input type="text" name="min_curation_percent" class="witness-chain-properties round wide" value="'+response.props.min_curation_percent/100+'"></label>';
-							result+='<label class="input-descr" style="opacity:0.4">'+l10n.witness.params_max_curation_percent+':<input type="text" name="max_curation_percent" class="witness-chain-properties round wide" value="'+response.props.max_curation_percent/100+'"></label>';
-							result+='<label class="input-descr" style="opacity:0.4">'+l10n.witness.params_flag_energy_additional_cost+':<input type="text" name="flag_energy_additional_cost" class="witness-chain-properties round wide" value="'+response.props.flag_energy_additional_cost/100+'"></label>';
-							result+='<input type="button" class="witness-chain-properties-update-action button" value="'+l10n.witness.params_action+'">';
+								result+='<label class="input-descr">'+l10n.witness.params_data_operations_cost_additional_bandwidth+':<input type="text" name="data_operations_cost_additional_bandwidth" class="witness-chain-properties round wide" value="'+response.props.data_operations_cost_additional_bandwidth/100+'"></label>';
+								result+='<label class="input-descr">'+l10n.witness.params_witness_miss_penalty_percent+':<input type="text" name="witness_miss_penalty_percent" class="witness-chain-properties round wide" value="'+response.props.witness_miss_penalty_percent/100+'"></label>';
+								result+='<label class="input-descr">'+l10n.witness.params_witness_miss_penalty_duration+':<input type="text" name="witness_miss_penalty_duration" class="witness-chain-properties round wide" value="'+response.props.witness_miss_penalty_duration+'"></label>';
+								result+='<hr>';
+								result+='<label class="input-descr" style="opacity:0.4">'+l10n.witness.params_min_curation_percent+':<input type="text" name="min_curation_percent" class="witness-chain-properties round wide" value="'+response.props.min_curation_percent/100+'"></label>';
+								result+='<label class="input-descr" style="opacity:0.4">'+l10n.witness.params_max_curation_percent+':<input type="text" name="max_curation_percent" class="witness-chain-properties round wide" value="'+response.props.max_curation_percent/100+'"></label>';
+								result+='<label class="input-descr" style="opacity:0.4">'+l10n.witness.params_flag_energy_additional_cost+':<input type="text" name="flag_energy_additional_cost" class="witness-chain-properties round wide" value="'+response.props.flag_energy_additional_cost/100+'"></label>';
+								result+='<input type="button" class="witness-chain-properties-update-action button" value="'+l10n.witness.params_action+'">';
+							}
 							view.html(result);
 						}
 					});
@@ -1612,6 +1708,159 @@ function reset_account_control(){
 		result+='<p><a class="reset-account-action button">'+l10n.reset_account.action+'</a>';
 		view.html(result);
 		generate_general_key();
+	}
+}
+function buy_account(account_login,account_offer_price,token_to_shares,public_key,private_key=''){
+	let success=function(result){
+		download('viz-buy-account.txt','VIZ Blockchain account: '+account_login+'\r\nAdditional VIZ to SHARES: '+token_to_shares+'\r\nGeneral private key (for any access types master/active/posting/memo): '+private_key+'\r\nPublic key: '+public_key+'');
+		add_notify(l10n.buy_account.success);
+	}
+	let failure=function(err){
+		$('.buy-account-control input[name=private]').removeAttr('disabled');
+		add_notify(l10n.buy_account.error,true);
+		if(typeof err.payload !== 'undefined'){
+			add_notify(err.payload.error.data.stack[0].format,true);
+		}
+		console.log(err);
+	}
+	$('.buy-account-control input[name=private]').attr('disabled','disabled');
+	if(users[current_user].shield){
+		shield_action(current_user,'buy_account',{account:account_login,account_offer_price,new_authority_key:public_key,token_to_shares},success,failure);
+	}
+	else{
+		gate.api.getRecoveryRequest('press',function(err,response){
+			if(null===response){
+				gate.broadcast.buyAccount(users[current_user].active_key,current_user,account_login,account_offer_price,public_key,token_to_shares,function(err,result){
+					if(!err){
+						success(result);
+					}
+					else{
+						failure(err);
+					}
+				});
+			}
+			else{
+				add_notify(l10n.buy_account.recoverable,true);
+			}
+		});
+	}
+}
+function lookup_buy_account(account_login){
+	gate.api.getChainProperties(function(err,response){
+		let props=response;
+		window.location.hash=account_login;
+		gate.api.getAccounts([account_login],function(err,response){
+			if(!err){
+				if(typeof response[0] !== 'undefined'){
+					let result='';
+					if(response[0].account_on_sale){
+						result+='<p>'+l10n.buy_account.status+': '+l10n.buy_account.on_sale+'</p>';
+						result+='<p>'+l10n.buy_account.price+': '+response[0].account_offer_price+'</p>';
+						result+='<p>'+l10n.buy_account.seller+': '+response[0].account_seller+'</p>';
+						result+='<p>'+l10n.buy_account.token_to_shares+': '+props.account_creation_fee+'</p>';
+						var summary_ammount=(parseFloat(props.account_creation_fee) + parseFloat(response[0].account_offer_price)).toFixed(3);
+						result+='<input type="hidden" name="account" value="'+account_login+'">';
+						result+='<input type="hidden" name="account_offer_price" value="'+response[0].account_offer_price+'">';
+						result+='<input type="hidden" name="token_to_shares" value="'+props.account_creation_fee+'">';
+
+						result+='<p>'+l10n.buy_account.new_authority_key+'</p>';
+						result+='<p class="input-descr">'+l10n.buy_account.create_private_key+' (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">'+l10n.global.generate_new+'</a>):<br><input type="text" name="private" class="generate-private round wide"></p>';
+						result+='<p class="input-descr">'+l10n.buy_account.create_public_key+':<br><input type="text" name="public" class="generate-public round wide" disabled></p>';
+
+						result+='<p><a class="buy-account-action button">'+l10n.buy_account.action+' ('+summary_ammount+' VIZ)</a></p>';
+					}
+					else{
+						result+='<p>'+l10n.buy_account.status+': '+l10n.buy_account.not_on_sale+'</p>';
+					}
+					console.log(response[0]);
+					$('.buy-account-lookup-control').html(result);
+					generate_key();
+				}
+				else{
+					err=true;
+				}
+			}
+			if(err){
+				if(0<account_login.indexOf('.')){
+					subaccount_login=account_login.substr(account_login.indexOf('.')+1);
+					gate.api.getAccounts([subaccount_login],function(err,response){
+						if(!err){
+							if(typeof response[0] !== 'undefined'){
+								let result='';
+								if(response[0].subaccount_on_sale){
+									result+='<p>'+l10n.buy_account.status+': '+l10n.buy_account.subaccount_on_sale+'</p>';
+									result+='<p>'+l10n.buy_account.price+': '+response[0].subaccount_offer_price+'</p>';
+									result+='<p>'+l10n.buy_account.seller+': '+response[0].subaccount_seller+'</p>';
+									result+='<p>'+l10n.buy_account.token_to_shares+': '+props.account_creation_fee+'</p>';
+									var summary_ammount=(parseFloat(props.account_creation_fee) + parseFloat(response[0].subaccount_offer_price)).toFixed(3);
+									result+='<input type="hidden" name="account" value="'+account_login+'">';
+									result+='<input type="hidden" name="account_offer_price" value="'+response[0].subaccount_offer_price+'">';
+									result+='<input type="hidden" name="token_to_shares" value="'+props.account_creation_fee+'">';
+
+									result+='<p>'+l10n.buy_account.new_authority_key+'</p>';
+									result+='<p class="input-descr">'+l10n.buy_account.create_private_key+' (<i class="fas fa-fw fa-random"></i> <a class="generate-action unselectable">'+l10n.global.generate_new+'</a>):<br><input type="text" name="private" class="generate-private round wide"></p>';
+									result+='<p class="input-descr">'+l10n.buy_account.create_public_key+':<br><input type="text" name="public" class="generate-public round wide" disabled></p>';
+
+									result+='<p><a class="buy-account-action button">'+l10n.buy_account.action+' ('+summary_ammount+' VIZ)</a></p>';
+								}
+								else{
+									result+='<p>'+l10n.buy_account.status+': '+l10n.buy_account.subaccount_not_on_sale+'</p>';
+								}
+								console.log(response[0]);
+								$('.buy-account-lookup-control').html(result);
+								generate_key();
+							}
+							else{
+								err=true;
+							}
+						}
+						if(err){
+							add_notify(l10n.errors.user_not_found,true);
+						}
+					});
+				}
+				else{
+					add_notify(l10n.errors.user_not_found,true);
+				}
+			}
+		});
+	});
+}
+function sell_account_control(){
+	if(0!=$('.control .sell-account-control').length){
+		let view=$('.sell-account-control');
+		let result='';
+		result+='<p><label class="input-descr">'+l10n.sell_account.login+':<br><input type="text" name="account_login" class="round" value="'+current_user+'"></label></p>';
+		result+='<p><label class="input-descr">'+l10n.sell_account.master_key+':<br><input type="text" name="master_key" class="round wide"></label></p>';
+		result+='<p><label class="input-descr">'+l10n.sell_account.seller+':<br><input type="text" name="seller_login" class="round"></label></p>';
+		result+='<p><label class="input-descr">'+l10n.sell_account.price+':<br><input type="text" name="price" class="round wide"></label></p>';
+		result+='<p><label class="input-descr"><input type="checkbox" name="on_sale" class="round"> &mdash; '+l10n.sell_account.on_sale+'</label></p>';
+		result+='<p><a class="sell-account-action button">'+l10n.sell_account.action+'</a></p>';
+		view.html(result);
+	}
+	if(0!=$('.control .sell-subaccount-control').length){
+		let view=$('.sell-subaccount-control');
+		let result='';
+		result+='<p><label class="input-descr">'+l10n.sell_subaccount.login+':<br><input type="text" name="account_login" class="round" value="'+current_user+'"></label></p>';
+		result+='<p><label class="input-descr">'+l10n.sell_subaccount.master_key+':<br><input type="text" name="master_key" class="round wide"></label></p>';
+		result+='<p><label class="input-descr">'+l10n.sell_subaccount.seller+':<br><input type="text" name="seller_login" class="round"></label></p>';
+		result+='<p><label class="input-descr">'+l10n.sell_subaccount.price+':<br><input type="text" name="price" class="round wide"></label></p>';
+		result+='<p><label class="input-descr"><input type="checkbox" name="on_sale" class="round"> &mdash; '+l10n.sell_subaccount.on_sale+'</label></p>';
+		result+='<p><a class="sell-subaccount-action button">'+l10n.sell_account.action+'</a>';
+		view.html(result);
+	}
+	if(0!=$('.control .buy-account-control').length){
+		let view=$('.buy-account-control');
+		let result='';
+		result+='<p><label class="input-descr">'+l10n.buy_account.login+':<br><input type="text" name="account_login" class="round"></label></p>';
+		result+='<p><a class="buy-account-lookup-action button">'+l10n.buy_account.lookup_action+'</a>';
+		result+='<div class="buy-account-lookup-control">';
+		result+='</div>';
+		view.html(result);
+		if(''!=window.location.hash){
+			$('.buy-account-control input[name=account_login]').val(window.location.hash.substring(1))
+			lookup_buy_account(window.location.hash.substring(1));
+		}
 	}
 }
 function create_account_control(){
@@ -2430,7 +2679,9 @@ function update_datetime(){
 $(window).on('hashchange',function(e){
 	e.preventDefault();
 	if(''!=window.location.hash){
-		$(window).scrollTop($(window.location.hash).offset().top - 64 - 12);
+		if($(window.location.hash).length>0){
+			$(window).scrollTop($(window.location.hash).offset().top - 64 - 12);
+		}
 	}
 	else{
 		$(window).scrollTop(0);
@@ -3349,6 +3600,46 @@ function app_mouse(e){
 					add_notify(l10n.global.error,true);
 				}
 			});
+		}
+	}
+	if($(target).hasClass('sell-account-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let master_key=$('.sell-account-control input[name=master_key]').val();
+			let account_login=$('.sell-account-control input[name=account_login]').val().toLowerCase();
+			let seller_login=$('.sell-account-control input[name=seller_login]').val().toLowerCase();
+			let price=$('.sell-account-control input[name=price]').val();
+			var on_sale=$('.sell-account-control input[name=on_sale]').prop('checked');
+			sell_account(master_key,account_login,seller_login,price,on_sale);
+		}
+	}
+	if($(target).hasClass('sell-subaccount-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let master_key=$('.sell-subaccount-control input[name=master_key]').val();
+			let account_login=$('.sell-subaccount-control input[name=account_login]').val().toLowerCase();
+			let seller_login=$('.sell-subaccount-control input[name=seller_login]').val().toLowerCase();
+			let price=$('.sell-subaccount-control input[name=price]').val();
+			var on_sale=$('.sell-subaccount-control input[name=on_sale]').prop('checked');
+			sell_subaccount(master_key,account_login,seller_login,price,on_sale);
+		}
+	}
+	if($(target).hasClass('buy-account-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let account_login=$('.buy-account-control input[name=account]').val().toLowerCase();
+			let account_offer_price=$('.buy-account-control input[name=account_offer_price]').val();
+			let token_to_shares=$('.buy-account-control input[name=token_to_shares]').val();
+			let public_key=$('.buy-account-control input[name=public]').val();
+			let private_key=$('.buy-account-control input[name=private]').val();
+			buy_account(account_login,account_offer_price,token_to_shares,public_key,private_key);
+		}
+	}
+	if($(target).hasClass('buy-account-lookup-action')){
+		e.preventDefault();
+		if($(target).closest('.control').length){
+			let account_login=$('.buy-account-control input[name=account_login]').val().toLowerCase();
+			lookup_buy_account(account_login);
 		}
 	}
 	if($(target).hasClass('reset-account-action')){
