@@ -38,19 +38,22 @@ if($block_id!=1){
 	$block_id++;
 }
 $work=true;
+$work_time=time();
 $current_block=$block_id;
 $dgp=$api->execute_method('get_dynamic_global_properties');
 print_r($dgp);
 $last_block=$dgp['head_block_number'];
 $sleep=0;
 while($work){
+	$current_block_time=0;
 	for(;$current_block<=$last_block;$current_block++){
 		$attempts=1;
 		$success=false;
 		$current_block_time=0;
 		while(!$success){
 			$current_block_time=microtime(true);
-			$block_data=$api->execute_method('get_ops_in_block',array($current_block,0));
+			//print 'Trying get_ops_in_block with '.($api->endpoint).' on #'.$current_block.' (used '.(round(memory_get_usage(true)/1024,2).'kb').')'.PHP_EOL;
+			$block_data=$api->execute_method('get_ops_in_block',array($current_block,0),false);
 			$success=$plugins->block($current_block,$block_data);
 			unset($block_data);
 			if(!$success){
@@ -64,7 +67,7 @@ while($work){
 			}
 			else{
 				$end_execute_time=microtime(true);
-				print 'SUCCESS block #'.$current_block.' (sleep '.($sleep/1000).'ms) ('.(int)(1000*($end_execute_time-$current_block_time)).'ms execute time)'.PHP_EOL;
+				print 'SUCCESS block #'.$current_block.' (sleep '.($sleep/1000).'ms) ('.(int)(1000*($end_execute_time-$current_block_time)).'ms execute time) (working '.(time() - $work_time).'s, '.(round((time() - $work_time)/60,2)).'m)'.PHP_EOL;
 			}
 			if(0==$current_block%100){
 				if(!file_exists($pid_file)){
