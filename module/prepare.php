@@ -259,6 +259,7 @@ function redis_add_feed($user,$content_id){
 		}
 		$offset_id=$redis->zrevrangebyscore('feed:'.$user,'+inf','-inf',array('limit'=>array($amount_limit,'1')));
 		if($offset_id){
+			trigger_error('Trying user: '.$user.' ('.gettype($user).'), offset_id: '.$offset_id.'  ('.gettype($offset_id).')');
 			$redis->zremrangebyscore('feed:'.$user,'-inf','('.$offset_id);
 		}
 	}
