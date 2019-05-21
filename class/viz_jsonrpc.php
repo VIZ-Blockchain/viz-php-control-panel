@@ -144,10 +144,22 @@ class viz_jsonrpc_web{
 		}
 		if($sock=fsockopen($host, $port, $errno, $errstr, 2)){//timeout=2
 			fwrite($sock,$request,strlen($request));
+			$read_timeout=microtime(true)+5;//+5sec
+			//print '$read_timeout='.$read_timeout.PHP_EOL;
 			while(!feof($sock)){
 				$result.=fread($sock,1024);
+				//print 'microtime(true)='.(microtime(true)).',$read_timeout='.$read_timeout.PHP_EOL;
+				if(microtime(true)>$read_timeout){
+					break;
+				}
 			}
 			fclose($sock);
+			if(microtime(true)>$read_timeout){
+				if($debug){
+					print '!!! SOCKET TIMED OUT 5 SEC ['.date('d.m.Y H:i:s').']'.PHP_EOL;
+				}
+				return false;
+			}
 		}
 		else{
 			return false;
@@ -217,7 +229,7 @@ class viz_jsonrpc_web{
 		else{
 			$jsonrpc_query=$this->build_method($method,$params);
 		}
-		$result=$this->get_url($this->endpoint,$jsonrpc_query);
+		$result=$this->get_url($this->endpoint,$jsonrpc_query,$debug);
 		if(false!==$result){
 			list($header,$result)=$this->parse_web_result($result);
 			if($debug||$this->debug){
