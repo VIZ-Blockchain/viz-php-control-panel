@@ -54,6 +54,7 @@ class viz_plugins{
 			if(method_exists($listener,'get_block')){
 				$listener->get_block($this->api->execute_method('get_block',array($id)));
 			}
+			print 'Execute listener plugin '.get_class($listener).', block: '.$id.''.PHP_EOL;
 			$listener->execute($id,$data);
 		}
 		unset($id);
